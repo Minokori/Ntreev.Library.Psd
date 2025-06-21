@@ -21,19 +21,19 @@ using System.Linq;
 using System.Text;
 
 namespace Ntreev.Library.Psd.Structures
-{
-    class StructureEnumerate : Properties
     {
+    class StructureEnumerate : Properties
+        {
         public StructureEnumerate()
             : base(2)
-        {
+            {
 
-        }
+            }
 
         public StructureEnumerate(PsdReader reader)
-        {
-            this.Add("Type", reader.ReadKey());
-            this.Add("Value", reader.ReadKey());
+            {
+            this.Add("Type", reader.ReadAsKey());
+            this.Add("Value", reader.ReadAsKey());
+            }
         }
     }
-}

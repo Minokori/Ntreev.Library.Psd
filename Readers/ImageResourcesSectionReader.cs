@@ -15,43 +15,32 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Psd.Readers;
-using Ntreev.Library.Psd.Readers.ImageResources;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
+namespace Ntreev.Library.Psd.Readers;
 
-namespace Ntreev.Library.Psd.Readers
+internal class ImageResourcesSectionReader(PsdReader reader) : LazyProperties(reader, null)
     {
-    class ImageResourcesSectionReader(PsdReader reader) : LazyProperties(reader, null)
+    protected override long InitStreamLength() => GlobalReader.ReadInt32();
+
+    protected override IProperties ReadValue()
         {
-        protected override long OnLengthGet(PsdReader reader)
+        Properties props = [];
+
+        while (GlobalReader.Position < EndPosition)
             {
-            return reader.ReadInt32();
+            GlobalReader.ValidateSignature();
+
+            var resourceID = GlobalReader.ReadInt16().ToString();
+            var name = GlobalReader.ReadAsPascalString(2);
+            long length = GlobalReader.ReadInt32();
+            length += length % 2;
+
+            var resourceReader = ReaderCollector.CreateReader(resourceID, GlobalReader, length);
+            var resourceName = ReaderCollector.GetDisplayName(resourceID);
+
+            props[resourceName] = resourceReader;
             }
 
-        protected override void ReadValue(PsdReader reader, object? userData, out IProperties value)
-            {
-            Properties props = [];
-
-            while (reader.Position < this.EndPosition)
-                {
-                reader.ValidateSignature();
-
-                string resourceID = reader.ReadInt16().ToString();
-                string name = reader.ReadPascalString(2);
-                long length = reader.ReadInt32();
-                length += (length % 2);
-
-                ResourceReaderBase resourceReader = ReaderCollector.CreateReader(resourceID, reader, length);
-                string resourceName = ReaderCollector.GetDisplayName(resourceID);
-
-                props[resourceName] = resourceReader;
-                }
-
-            value = props;
-            }
+        return props;
         }
     }
+

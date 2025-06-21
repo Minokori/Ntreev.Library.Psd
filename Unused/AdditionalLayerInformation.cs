@@ -15,12 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace Ntreev.Library.Psd
-    {
-    class AdditionalLayerInformation
-        {
-        private LinkedLayer[] _linkedLayers = [];
+namespace Ntreev.Library.Psd;
 
-        public LinkedLayer[] LinkedLayers { get => _linkedLayers; set => _linkedLayers = value; }
-        }
+internal class AdditionalLayerInformation
+    {
+    public LinkedLayer[] LinkedLayers { get; set; } = [];
     }
+

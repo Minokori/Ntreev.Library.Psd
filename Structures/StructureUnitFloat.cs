@@ -21,21 +21,21 @@ using System.Linq;
 using System.Text;
 
 namespace Ntreev.Library.Psd.Structures
-{
-    class StructureUnitFloat : Properties
     {
+    class StructureUnitFloat : Properties
+        {
         public StructureUnitFloat()
             : base(2)
-        {
+            {
 
-        }
+            }
 
         public StructureUnitFloat(PsdReader reader)
-        {
-            string type = reader.ReadType();
-          
+            {
+            string type = reader.ReadAsType();
+
             this.Add("Type", PsdUtility.ToUnitType(type));
             this.Add("Value", reader.ReadDouble());
+            }
         }
     }
-}

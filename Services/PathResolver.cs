@@ -14,20 +14,26 @@
 //WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-namespace Ntreev.Library.Psd;
 
-[AttributeUsage(AttributeTargets.Class)]
-internal class ResourceIDAttribute : Attribute
+namespace Ntreev.Library.Psd.Services;
+
+public class PathResolver : PsdUriResolver
     {
-    private string displayName;
+    private readonly Dictionary<Uri, PsdDocument> uriToDocuments = [];
 
-    public ResourceIDAttribute(string resourceID) => ID = resourceID;
-
-    public string ID { get; }
-
-    public string DisplayName
+    public override PsdDocument GetDocument(Uri absoluteUri)
         {
-        get => string.IsNullOrEmpty(this.displayName) == true ? ID : displayName; set => displayName = value;
+        var filename = absoluteUri.LocalPath;
+        if (File.Exists(filename) == false)
+            throw new FileNotFoundException(string.Format("{0} 파일을 찾을 수 없습니다.", filename), filename);
+
+        if (uriToDocuments.ContainsKey(absoluteUri) == false)
+            {
+            var document = PsdDocument.Create(filename);
+            uriToDocuments.Add(absoluteUri, document);
+            }
+
+        return uriToDocuments[absoluteUri];
         }
     }
 

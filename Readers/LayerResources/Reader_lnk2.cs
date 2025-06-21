@@ -15,21 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Ntreev.Library.Psd.Attributes;
+namespace Ntreev.Library.Psd.Readers.LayerResources;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources
-{
-    [ResourceID("lnk2")]
-    class Reader_lnk2 : Reader_lnkD
+[ResourceID("lnk2")]
+internal class Reader_lnk2 : Reader_lnkD
     {
-        public Reader_lnk2(PsdReader reader, long length)
-            : base(reader, length)
+    public Reader_lnk2(PsdReader reader, long length)
+        : base(reader, length)
         {
 
         }
     }
-}
+

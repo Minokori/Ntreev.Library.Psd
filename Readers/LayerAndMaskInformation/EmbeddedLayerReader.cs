@@ -15,77 +15,57 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation
-{
-    class EmbeddedLayerReader : ValueReader<EmbeddedLayer>
+internal class EmbeddedLayerReader(PsdReader reader) : ValueReader<EmbeddedLayer>(reader, true, null)
     {
-        public EmbeddedLayerReader(PsdReader reader)
-            : base(reader, true, null)
+    protected override long InitStreamLength() => (GlobalReader.ReadInt64() + 3) & (~3);
+
+    private Uri ReadAboluteUri(PsdReader reader)
         {
-            
+        var props = new DescriptorStructure(reader);
+        if (props.Contains("fullPath") == true)
+            {
+            var absoluteUri = new Uri(props["fullPath"] as string);
+            if (File.Exists(absoluteUri.LocalPath) == true)
+                return absoluteUri;
+            }
+
+        if (props.Contains("relPath") == true)
+            {
+            var relativePath = props["relPath"] as string;
+            var absoluteUri = PsdReader.Resolver.ResolveUri(reader.Uri, relativePath);
+            if (File.Exists(absoluteUri.LocalPath) == true)
+                return absoluteUri;
+            }
+
+        if (props.Contains("Nm") == true)
+            {
+            var name = props["Nm"] as string;
+            var absoluteUri = PsdReader.Resolver.ResolveUri(reader.Uri, name);
+            if (File.Exists(absoluteUri.LocalPath) == true)
+                return absoluteUri;
+            }
+
+        return props.Contains("fullPath") == true ? new Uri(props["fullPath"] as string) : null;
         }
 
-        protected override long OnLengthGet(PsdReader reader)
+    protected override EmbeddedLayer ReadValue()
         {
-            return (reader.ReadInt64() + 3) & (~3);
-        }
+        GlobalReader.ValidateSignature("liFE");
 
-        private Uri ReadAboluteUri(PsdReader reader)
-        {
-            IProperties props = new DescriptorStructure(reader);
-            if (props.Contains("fullPath") == true)
-            {
-                Uri absoluteUri = new Uri(props["fullPath"] as string);
-                if (File.Exists(absoluteUri.LocalPath) == true)
-                    return absoluteUri;
-            }
+        var version = GlobalReader.ReadInt32();
 
-            if (props.Contains("relPath") == true)
-            {
-                string relativePath = props["relPath"] as string;
-                Uri absoluteUri = reader.Resolver.ResolveUri(reader.Uri, relativePath);
-                if (File.Exists(absoluteUri.LocalPath) == true)
-                    return absoluteUri;
-            }
+        var id = new Guid(GlobalReader.ReadAsPascalString(1));
+        var name = GlobalReader.ReadString();
+        var type = GlobalReader.ReadAsType();
+        var creator = GlobalReader.ReadAsType();
 
-            if (props.Contains("Nm") == true)
-            {
-                string name = props["Nm"] as string;
-                Uri absoluteUri = reader.Resolver.ResolveUri(reader.Uri, name);
-                if (File.Exists(absoluteUri.LocalPath) == true)
-                    return absoluteUri;
-            }
+        var length = GlobalReader.ReadInt64();
+        IProperties? properties = GlobalReader.ReadBoolean() == true ? new DescriptorStructure(GlobalReader) : null;
+        var absoluteUri = ReadAboluteUri(GlobalReader);
 
-            if (props.Contains("fullPath") == true)
-            {
-                return new Uri(props["fullPath"] as string);
-            }
-
-            return null;
-        }
-
-        protected override void ReadValue(PsdReader reader, object userData, out EmbeddedLayer value)
-        {
-            reader.ValidateSignature("liFE");
-
-            int version = reader.ReadInt32();
-            
-            Guid id = new Guid(reader.ReadPascalString(1));
-            string name = reader.ReadString();
-            string type = reader.ReadType();
-            string creator = reader.ReadType();
-
-            long length = reader.ReadInt64();
-            IProperties properties = reader.ReadBoolean() == true ? new DescriptorStructure(reader) : null;
-            Uri absoluteUri = this.ReadAboluteUri(reader);
-
-            value = new EmbeddedLayer(id, reader.Resolver, absoluteUri);
+        return new EmbeddedLayer(id, absoluteUri);
         }
     }
-}
+

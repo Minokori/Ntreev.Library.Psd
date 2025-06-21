@@ -15,38 +15,36 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.ReadersPrototype;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources
-{
-    [ResourceID("PlLd")]
-    class Reader_PlLd : ResourceReaderBase
+namespace Ntreev.Library.Psd.Readers.LayerResources;
+
+[ResourceID("PlLd")]
+internal class Reader_PlLd : ResourceReaderBase
     {
-        public Reader_PlLd(PsdReader reader, long length)
-            : base(reader, length)
+    public Reader_PlLd(PsdReader reader, long length)
+        : base(reader, length)
         {
 
         }
 
-        protected override void ReadValue(PsdReader reader, object userData, out IProperties value)
+    protected override IProperties ReadValue()
         {
-            Properties props = new Properties();
+        Properties props = [];
 
-            reader.ValidateType("plcL", "LayerResource PlLd");
-            props["Version"] = reader.ReadInt32();
-            props["UniqueID"] = reader.ReadPascalString(1);
-            props["PageNumbers"] = reader.ReadInt32();
-            props["Pages"] = reader.ReadInt32();
-            props["AntiAlias"] = reader.ReadInt32();
-            props["LayerType"] = reader.ReadInt32();
-            props["Transformation"] = reader.ReadDoubles(8);
-            reader.ValidateInt32(0, "WarpVersion");
-            props["Warp"] = new DescriptorStructure(reader);
+        GlobalReader.ValidateType("plcL", "LayerResource PlLd");
+        props["Version"] = GlobalReader.ReadInt32();
+        props["UniqueID"] = GlobalReader.ReadAsPascalString(1);
+        props["PageNumbers"] = GlobalReader.ReadInt32();
+        props["Pages"] = GlobalReader.ReadInt32();
+        props["AntiAlias"] = GlobalReader.ReadInt32();
+        props["LayerType"] = GlobalReader.ReadInt32();
+        props["Transformation"] = GlobalReader.ReadDoubles(8);
+        GlobalReader.ValidateInt32(0, "WarpVersion");
+        props["Warp"] = new DescriptorStructure(GlobalReader);
 
-            value = props;
+        return props;
         }
     }
-}
+

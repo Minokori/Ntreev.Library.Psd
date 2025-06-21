@@ -15,19 +15,26 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace Ntreev.Library.Psd.Exceptions;
 
-namespace Ntreev.Library.Psd.Readers
-{
-    abstract class ResourceReaderBase : LazyProperties
+internal class InvalidFormatException : Exception
     {
-        public ResourceReaderBase(PsdReader reader, long length)
-            : base(reader, length, null)
+    public InvalidFormatException()
+        : base("Invalid PSD file")
+        {
+
+        }
+
+    public InvalidFormatException(string message)
+        : base(message)
+        {
+
+        }
+
+    public InvalidFormatException(string format, params object[] args)
+        : base(string.Format(format, args))
         {
 
         }
     }
-}
+

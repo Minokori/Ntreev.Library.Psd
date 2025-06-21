@@ -1,42 +1,35 @@
+using Ntreev.Library.Psd.Exceptions;
+using Ntreev.Library.Psd.Services;
 namespace Ntreev.Library.Psd;
 
-partial class PsdReader
+internal partial class PsdReader
     {
 
-    public long Position
-        {
-        get => _reader.BaseStream.Position;
-        set => _reader.BaseStream.Position = value;
-        }
+    //public long StartPosition
+    //    {
+    //    get => _reader.BaseStream.StartPosition;
+    //    set => _reader.BaseStream.StartPosition = value;
+    //    }
 
-    public long Length => _reader.BaseStream.Length;
+    //public long StreamLength => _reader.BaseStream.StreamLength;
 
-    public int Version
-        {
-        get => _version;
-        set
-            {
-            if (value != 1 && value != 2)
-                throw new InvalidFormatException();
+    //public int Version
+    //    {
+    //    get => field;
+    //    set
+    //        {
+    //        if (value is not 1 and not 2)
+    //            throw new InvalidFormatException();
 
-            _version = value;
-            }
-        }
+    //        field = value;
+    //        }
+    //    }
 
-    public PsdUriResolver Resolver
-        {
-        get => _resolver;
-        }
+    //public PsdUriResolver Resolver { get; } = resolver;
 
-    public Stream Stream
-        {
-        get => _stream;
-        }
+    //public Stream Stream { get; } = stream;
 
-    public Uri Uri
-        {
-        get => _uri;
-        }
+    //public Uri Uri { get; init; } = uri;
     }
 
 

@@ -15,59 +15,42 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation
-{
-    class DocumentResourceReader : LazyProperties
+internal class DocumentResourceReader : LazyProperties
     {
-        private static string[] doubleTypeKeys = { "LMsk", "Lr16", "Lr32", "Layr", "Mt16", "Mt32", "Mtrn", "Alph", "FMsk", "lnk2", "FEid", "FXid", "PxSD", "lnkE", "extd", };
+    private static string[] doubleTypeKeys = { "LMsk", "Lr16", "Lr32", "Layr", "Mt16", "Mt32", "Mtrn", "Alph", "FMsk", "lnk2", "FEid", "FXid", "PxSD", "lnkE", "extd", };
 
-        public DocumentResourceReader(PsdReader reader, long length)
-            : base(reader, length, null)
+    public DocumentResourceReader(PsdReader reader, long length)
+        : base(reader, length, null)
         {
 
         }
 
-        protected override void ReadValue(PsdReader reader, object userData, out IProperties value)
+    protected override IProperties ReadValue()
         {
-            Properties props = new Properties();
+        Properties props = [];
 
-            while (reader.Position < this.EndPosition)
+        while (GlobalReader.Position < this.EndPosition)
             {
-                reader.ValidateSignature(true);
-                string resourceID = reader.ReadType();
-                long length = this.ReadLength(reader, resourceID);
+            GlobalReader.ValidateSignature(true);
+            var resourceID = GlobalReader.ReadAsType();
+            var length = this.ReadLength(GlobalReader, resourceID);
 
-                ResourceReaderBase resourceReader = ReaderCollector.CreateReader(resourceID, reader, length);
-                string resourceName = ReaderCollector.GetDisplayName(resourceID);
+            var resourceReader = ReaderCollector.CreateReader(resourceID, GlobalReader, length);
+            var resourceName = ReaderCollector.GetDisplayName(resourceID);
 
-                props[resourceName] = resourceReader;
+            props[resourceName] = resourceReader;
             }
 
-            value = props;
+        return props;
         }
 
-        private long ReadLength(PsdReader reader, string resourceID)
+    private long ReadLength(PsdReader reader, string resourceID)
         {
-            long length = 0;
-            if (doubleTypeKeys.Contains(resourceID) && reader.Version == 2)
-            {
-                length = reader.ReadInt64();
-            }
-            else if(reader.Version == 2)
-            {
-                length = reader.ReadInt64();
-            }
-            else
-            {
-                length = reader.ReadInt32();
-            }
-
-            return (length + 3) & (~3);
+        var length = doubleTypeKeys.Contains(resourceID) && reader.Version == 2
+            ? reader.ReadInt64()
+            : reader.Version == 2 ? reader.ReadInt64() : reader.ReadInt32();
+        return (length + 3) & (~3);
         }
     }
-}

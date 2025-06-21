@@ -1,135 +1,81 @@
-//Released under the MIT License.
-//
-//Copyright (c) 2015 Ntreev Soft co., Ltd.
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
-//rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
-//persons to whom the Software is furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in all copies or substantial portions of the 
-//Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
-//WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-//OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Ntreev.Library.Psd
+namespace Ntreev.Library.Psd;
+
+internal class Properties(int capacity = 0) : Dictionary<string, object>(capacity), IProperties
     {
-    class Properties : IProperties
+    public bool Contains(string property)
         {
-        private readonly Dictionary<string, object> props;
+        var subKeys = property.Split(['.', '[', ']'], StringSplitOptions.RemoveEmptyEntries);
 
-        public Properties()
+        object value = this;
+
+        foreach (var item in subKeys)
             {
-            this.props = [];
-            }
-
-        public Properties(int capacity)
-            {
-            this.props = new Dictionary<string, object>(capacity);
-            }
-
-        public void Add(string key, object value)
-            {
-            this.props.Add(key, value);
-            }
-
-        public bool Contains(string property)
-            {
-            string[] ss = property.Split(new char[] { '.', '[', ']', }, StringSplitOptions.RemoveEmptyEntries);
-
-            object value = this.props;
-
-            foreach (var item in ss)
+            if ((value is ArrayList) == true)
                 {
-                if (value is ArrayList == true)
-                    {
-                    ArrayList arrayList = value as ArrayList;
-                    int index;
-                    if (int.TryParse(item, out index) == false)
-                        return false;
-                    if (index >= arrayList.Count)
-                        return false;
-                    value = arrayList[index];
-                    }
-                else if (value is IDictionary<string, object> == true)
-                    {
-                    IDictionary<string, object> props = value as IDictionary<string, object>;
-                    if (props.ContainsKey(item) == false)
-                        {
-                        return false;
-                        }
-
-                    value = props[item];
-                    }
-
+                var arrayList = value as ArrayList;
+                if (int.TryParse(item, out var index) == false)
+                    return false;
+                if (index >= arrayList.Count)
+                    return false;
+                value = arrayList[index];
                 }
-            return true;
-            }
-
-        private object GetProperty(string property)
-            {
-            string[] ss = property.Split(new char[] { '.', '[', ']', }, StringSplitOptions.RemoveEmptyEntries);
-
-            object value = this.props;
-
-            foreach (var item in ss)
+            else if ((value is IDictionary<string, object>) == true)
                 {
-                if (value is ArrayList == true)
+                var props = value as IDictionary<string, object>;
+                if (props.ContainsKey(item) == false)
                     {
-                    ArrayList arrayList = value as ArrayList;
-                    value = arrayList[int.Parse(item)];
+                    return false;
                     }
-                else if (value is IDictionary<string, object> == true)
-                    {
-                    IDictionary<string, object> props = value as IDictionary<string, object>;
-                    value = props[item];
-                    }
-                else if (value is IProperties == true)
-                    {
-                    IProperties props = value as IProperties;
-                    value = props[item];
-                    }
-                }
-            return value;
-            }
 
-        public int Count
-            {
-            get { return this.props.Count; }
-            }
-
-        public object this[string property]
-            {
-            get
-                {
-                return this.GetProperty(property);
-                }
-            set
-                {
-                this.props[property] = value;
+                value = props[item];
                 }
             }
 
-        #region IProperties
-
-        IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
-            {
-            return this.props.GetEnumerator();
-            }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-            return this.props.GetEnumerator();
-            }
-
-        #endregion
+        return true;
         }
+
+    private object GetProperty(string property)
+        {
+        var ss = property.Split(['.', '[', ']'], StringSplitOptions.RemoveEmptyEntries);
+
+        object value = this;
+
+        foreach (var item in ss)
+            {
+            if ((value is ArrayList) == true)
+                {
+                var arrayList = value as ArrayList;
+                value = arrayList[int.Parse(item)];
+                }
+            else if ((value is IDictionary<string, object>) == true)
+                {
+                var props = value as IDictionary<string, object>;
+                value = props[item];
+                }
+            else if ((value is IProperties) == true)
+                {
+                var props = value as IProperties;
+                value = props[item];
+                }
+            }
+
+        return value;
+        }
+    public new object this[string property]
+        {
+        get => GetProperty(property);
+        set => Add(property, value);
+        }
+
+    #region IProperties
+
+    IEnumerator<KeyValuePair<string, object>> IEnumerable<
+        KeyValuePair<string, object>
+    >.GetEnumerator() => GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    #endregion
     }

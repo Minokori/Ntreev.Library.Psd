@@ -26,28 +26,25 @@ namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 /// <param name="reader"></param>
 /// <param name="length"></param>
 /// <param name="layer">Channels</param>
-class ChannelsReader(PsdReader reader, long length, PsdLayer layer) : LazyValueReader<Channel[]>(reader, length, layer)
+internal class ChannelsReader(PsdReader reader, long length, PsdLayer layer) : LazyValueReader<Channel[]>(reader, length, layer)
     {
-    protected override void ReadValue(PsdReader reader, object userData, out Channel[] value)
+    protected override Channel[] ReadValue()
         {
-        PsdLayer layer = userData as PsdLayer;
-        LayerRecords records = layer.Records;
+        var layer = UserData as PsdLayer;
+        var records = layer.Records;
 
-        using (MemoryStream stream = new(reader.ReadBytes((int)this.Length)))
-        using (PsdReader r = new(stream, reader.Resolver, reader.Uri))
-            {
-            r.Version = reader.Version;
-            ReadValue(r, layer.Depth, records.Channels);
-            }
-
-        value = records.Channels;
+        using MemoryStream stream = new(GlobalReader.ReadBytes((int)StreamLength));
+        using PsdReader r = new(stream) { Uri = GlobalReader.Uri };
+        r.Version = GlobalReader.Version;
+        ReadValue(r, layer.Depth, records.Channels);
+        return records.Channels;
         }
 
     private static void ReadValue(PsdReader reader, int depth, Channel[] channels)
         {
         foreach (var item in channels)
             {
-            CompressionType compressionType = reader.ReadCompressionType();
+            var compressionType = reader.ReadCompressionType();
             item.ReadHeader(reader, compressionType);
             item.Read(reader, depth, compressionType);
             }

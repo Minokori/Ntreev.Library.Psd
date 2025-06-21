@@ -16,41 +16,28 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-namespace Ntreev.Library.Psd
+namespace Ntreev.Library.Psd;
+
+/// <summary>
+/// 针对 <see cref="IProperties"/> 的懒加载实现"/>
+/// </summary>
+internal abstract class LazyProperties : LazyValueReader<IProperties>, IProperties
     {
-    abstract class LazyProperties : LazyValueReader<IProperties>, IProperties
-        {
-        protected LazyProperties(PsdReader reader, object? userData) : base(reader, userData) { }
+    protected LazyProperties(PsdReader reader, object? userData) : base(reader, userData) { }
 
-        protected LazyProperties(PsdReader reader, long length, object? userData) : base(reader, length, userData) { }
+    protected LazyProperties(PsdReader reader, long length, object? userData) : base(reader, length, userData) { }
 
-        public bool Contains(string property)
-            {
-            return this.Value.Contains(property);
-            }
+    public bool Contains(string property) => Value.Contains(property);
 
-        public object this[string property]
-            {
-            get { return this.Value[property]; }
-            }
+    public object this[string property] => Value[property];
 
-        public int Count
-            {
-            get { return this.Value.Count; }
-            }
+    public int Count => Value.Count;
 
-        #region IProperties
+    #region IProperties
 
-        IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
-            {
-            return (this.Value as IProperties).GetEnumerator();
-            }
+    IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator() => Value.GetEnumerator();
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-            return (this.Value as IProperties).GetEnumerator();
-            }
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => Value.GetEnumerator();
 
-        #endregion
-        }
+    #endregion
     }

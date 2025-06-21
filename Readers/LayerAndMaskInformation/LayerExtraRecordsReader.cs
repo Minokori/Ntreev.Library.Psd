@@ -15,43 +15,35 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation
+internal class LayerExtraRecordsReader : ValueReader<LayerRecords>
     {
-    class LayerExtraRecordsReader : ValueReader<LayerRecords>
+    private LayerExtraRecordsReader(PsdReader reader, LayerRecords records)
+        : base(reader, true, records)
         {
-        private LayerExtraRecordsReader(PsdReader reader, LayerRecords records)
-            : base(reader, true, records)
-            {
 
-            }
+        }
 
-        public static LayerRecords Read(PsdReader reader, LayerRecords records)
-            {
-            LayerExtraRecordsReader instance = new(reader, records);
-            return instance.Value;
-            }
+    public static LayerRecords Read(PsdReader reader, LayerRecords records)
+        {
+        LayerExtraRecordsReader instance = new(reader, records);
+        return instance.Value;
+        }
 
-        protected override long OnLengthGet(PsdReader reader)
-            {
-            return reader.ReadUInt32();
-            }
+    protected override long InitStreamLength() => GlobalReader.ReadUInt32();
 
-        protected override void ReadValue(PsdReader reader, object userData, out LayerRecords value)
-            {
-            LayerRecords records = userData as LayerRecords;
-            LayerMask mask = LayerMaskReader.Read(reader);
-            LayerBlendingRanges blendingRanges = LayerBlendingRangesReader.Read(reader);
-            string name = reader.ReadPascalString(4);
-            IProperties resources = new LayerResourceReader(reader, this.EndPosition - reader.Position);
+    protected override LayerRecords ReadValue()
+        {
+        var records = UserData as LayerRecords;
+        var mask = LayerMaskReader.Read(GlobalReader);
+        var blendingRanges = LayerBlendingRangesReader.Read(GlobalReader);
+        var name = GlobalReader.ReadAsPascalString(4);
+        IProperties resources = new LayerResourceReader(GlobalReader, EndPosition - GlobalReader.Position);
 
-            records.SetExtraRecords(mask, blendingRanges, resources, name);
+        records.SetExtraRecords(mask, blendingRanges, resources, name);
 
-            value = records;
-            }
+        return records;
         }
     }
+

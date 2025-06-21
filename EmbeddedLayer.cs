@@ -1,92 +1,46 @@
-//Released under the MIT License.
-//
-//Copyright (c) 2015 Ntreev Soft co., Ltd.
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
-//rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
-//persons to whom the Software is furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in all copies or substantial portions of the 
-//Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
-//WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-//OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+using Ntreev.Library.Psd.Services;
 
-using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+namespace Ntreev.Library.Psd;
 
-namespace Ntreev.Library.Psd
-{
-    class EmbeddedLayer : ILinkedLayer
+
+/// <summary>
+/// 植入的其他 PSD document.
+/// </summary>
+internal class EmbeddedLayer : ILinkedLayer
     {
-        private readonly Guid id;
-        private readonly PsdUriResolver resolver;
-        private readonly Uri absoluteUri;
-        private PsdDocument document;
-        private readonly int width;
-        private readonly int height;
-        
-        public EmbeddedLayer(Guid id, PsdUriResolver resolver, Uri absoluteUri)
-        {
-            this.id = id;
-            this.resolver = resolver;
-            this.absoluteUri = absoluteUri;
+    private readonly PsdUriResolver resolver = PsdService.Resolver;
 
-            if (File.Exists(this.absoluteUri.LocalPath) == true)
+    public EmbeddedLayer(Guid id, Uri absoluteUri)
+        {
+        ID = id;
+        AbsoluteUri = absoluteUri;
+
+        if (File.Exists(AbsoluteUri.LocalPath) == true)
             {
-                var header = FileHeaderSection.FromFile(this.absoluteUri.LocalPath);
-                this.width = header.Width;
-                this.height = header.Height;
+            var header = FileHeaderSection.FromFile(this.AbsoluteUri.LocalPath);
+            Width = header.Width;
+            Height = header.Height;
             }
         }
 
-        public PsdDocument Document
+    public PsdDocument Document
         {
-            get
+        get
             {
-                if (this.document == null)
-                {
-                    this.document = this.resolver.GetDocument(this.absoluteUri);
-                }
-                return this.document;
+            field ??= resolver.GetDocument(this.AbsoluteUri);
+            return field;
             }
         }
 
-        public Uri AbsoluteUri
-        {
-            get { return this.absoluteUri; }
-        }
+    public Uri AbsoluteUri { get; }
 
-        public bool HasDocument
-        {
-            get { return File.Exists(this.absoluteUri.LocalPath); }
-        }
+    public bool HasDocument => File.Exists(this.AbsoluteUri.LocalPath);
 
-        public Guid ID
-        {
-            get { return this.id; }
-        }
+    public Guid ID { get; }
 
-        public string Name
-        {
-            get { return this.absoluteUri.LocalPath; }
-        }
+    public string Name => this.AbsoluteUri.LocalPath;
 
-        public int Width
-        {
-            get { return this.width; }
-        }
+    public int Width { get; }
 
-        public int Height
-        {
-            get { return this.height; }
-        }
+    public int Height { get; }
     }
-}

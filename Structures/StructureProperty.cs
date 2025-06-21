@@ -21,20 +21,20 @@ using System.Linq;
 using System.Text;
 
 namespace Ntreev.Library.Psd.Structures
-{
-    class StructureProperty : Properties
     {
+    class StructureProperty : Properties
+        {
         public StructureProperty()
             : base(3)
-        {
+            {
 
-        }
+            }
 
         public StructureProperty(PsdReader reader)
-        {
+            {
             this.Add("Name", reader.ReadString());
-            this.Add("ClassID", reader.ReadKey());
-            this.Add("KeyID", reader.ReadKey());
+            this.Add("ClassID", reader.ReadAsKey());
+            this.Add("KeyID", reader.ReadAsKey());
+            }
         }
     }
-}

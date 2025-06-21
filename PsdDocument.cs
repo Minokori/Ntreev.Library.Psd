@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Library.Psd.Readers;
+using Ntreev.Library.Psd.Services;
 
 namespace Ntreev.Library.Psd;
 
@@ -50,7 +51,7 @@ public partial class PsdDocument : IPsdLayer, IDisposable
 
     internal void Read(Stream stream, PsdUriResolver resolver, Uri uri)
         {
-        this.reader = new PsdReader(stream, resolver, uri);
+        reader = new PsdReader(stream) { Uri = uri };
         this.reader.ReadDocumentHeader();
         this.fileHeaderSection = new FileHeaderSectionReader(this.reader);
         this.colorModeDataSection = new ColorModeDataSectionReader(this.reader);

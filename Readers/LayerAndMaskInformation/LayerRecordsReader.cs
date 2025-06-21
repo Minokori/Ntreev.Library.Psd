@@ -15,59 +15,54 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation
+internal class LayerRecordsReader : ValueReader<LayerRecords>
     {
-    class LayerRecordsReader : ValueReader<LayerRecords>
+    private LayerRecordsReader(PsdReader reader)
+        : base(reader, false, null)
         {
-        private LayerRecordsReader(PsdReader reader)
-            : base(reader, false, null)
-            {
 
+        }
+
+    public static LayerRecords Read(PsdReader reader)
+        {
+        LayerRecordsReader instance = new(reader);
+        return instance.Value;
+        }
+
+    protected override LayerRecords ReadValue()
+        {
+        LayerRecords records = new()
+            {
+            Top = GlobalReader.ReadInt32(),
+            Left = GlobalReader.ReadInt32(),
+            Bottom = GlobalReader.ReadInt32(),
+            Right = GlobalReader.ReadInt32()
+            };
+        records.ValidateSize();
+
+        int channelCount = GlobalReader.ReadUInt16();
+
+        records.ChannelCount = channelCount;
+
+        for (var i = 0; i < channelCount; i++)
+            {
+            records.Channels[i].Type = GlobalReader.ReadChannelType();
+            records.Channels[i].Size = GlobalReader.ReadLength();
+            records.Channels[i].Width = records.Width;
+            records.Channels[i].Height = records.Height;
             }
 
-        public static LayerRecords Read(PsdReader reader)
-            {
-            LayerRecordsReader instance = new(reader);
-            return instance.Value;
-            }
+        GlobalReader.ValidateSignature();
 
-        protected override void ReadValue(PsdReader reader, object userData, out LayerRecords value)
-            {
-            LayerRecords records = new()
-                {
-                Top = reader.ReadInt32(),
-                Left = reader.ReadInt32(),
-                Bottom = reader.ReadInt32(),
-                Right = reader.ReadInt32()
-                };
-            records.ValidateSize();
+        records.BlendMode = GlobalReader.ReadBlendMode();
+        records.Opacity = GlobalReader.ReadByte();
+        records.Clipping = GlobalReader.ReadBoolean();
+        records.Flags = GlobalReader.ReadLayerFlags();
+        records.Filter = GlobalReader.ReadByte();
 
-            int channelCount = reader.ReadUInt16();
-
-            records.ChannelCount = channelCount;
-
-            for (int i = 0; i < channelCount; i++)
-                {
-                records.Channels[i].Type = reader.ReadChannelType();
-                records.Channels[i].Size = reader.ReadLength();
-                records.Channels[i].Width = records.Width;
-                records.Channels[i].Height = records.Height;
-                }
-
-            reader.ValidateSignature();
-
-            records.BlendMode = reader.ReadBlendMode();
-            records.Opacity = reader.ReadByte();
-            records.Clipping = reader.ReadBoolean();
-            records.Flags = reader.ReadLayerFlags();
-            records.Filter = reader.ReadByte();
-
-            value = records;
-            }
+        return records;
         }
     }
+

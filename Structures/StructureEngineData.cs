@@ -15,186 +15,191 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Ntreev.Library.Psd.Structures
-{
-    class StructureEngineData : Properties
+namespace Ntreev.Library.Psd.Structures;
+
+internal class StructureEngineData : Properties
     {
-        public StructureEngineData(PsdReader reader)
+    public StructureEngineData(PsdReader reader)
         {
-            int length = reader.ReadInt32();
-            reader.Skip('\n', 2);
-            this.ReadProperties(reader, 0, this);
+        var length = reader.ReadInt32();
+        reader.Skip('\n', 2);
+        this.ReadProperties(reader, 0, this);
         }
 
-        private void ReadProperties(PsdReader reader, int level, Properties props)
+    private void ReadProperties(PsdReader reader, int level, Properties props)
         {
+        reader.Skip('\t', level);
+        var c = reader.ReadChar();
+        if (c == ']')
+            {
+            return;
+            }
+        else if (c == '<')
+            {
+            reader.Skip('<');
+            }
+
+        reader.Skip('\n');
+        //Properties properties = new Properties();
+        while (true)
+            {
             reader.Skip('\t', level);
-            char c = reader.ReadChar();
-            if (c == ']')
-            {
+            c = reader.ReadChar();
+            if (c == '>')
+                {
+                reader.Skip('>');
                 return;
-            }
-            else if (c == '<')
-            {
-                reader.Skip('<');
-            }
-            reader.Skip('\n');
-            //Properties props = new Properties();
-            while (true)
-            {
-                reader.Skip('\t', level);
-                c = reader.ReadChar();
-                if (c == '>')
-                {
-                    reader.Skip('>');
-                    return;
                 }
-                else
+            else
                 {
-                    //assert c == 9;
+                //assert c == 9;
+                c = reader.ReadChar();
+                //assert c == '/' : "unknown char: " + c + " on level: " + level;
+                var name = string.Empty;
+                while (true)
+                    {
                     c = reader.ReadChar();
-                    //assert c == '/' : "unknown char: " + c + " on level: " + level;
-                    string name = string.Empty;
-                    while (true)
-                    {
-                        c = reader.ReadChar();
-                        if (c == ' ' || c == 10)
+                    if (c is ' ' or (char)10)
                         {
-                            break;
+                        break;
                         }
-                        name += c;
+
+                    name += c;
                     }
-                    if (c == 10)
+
+                if (c == 10)
                     {
-                        Properties p = new Properties();
-                        this.ReadProperties(reader, level + 1, p);
-                        if (p.Count > 0)
-                            props.Add(name, p);
-                        reader.Skip('\n');
+                    Properties p = [];
+                    this.ReadProperties(reader, level + 1, p);
+                    if (p.Count > 0)
+                        props.Add(name, p);
+                    reader.Skip('\n');
                     }
-                    else if (c == ' ')
+                else if (c == ' ')
                     {
-                        object value = this.ReadValue(reader, level + 1);
-                        props.Add(name, value);
+                    var value = this.ReadValue(reader, level + 1);
+                    props.Add(name, value);
                     }
-                    else
+                else
                     {
-                        //assert false;
+                    //assert false;
                     }
                 }
             }
         }
-
-        private object ReadValue(PsdReader reader, int level)
+    // BUG
+    private object ReadValue(PsdReader reader, int level)
         {
-            char c = reader.ReadChar();
-            if (c == ']')
+        var c = reader.ReadChar();
+        if (c == ']')
             {
-                return null;
+            return null;
             }
-            else if (c == '(')
+        else if (c == '(')
             {
-                // unicode string
-                string text = string.Empty;
-                int stringSignature = reader.ReadInt16() & 0xFFFF;
-                //assert stringSignature == 0xFEFF;
-                while (true)
+            // unicode string
+            var text = string.Empty;
+
+            var stringSignature = reader.ReadInt16() & 0xFFFF;
+
+            //assert stringSignature == 0xFEFF;
+            while (true)
                 {
-                    char b1 = reader.ReadChar();
-                    if (b1 == ')')
+                var b1 = reader.ReadChar();
+                if (b1 == ')')
                     {
-                        reader.Skip('\n');
-                        return text;
+                    reader.Skip('\n');
+                    return text;
                     }
-                    char b2 = reader.ReadChar();
-                    if (b2 == '\\')
+
+                var b2 = reader.ReadChar();
+                if (b2 == '\\')
                     {
-                        b2 = reader.ReadChar();
+                    b2 = reader.ReadChar();
                     }
-                    if (b2 == 13)
+
+                if (b2 == 13)
                     {
-                        text += '\n';
+                    text += '\n';
                     }
-                    else
+                else
                     {
-                        text += (char)((b1 << 8) | b2);
+                    text += (char)((b1 << 8) | b2);
                     }
                 }
             }
-            else if (c == '[')
+        else if (c == '[')
             {
-                ArrayList list = new ArrayList();
-                // array
+            ArrayList list = [];
+            // array
+            c = reader.ReadChar();
+            while (true)
+                {
+                if (c == ' ')
+                    {
+                    var val = this.ReadValue(reader, level);
+                    if (val == null)
+                        {
+                        reader.Skip('\n');
+                        return list;
+                        }
+                    else
+                        {
+                        list.Add(val);
+                        }
+                    }
+                else if (c == 10)
+                    {
+                    Properties p = [];
+                    this.ReadProperties(reader, level, p);
+                    reader.Skip('\n');
+                    if (p.Count == 0)
+                        {
+                        return list;
+                        }
+                    else
+                        {
+                        list.Add(p);
+                        }
+                    }
+                else
+                    {
+                    //assert false;
+                    }
+                }
+            }
+        else
+            {
+            var value = string.Empty;
+            do
+                {
+                value += c;
                 c = reader.ReadChar();
-                while (true)
-                {
-                    if (c == ' ')
-                    {
-                        object val = this.ReadValue(reader, level);
-                        if (val == null)
-                        {
-                            reader.Skip('\n');
-                            return list;
-                        }
-                        else
-                        {
-                            list.Add(val);
-                        }
-                    }
-                    else if (c == 10)
-                    {
-                        Properties p = new Properties();
-                        this.ReadProperties(reader, level, p);
-                        reader.Skip('\n');
-                        if (p.Count == 0)
-                        {
-                            return list;
-                        }
-                        else
-                        {
-                            list.Add(p);
-                        }
-                    }
-                    else
-                    {
-                        //assert false;
-                    }
                 }
-            }
-            else
-            {
-                string value = string.Empty;
-                do
-                {
-                    value += c;
-                    c = reader.ReadChar();
-                }
-                while (c != 10 && c != ' ');
+            while (c is not (char)10 and not ' ');
 
                 {
-                    int f;
-                    if (int.TryParse(value, out f) == true)
-                        return f;
-                }
-                {
-                    float f;
-                    if (float.TryParse(value, out f) == true)
-                        return f;
-                }
-                {
-                    bool f;
-                    if (bool.TryParse(value, out f) == true)
-                        return f;
+                int f;
+                if (int.TryParse(value, out f) == true)
+                    return f;
                 }
 
-                return value;
+                {
+                float f;
+                if (float.TryParse(value, out f) == true)
+                    return f;
+                }
+
+                {
+                bool f;
+                if (bool.TryParse(value, out f) == true)
+                    return f;
+                }
+
+            return value;
             }
         }
     }
-}
+

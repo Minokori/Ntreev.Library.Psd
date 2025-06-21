@@ -16,80 +16,80 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation
+namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
+
+internal class LayerInfoReader(PsdReader reader, PsdDocument document) : ValueReader<PsdLayer[]>(reader, true, document)
     {
-    class LayerInfoReader(PsdReader reader, PsdDocument document) : ValueReader<PsdLayer[]>(reader, true, document)
+    protected override PsdLayer[] ReadValue()
         {
-        protected override void ReadValue(PsdReader reader, object? userData, out PsdLayer[] value)
+        var document = (PsdDocument)UserData!;
+        var layerCount = Math.Abs((int)GlobalReader.ReadInt16());
+
+        var layers = new PsdLayer[layerCount];
+        for (var i = 0; i < layerCount; i++)
             {
-            PsdDocument document = (PsdDocument)userData!;
-            int layerCount = Math.Abs((int)reader.ReadInt16());
-
-            PsdLayer[] layers = new PsdLayer[layerCount];
-            for (int i = 0; i < layerCount; i++)
-                {
-                layers[i] = new PsdLayer(reader, document);
-                }
-
-            foreach (var item in layers)
-                {
-                item.ReadChannels(reader);
-                }
-
-            layers = Initialize(null, layers);
-
-            foreach (var item in layers.SelectMany(item => item.Descendants()).Reverse())
-                {
-                item.ComputeBounds();
-                }
-
-            value = layers;
+            layers[i] = new PsdLayer(GlobalReader, document);
             }
 
-        public static PsdLayer[] Initialize(PsdLayer parent, PsdLayer[] layers)
+        foreach (var item in layers)
             {
-            Stack<PsdLayer> stack = new();
-            List<PsdLayer> rootLayers = [];
-            Dictionary<PsdLayer, List<PsdLayer>> layerToChilds = [];
-
-            foreach (var item in layers.Reverse())
-                {
-                if (item.SectionType == SectionType.Divider)
-                    {
-                    parent = stack.Pop();
-                    continue;
-                    }
-
-                if (parent != null)
-                    {
-                    if (layerToChilds.ContainsKey(parent) == false)
-                        {
-                        layerToChilds.Add(parent, []);
-                        }
-
-                    List<PsdLayer> childs = layerToChilds[parent];
-                    childs.Insert(0, item);
-                    item.Parent = parent;
-                    }
-                else
-                    {
-                    rootLayers.Insert(0, item);
-                    }
-
-                if (item.SectionType == SectionType.Opend || item.SectionType == SectionType.Closed)
-                    {
-                    stack.Push(parent);
-                    parent = item;
-                    }
-                }
-
-            foreach (var item in layerToChilds)
-                {
-                item.Key.Childs = [.. item.Value];
-                }
-
-            return [.. rootLayers];
+            item.ReadChannels(GlobalReader);
             }
+
+        layers = Initialize(null, layers);
+
+        foreach (var item in layers.SelectMany(item => item.Descendants()).Reverse())
+            {
+            item.ComputeBounds();
+            }
+
+        return layers;
+        }
+
+    public static PsdLayer[] Initialize(PsdLayer parent, PsdLayer[] layers)
+        {
+        Stack<PsdLayer> stack = new();
+        List<PsdLayer> rootLayers = [];
+        Dictionary<PsdLayer, List<PsdLayer>> layerToChilds = [];
+
+        foreach (var item in ((IEnumerable<PsdLayer>)layers).Reverse())
+            {
+            if (item.SectionType == SectionType.Divider)
+                {
+                parent = stack.Pop();
+                continue;
+                }
+
+            if (parent != null)
+                {
+                if (layerToChilds.ContainsKey(parent) == false)
+                    {
+                    layerToChilds.Add(parent, []);
+                    }
+
+                var childs = layerToChilds[parent];
+                childs.Insert(0, item);
+                item.Parent = parent;
+                }
+            else
+                {
+                rootLayers.Insert(0, item);
+                }
+
+            if (item.SectionType is SectionType.Opend or SectionType.Closed)
+                {
+                stack.Push(parent);
+                parent = item;
+                }
+            }
+
+        foreach (var item in layerToChilds)
+            {
+            item.Key.Childs = [.. item.Value];
+            }
+
+        return [.. rootLayers];
         }
     }
+
 

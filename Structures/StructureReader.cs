@@ -15,87 +15,38 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Ntreev.Library.Psd.Structures
-{
-    static class StructureReader
+namespace Ntreev.Library.Psd.Structures;
+
+internal static class StructureReader
     {
-        public static object Read(string ostype, PsdReader reader)
+    public static object Read(string ostype, PsdReader reader)
         {
-            switch (ostype)
+        return ostype switch
             {
-                case "obj ":
-                    return new StructureReference(reader);
-
-                case "Objc":
-                    return new DescriptorStructure(reader, false);
-
-                case "VlLs":
-                    return new StructureList(reader);
-
-                case "doub":
-                    return reader.ReadDouble();
-
-                case "UntF":
-                    return new StructureUnitFloat(reader);
-
-                case "TEXT":
-                    return reader.ReadString();
-
-                case "enum":
-                    return new StructureEnumerate(reader);
-
-                case "long":
-                    return reader.ReadInt32();
-
-                case "bool":
-                    return reader.ReadBoolean();
-
-                case "GlbO":
-                    return new DescriptorStructure(reader, false);
-
-                case "type":
-                    return new StructureClass(reader);
-
-                case "GlbC":
-                    return new StructureClass(reader);
-
-                case "alis":
-                    return new StructureAlias(reader);
-
-                case "tdta":
-                    return new StructureUnknownOSType("Cannot read RawData");
-
-                case "prop":
-                    return new StructureProperty(reader);
-
-                case "Clss":
-                    return new StructureClass(reader);
-
-                case "Enmr":
-                    return new StructureEnumerate(reader);
-
-                case "rele":
-                    return new StructureOffset(reader);
-
-                case "Idnt":
-                    return new StructureUnknownOSType("Cannot read Identifier");
-
-                case "indx":
-                    return new StructureUnknownOSType("Cannot read Index");
-
-                case "name":
-                    return new StructureUnknownOSType("Cannot read Name");
-
-                case "ObAr":
-                    return new StructureObjectArray(reader);
-
-            }
-            throw new NotSupportedException(ostype);
+                "obj " => new StructureReference(reader),
+                "Objc" => new DescriptorStructure(reader, false),
+                "VlLs" => new StructureList(reader),
+                "doub" => reader.ReadDouble(),
+                "UntF" => new StructureUnitFloat(reader),
+                "TEXT" => reader.ReadString(),
+                "enum" => new StructureEnumerate(reader),
+                "long" => reader.ReadInt32(),
+                "bool" => reader.ReadBoolean(),
+                "GlbO" => new DescriptorStructure(reader, false),
+                "type" => new StructureClass(reader),
+                "GlbC" => new StructureClass(reader),
+                "alis" => new StructureAlias(reader),
+                "tdta" => new StructureUnknownOSType("Cannot read RawData"),
+                "prop" => new StructureProperty(reader),
+                "Clss" => new StructureClass(reader),
+                "Enmr" => new StructureEnumerate(reader),
+                "rele" => new StructureOffset(reader),
+                "Idnt" => new StructureUnknownOSType("Cannot read Identifier"),
+                "indx" => new StructureUnknownOSType("Cannot read Index"),
+                "name" => new StructureUnknownOSType("Cannot read Name"),
+                "ObAr" => new StructureObjectArray(reader),
+                _ => throw new NotSupportedException(ostype),
+                };
         }
     }
-}

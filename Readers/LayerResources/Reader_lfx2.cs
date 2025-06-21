@@ -15,26 +15,23 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.ReadersPrototype;
+namespace Ntreev.Library.Psd.Readers.LayerResources;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources
-{
-    [ResourceID("lfx2")]
-    class Reader_lfx2 : ResourceReaderBase
+[ResourceID("lfx2", DisplayName = "Object-based effects layer info")]
+internal class Reader_lfx2 : ResourceReaderBase
     {
-        public Reader_lfx2(PsdReader reader, long length)
-            : base(reader, length)
+    public Reader_lfx2(PsdReader reader, long length)
+        : base(reader, length)
         {
 
         }
 
-        protected override void ReadValue(PsdReader reader, object userData, out IProperties value)
+    protected override IProperties ReadValue()
         {
-            reader.ValidateInt32(0, "lfx2 Version");
-            value = new DescriptorStructure(reader, true);
+        GlobalReader.ValidateInt32(0, "lfx2 Version");
+        return new DescriptorStructure(GlobalReader, true);
         }
     }
-}
+

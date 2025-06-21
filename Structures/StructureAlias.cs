@@ -22,6 +22,6 @@ class StructureAlias : Properties
     public StructureAlias(PsdReader reader)
         {
         int length = reader.ReadInt32();
-        this.Add("Alias", reader.ReadAscii(length));
+        Add("Alias", reader.ReadAsAscii(length));
         }
     }

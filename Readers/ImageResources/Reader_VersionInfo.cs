@@ -15,33 +15,31 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.ReadersPrototype;
+namespace Ntreev.Library.Psd.Readers.ImageResources;
 
-namespace Ntreev.Library.Psd.Readers.ImageResources
-{
-    [ResourceID("1057", DisplayName = "Version")]
-    class Reader_VersionInfo : ResourceReaderBase
+[ResourceID("1057", DisplayName = "Version")]
+internal class Reader_VersionInfo : ResourceReaderBase
     {
-        public Reader_VersionInfo(PsdReader reader, long length)
-            : base(reader, length)
+    public Reader_VersionInfo(PsdReader reader, long length)
+        : base(reader, length)
         {
 
         }
 
-        protected override void ReadValue(PsdReader reader, object userData, out IProperties value)
+    protected override IProperties ReadValue()
         {
-            Properties props = new Properties(5);
+        var props = new Properties(5)
+            {
+            ["Version"] = GlobalReader.ReadInt32(),
+            ["HasCompatibilityImage"] = GlobalReader.ReadBoolean(),
+            ["WriterName"] = GlobalReader.ReadString(),
+            ["ReaderName"] = GlobalReader.ReadString(),
+            ["FileVersion"] = GlobalReader.ReadInt32()
+            };
 
-            props["Version"] = reader.ReadInt32();
-            props["HasCompatibilityImage"] = reader.ReadBoolean();
-            props["WriterName"] = reader.ReadString();
-            props["ReaderName"] = reader.ReadString();
-            props["FileVersion"] = reader.ReadInt32();
-
-            value = props;
+        return props;
         }
     }
-}
+

@@ -14,30 +14,24 @@
 //WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-namespace Ntreev.Library.Psd;
+namespace Ntreev.Library.Psd.Services;
 public abstract class PsdUriResolver
     {
     public abstract PsdDocument GetDocument(Uri absoluteUri);
 
     public virtual Uri ResolveUri(Uri baseUri, string relativeUri)
         {
-        if ((baseUri == null) || (!baseUri.IsAbsoluteUri && (baseUri.OriginalString.Length == 0)))
+        if (baseUri == null || !baseUri.IsAbsoluteUri && baseUri.OriginalString.Length == 0)
             {
             Uri uri = new(relativeUri, UriKind.RelativeOrAbsolute);
-            if (!uri.IsAbsoluteUri && (uri.OriginalString.Length > 0))
-                {
+            if (!uri.IsAbsoluteUri && uri.OriginalString.Length > 0)
                 uri = new Uri(Path.GetFullPath(relativeUri));
-                }
             return uri;
             }
-        if ((relativeUri == null) || (relativeUri.Length == 0))
-            {
+        if (relativeUri == null || relativeUri.Length == 0)
             return baseUri;
-            }
         if (!baseUri.IsAbsoluteUri)
-            {
             throw new NotSupportedException("PSD_RelativeUriNotSupported");
-            }
         return new Uri(baseUri, relativeUri);
         }
     }

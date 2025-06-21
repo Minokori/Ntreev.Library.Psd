@@ -15,35 +15,23 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace Ntreev.Library.Psd;
 
-namespace Ntreev.Library.Psd
-{
-    class LayerMask
+internal class LayerMask
     {
-        public int Left { get; set; }
+    public int Left { get; set; }
 
-        public int Top { get; set; }
+    public int Top { get; set; }
 
-        public int Right { get; set; }
+    public int Right { get; set; }
 
-        public int Bottom { get; set; }
+    public int Bottom { get; set; }
 
-        public byte Color { get; set; }
+    public byte Color { get; set; }
 
-        public byte Flag { get; set; }
+    public byte Flag { get; set; }
 
-        public int Width
-        {
-            get { return this.Right - this.Left; }
-        }
+    public int Width => this.Right - this.Left;
 
-        public int Height
-        {
-            get { return this.Bottom - this.Top; }
-        }
+    public int Height => this.Bottom - this.Top;
     }
-}

@@ -15,24 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Ntreev.Library.Psd.ReadersPrototype;
 
-namespace Ntreev.Library.Psd.Readers
-{
-    class EmptyResourceReader : ResourceReaderBase
+namespace Ntreev.Library.Psd.Readers;
+
+internal class EmptyResourceReader(PsdReader reader, long length) : ResourceReaderBase(reader, length)
     {
-        public EmptyResourceReader(PsdReader reader, long length)
-            : base(reader, length)
-        {
-
-        }
-
-        protected override void ReadValue(PsdReader reader, object userData, out IProperties value)
-        {
-            value = new Properties();
-        }
+    protected override IProperties ReadValue() => new Properties();
     }
-}
+

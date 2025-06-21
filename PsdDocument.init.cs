@@ -1,13 +1,12 @@
+using Ntreev.Library.Psd.Services;
+
 namespace Ntreev.Library.Psd;
 
 public partial class PsdDocument
     {
     public PsdDocument() { }
     #region static classmethod for init
-    public static PsdDocument Create(string filename)
-        {
-        return Create(filename, new PathResolver());
-        }
+    public static PsdDocument Create(string filename) => Create(filename, PsdService.Resolver);
 
     public static PsdDocument Create(string filename, PsdUriResolver resolver)
         {
@@ -18,10 +17,7 @@ public partial class PsdDocument
         return document;
         }
 
-    public static PsdDocument Create(Stream stream)
-        {
-        return Create(stream, null);
-        }
+    public static PsdDocument Create(Stream stream) => Create(stream, null);
 
     public static PsdDocument Create(Stream stream, PsdUriResolver resolver)
         {

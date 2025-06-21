@@ -15,52 +15,53 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.ReadersPrototype;
+namespace Ntreev.Library.Psd.Readers.LayerResources;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources
-{
-    [ResourceID("lrFX")]
-    class Reader_lrFX : ResourceReaderBase
+[ResourceID("lrFX")]
+internal class Reader_lrFX : ResourceReaderBase
     {
-        public Reader_lrFX(PsdReader reader, long length)
-            : base(reader, length)
+    public Reader_lrFX(PsdReader reader, long length)
+        : base(reader, length)
         {
 
         }
 
-        protected override void ReadValue(PsdReader reader, object userData, out IProperties value)
+    protected override IProperties ReadValue()
         {
-            value = new Properties();
+        var value = new Properties();
 
-            short version = reader.ReadInt16();
-            int count = reader.ReadInt16();
+        var version = GlobalReader.ReadInt16();
+        int count = GlobalReader.ReadInt16();
 
-            for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
             {
-                string _8bim = reader.ReadAscii(4);
-                string effectType = reader.ReadAscii(4);
-                int size = reader.ReadInt32();
-                long p = reader.Position;
+            var _8bim = GlobalReader.ReadAsAscii(4);
+            var effectType = GlobalReader.ReadAsAscii(4);
+            var size = GlobalReader.ReadInt32();
+            var p = GlobalReader.Position;
 
-                switch (effectType)
+            switch (effectType)
                 {
-                    case "dsdw":
-                        {
-                            //ShadowInfo.Parse(_reader);
-                        }
-                        break;
-                    case "sofi":
-                        {
-                            //this.solidFillInfo = SolidFillInfo.Parse(_reader);
-                        }
-                        break;
+                case "dsdw":
+                    {
+                    //ShadowInfo.Parse(_reader);
+                    }
+
+                break;
+                case "sofi":
+                    {
+                    //this.solidFillInfo = SolidFillInfo.Parse(_reader);
+                    }
+
+                break;
                 }
 
-                reader.Position = p + size;
+            GlobalReader.Position = p + size;
             }
+
+        return value;
         }
     }
-}
+

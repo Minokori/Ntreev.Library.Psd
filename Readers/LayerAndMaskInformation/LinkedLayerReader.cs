@@ -15,63 +15,55 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation
-{
-    class LinkedLayerReader : ValueReader<LinkedLayer>
+internal class LinkedLayerReader : ValueReader<LinkedLayer>
     {
-        public LinkedLayerReader(PsdReader reader)
-            : base(reader, true, null)
+    public LinkedLayerReader(PsdReader reader)
+        : base(reader, true, null)
         {
-            
+
         }
 
-        protected override long OnLengthGet(PsdReader reader)
+    protected override long InitStreamLength() => (GlobalReader.ReadInt64() + 3) & (~3);
+
+    protected override LinkedLayer ReadValue()
         {
-            return (reader.ReadInt64() + 3) & (~3);
-        }
+        GlobalReader.ValidateSignature("liFD");
+        var version = GlobalReader.ReadInt32();
 
-        protected override void ReadValue(PsdReader reader, object userData, out LinkedLayer value)
-        {
-            reader.ValidateSignature("liFD");
-            int version = reader.ReadInt32();
+        var id = new Guid(GlobalReader.ReadAsPascalString(1));
+        var name = GlobalReader.ReadString();
+        var type = GlobalReader.ReadAsType();
+        var creator = GlobalReader.ReadAsType();
+        var length = GlobalReader.ReadInt64();
+        var properties = GlobalReader.ReadBoolean() == true ? new DescriptorStructure(GlobalReader) : null;
 
-            Guid id = new Guid(reader.ReadPascalString(1));
-            string name = reader.ReadString();
-            string type = reader.ReadType();
-            string creator = reader.ReadType();
-            long length = reader.ReadInt64();
-            IProperties properties = reader.ReadBoolean() == true ? new DescriptorStructure(reader) : null;
-
-            bool isDocument = this.IsDocument(reader);
-            LinkedDocumentReader documentReader = null;
-            LinkedDocumnetFileHeaderReader fileHeaderReader = null;
-            if(length > 0 && isDocument == true)
+        var isDocument = this.IsDocument(GlobalReader);
+        LinkedDocumentReader documentReader = null;
+        LinkedDocumnetFileHeaderReader fileHeaderReader = null;
+        if (length > 0 && isDocument == true)
             {
-                long position = reader.Position;
-                documentReader = new LinkedDocumentReader(reader, length);
-                reader.Position = position;
-                fileHeaderReader = new LinkedDocumnetFileHeaderReader(reader, length);
+            var position = GlobalReader.Position;
+            documentReader = new LinkedDocumentReader(GlobalReader, length);
+            GlobalReader.Position = position;
+            fileHeaderReader = new LinkedDocumnetFileHeaderReader(GlobalReader, length);
             }
 
-            value = new LinkedLayer(name, id, documentReader, fileHeaderReader);
+        return new LinkedLayer(name, id, documentReader, fileHeaderReader);
         }
 
-        private bool IsDocument(PsdReader reader)
+    private bool IsDocument(PsdReader reader)
         {
-            long position = reader.Position;
-            try
+        var position = reader.Position;
+        try
             {
-                return reader.ReadType() == "8BPS";
+            return reader.ReadAsType() == "8BPS";
             }
-            finally
+        finally
             {
-                reader.Position = position;
+            reader.Position = position;
             }
         }
     }
-}
+

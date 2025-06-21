@@ -16,35 +16,35 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-namespace Ntreev.Library.Psd
+namespace Ntreev.Library.Psd;
+
+/// <summary>
+/// Photoshop 图层接口，继承自 <see cref="IImageSource"/>
+/// </summary>
+public interface IPsdLayer : IImageSource
     {
-    /// <summary>
-    /// Photoshop 图层接口，继承自 <see cref="IImageSource"/>
-    /// </summary>
-    public interface IPsdLayer : IImageSource
-        {
-        BlendMode BlendMode { get; }
+    BlendMode BlendMode { get; }
 
-        IPsdLayer[] Childs { get; }
+    IPsdLayer[] Childs { get; }
 
-        bool IsClipping { get; }
+    bool IsClipping { get; }
 
-        ILinkedLayer LinkedLayer { get; }
+    ILinkedLayer LinkedLayer { get; }
 
-        string Name { get; }
+    string Name { get; }
 
-        IPsdLayer Parent { get; }
+    IPsdLayer Parent { get; }
 
-        IProperties Resources { get; }
+    IProperties Resources { get; }
 
-        PsdDocument Document { get; }
+    PsdDocument Document { get; }
 
-        int Left { get; }
+    int Left { get; }
 
-        int Top { get; }
+    int Top { get; }
 
-        int Right { get; }
+    int Right { get; }
 
-        int Bottom { get; }
-        }
+    int Bottom { get; }
     }
+

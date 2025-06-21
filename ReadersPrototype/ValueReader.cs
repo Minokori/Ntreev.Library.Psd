@@ -1,103 +1,55 @@
-//Released under the MIT License.
-//
-//Copyright (c) 2015 Ntreev Soft co., Ltd.
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
-//rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
-//persons to whom the Software is furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in all copies or substantial portions of the 
-//Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
-//WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-//OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+namespace Ntreev.Library.Psd;
 
-namespace Ntreev.Library.Psd
+/// <summary>
+/// 读取指定数据类型的类, 该类从 <see cref="PsdReader"/> 中读取数据。<para/>
+/// 在实例化后, 仅需要访问其 <see cref="Value"/> 属性即可获取读取的数据。<para/>"/>
+/// </summary>
+/// <typeparam name="T">读取的数据类型</typeparam>
+internal abstract partial class ValueReader<T>
     {
-    abstract partial class ValueReader<T>
+    /// <summary>
+    /// 全局 BinaryReader, 每个 <see cref="PsdDocument"/> 具有一个
+    /// </summary>
+    protected PsdReader GlobalReader { get; init; }
+
+    /// <summary>
+    /// 读取数据使用的协议版本, 1 为 32位版本, 2 为 64 位版本
+    /// </summary>
+    protected int ReaderVersion { get; init; }
+    protected object? UserData { get; init; } = null;
+
+    /// <summary>
+    /// 数据是否读取过.
+    /// </summary>
+    private bool HasRead { get; set; }
+
+
+    /// <summary>
+    /// 从 文件流中读取值, 赋值给 <see cref="Value"/>, 将 <see cref="HasRead"/> 设置为 true
+    /// </summary>
+    private T? InitValue()
         {
-        private readonly PsdReader reader;
-        private readonly int readerVersion;
-        private readonly long position;
-        private readonly long length;
-        private readonly object? userData;
-        private T value;
-        private bool isRead;
+        //更新字节流的位置指针，从指定位置开始读取
+        GlobalReader.Position = StartPosition;
+        GlobalReader.Version = ReaderVersion;
 
-        protected ValueReader(PsdReader reader, bool hasLength, object? userData)
-            {
-            if (hasLength == true)
-                {
-                this.length = this.OnLengthGet(reader);
-                }
+        // 从 reader 提供的字节流中读取值到 value 中
+        var value = ReadValue();
 
-            this.reader = reader;
-            this.readerVersion = reader.Version;
-            this.position = reader.Position;
-            this.userData = userData;
-
-            if (hasLength == false)
-                {
-                this.Refresh();
-                this.length = reader.Position - this.position;
-                }
-            else
-                {
-                //this.Refresh();
-                }
-
-            this.reader.Position = this.position + this.length;
-            }
-
-        protected ValueReader(PsdReader reader, long length, object? userData)
-            {
-            if (length < 0)
-                throw new InvalidFormatException();
-            this.reader = reader;
-            this.length = length;
-            this.readerVersion = reader.Version;
-            this.position = reader.Position;
-            this.userData = userData;
-
-            if (this.length == 0)
-                {
-                this.Refresh();
-                this.length = reader.Position - this.position;
-                }
-            else
-                {
-                //this.Refresh();
-                }
-
-            this.reader.Position = this.position + this.length;
-            }
-
-        private void Refresh()
-            {
-            //更新字节流的位置指针，从指定位置开始读取
-            this.reader.Position = this.position;
-            this.reader.Version = this.readerVersion;
-
-            // 从reader提供的字节流中读取值到this.value中
-            this.ReadValue(this.reader, this.userData, out this.value);
-
-            // 更新字节流指针，便于继续读取
-            if (this.length > 0)
-                this.reader.Position = this.position + this.length;
-            // 设置为已读取状态
-            this.isRead = true;
-            }
-
-
-        protected virtual long OnLengthGet(PsdReader reader)
-            {
-            return reader.ReadLength();
-            }
-
-
-        protected abstract void ReadValue(PsdReader reader, object? userData, out T value);
+        // 更新字节流指针，便于继续读取
+        if (StreamLength > 0)
+            GlobalReader.Position = StartPosition + StreamLength;
+        // 设置为已读取状态
+        HasRead = true;
+        return value;
         }
+
+    protected virtual long InitStreamLength() => GlobalReader.ReadLength();
+
+
+    /// <summary>
+    /// 使用自己引用的 全局 GlobalReader 对象从字节流中读取值. <para/>
+    /// 应重写该方法以实现具体的数据读取逻辑。
+    /// </summary>
+    protected abstract T ReadValue();
     }

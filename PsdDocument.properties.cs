@@ -2,131 +2,55 @@ namespace Ntreev.Library.Psd;
 
 public partial class PsdDocument
     {
+    public FileHeaderSection FileHeaderSection => fileHeaderSection.Value;
 
+    public byte[] ColorModeData => colorModeDataSection.Value;
 
-    public FileHeaderSection FileHeaderSection
-        {
-        get { return this.fileHeaderSection.Value; }
-        }
+    public int Width => fileHeaderSection.Value.Width;
 
-    public byte[] ColorModeData
-        {
-        get { return this.colorModeDataSection.Value; }
-        }
+    public int Height => fileHeaderSection.Value.Height;
 
-    public int Width
-        {
-        get { return this.fileHeaderSection.Value.Width; }
-        }
+    public int Depth => fileHeaderSection.Value.Depth;
 
-    public int Height
-        {
-        get { return this.fileHeaderSection.Value.Height; }
-        }
+    public IPsdLayer[] Childs => layerAndMaskSection.Value.Layers;
 
-    public int Depth
-        {
-        get { return this.fileHeaderSection.Value.Depth; }
-        }
+    public IEnumerable<ILinkedLayer> LinkedLayers => layerAndMaskSection.Value.LinkedLayers;
 
-    public IPsdLayer[] Childs
-        {
-        get { return this.layerAndMaskSection.Value.Layers; }
-        }
+    public IProperties Resources => layerAndMaskSection.Value.Resources;
 
-    public IEnumerable<ILinkedLayer> LinkedLayers
-        {
-        get { return this.layerAndMaskSection.Value.LinkedLayers; }
-        }
+    public IProperties ImageResources => imageResourcesSection;
 
-    public IProperties Resources
-        {
-        get { return this.layerAndMaskSection.Value.Resources; }
-        }
-
-    public IProperties ImageResources
-        {
-        get { return this.imageResourcesSection; }
-        }
-
-    public bool HasImage
-        {
-        get
-            {
-            if (this.imageResourcesSection.Contains("Version") == false)
-                return false;
-            return this.imageResourcesSection.ToBoolean("Version", "HasCompatibilityImage");
-            }
-        }
+    public bool HasImage =>
+        imageResourcesSection.Contains("Version") != false
+        && imageResourcesSection.ToBoolean("Version", "HasCompatibilityImage");
 
     #region IPsdLayer
 
-    IPsdLayer IPsdLayer.Parent
-        {
-        get { return null; }
-        }
+    IPsdLayer IPsdLayer.Parent => null;
 
-    bool IPsdLayer.IsClipping
-        {
-        get { return false; }
-        }
+    bool IPsdLayer.IsClipping => false;
 
-    PsdDocument IPsdLayer.Document
-        {
-        get { return this; }
-        }
+    PsdDocument IPsdLayer.Document => this;
 
-    ILinkedLayer IPsdLayer.LinkedLayer
-        {
-        get { return null; }
-        }
+    ILinkedLayer IPsdLayer.LinkedLayer => null;
 
-    string IPsdLayer.Name
-        {
-        get { return "Document"; }
-        }
+    string IPsdLayer.Name => "Document";
 
-    int IPsdLayer.Left
-        {
-        get { return 0; }
-        }
+    int IPsdLayer.Left => 0;
 
-    int IPsdLayer.Top
-        {
-        get { return 0; }
-        }
+    int IPsdLayer.Top => 0;
 
-    int IPsdLayer.Right
-        {
-        get { return this.Width; }
-        }
+    int IPsdLayer.Right => this.Width;
 
-    int IPsdLayer.Bottom
-        {
-        get { return this.Height; }
-        }
+    int IPsdLayer.Bottom => this.Height;
 
-    BlendMode IPsdLayer.BlendMode
-        {
-        get { return BlendMode.Normal; }
-        }
+    BlendMode IPsdLayer.BlendMode => BlendMode.Normal;
 
-    IChannel[] IImageSource.Channels
-        {
-        get { return this.imageDataSection.Value; }
-        }
-
+    IChannel[] IImageSource.Channels => this.imageDataSection.Value;
 
     // TODO This makes MergeChannels on PsdDocument class no opacity
-    float IImageSource.Opacity
-        {
-        get { return 1.0f; }
-        }
+    float IImageSource.Opacity => 1.0f;
 
-    bool IImageSource.HasMask
-        {
-        get { return this.FileHeaderSection.NumberOfChannels > 4; }
-        }
+    bool IImageSource.HasMask => this.FileHeaderSection.NumberOfChannels > 4;
     #endregion
     }
-

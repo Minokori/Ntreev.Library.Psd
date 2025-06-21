@@ -15,64 +15,57 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace Ntreev.Library.Psd.Readers
+namespace Ntreev.Library.Psd.Readers;
+
+internal class ImageDataSectionReader(PsdReader reader, PsdDocument document) : LazyValueReader<Channel[]>(reader, document)
     {
-    class ImageDataSectionReader(PsdReader reader, PsdDocument document) : LazyValueReader<Channel[]>(reader, document)
+    protected override long InitStreamLength() => GlobalReader.Length - GlobalReader.Position;
+
+    protected override Channel[] ReadValue() => ReadValue(GlobalReader, (PsdDocument)UserData!);
+
+    // TODO 透明度消失疑似发生在这里
+    private static Channel[] ReadValue(PsdReader reader, PsdDocument document)
         {
-        protected override long OnLengthGet(PsdReader reader)
+        var channelCount = document.FileHeaderSection.NumberOfChannels;
+        var width = document.Width;
+        var height = document.Height;
+        var depth = document.FileHeaderSection.Depth;
+
+        var compressionType = (CompressionType)reader.ReadInt16();
+
+        ChannelType[] types = [ChannelType.Red, ChannelType.Green, ChannelType.Blue, ChannelType.Alpha];
+        var channels = new Channel[channelCount];
+
+        for (var i = 0; i < channels.Length; i++)
             {
-            return reader.Length - reader.Position;
+            var type = i < types.Length ? types[i] : ChannelType.Mask;
+            channels[i] = new Channel(type, width, height, 0);
+            channels[i].ReadHeader(reader, compressionType);
             }
 
-        protected override void ReadValue(PsdReader reader, object? userData, out Channel[] value)
+        for (var i = 0; i < channels.Length; i++)
             {
-
-            value = ReadValue(reader, (PsdDocument)userData!);
+            channels[i].Read(reader, depth, compressionType);
             }
 
-        // TODO 透明度消失疑似发生在这里
-        private static Channel[] ReadValue(PsdReader reader, PsdDocument document)
+        if (channels.Length == 4)
             {
-            int channelCount = document.FileHeaderSection.NumberOfChannels;
-            int width = document.Width;
-            int height = document.Height;
-            int depth = document.FileHeaderSection.Depth;
 
-            CompressionType compressionType = (CompressionType)reader.ReadInt16();
-
-            ChannelType[] types = [ChannelType.Red, ChannelType.Green, ChannelType.Blue, ChannelType.Alpha];
-            Channel[] channels = new Channel[channelCount];
-
-            for (int i = 0; i < channels.Length; i++)
+            for (var i = 0; i < channels[3].Data.Length; i++)
                 {
-                ChannelType type = i < types.Length ? types[i] : ChannelType.Mask;
-                channels[i] = new Channel(type, width, height, 0);
-                channels[i].ReadHeader(reader, compressionType);
-                }
+                var a = channels[3].Data[i] / 255.0f;
 
-            for (int i = 0; i < channels.Length; i++)
-                {
-                channels[i].Read(reader, depth, compressionType);
-                }
-
-            if (channels.Length == 4)
-                {
-
-                for (int i = 0; i < channels[3].Data.Length; i++)
+                for (var j = 0; j < 3; j++)
                     {
-                    float a = channels[3].Data[i] / 255.0f;
-
-                    for (int j = 0; j < 3; j++)
-                        {
-                        float r = channels[j].Data[i] / 255.0f;
-                        float r1 = (((a + r) - 1f) * 1f) / a;
-                        channels[j].Data[i] = (byte)(r1 * 255.0f);
-                        }
+                    var r = channels[j].Data[i] / 255.0f;
+                    var r1 = (a + r - 1f) * 1f / a;
+                    channels[j].Data[i] = (byte)(r1 * 255.0f);
                     }
-
                 }
 
-            return [.. channels.OrderBy(item => item.Type)];
             }
+
+        return [.. channels.OrderBy(item => item.Type)];
         }
     }
+

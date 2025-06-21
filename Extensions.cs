@@ -41,7 +41,7 @@ public static class Extensions
 
             return buffer;
             }
-        else //TODO channels.Length == 3,now it's for psdfile
+        else //TODO channels.StreamLength == 3,now it's for psdfile
             {
 
             var channelNum = channels.Length; //通道数

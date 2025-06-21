@@ -21,33 +21,33 @@ using System.Linq;
 using System.Text;
 
 namespace Ntreev.Library.Psd.Structures
-{
-    class StructureObjectArray : Properties
     {
-        public StructureObjectArray(PsdReader reader)
+    class StructureObjectArray : Properties
         {
+        public StructureObjectArray(PsdReader reader)
+            {
             int version = reader.ReadInt32();
             this.Add("Name", reader.ReadString());
-            this.Add("ClassID", reader.ReadKey());
+            this.Add("ClassID", reader.ReadAsKey());
 
             int count = reader.ReadInt32();
 
             List<Properties> items = new List<Properties>();
 
             for (int i = 0; i < count; i++)
-            {
-                Properties props = new Properties();
-                props.Add("Type1", reader.ReadKey());
-                props.Add("EnumName", reader.ReadType());
+                {
+                Properties props = [];
+                props.Add("Type1", reader.ReadAsKey());
+                props.Add("EnumName", reader.ReadAsType());
 
 
-                props.Add("Type2", PsdUtility.ToUnitType(reader.ReadType()));
+                props.Add("Type2", PsdUtility.ToUnitType(reader.ReadAsType()));
                 int d4 = reader.ReadInt32();
                 props.Add("Values", reader.ReadDoubles(d4));
 
                 items.Add(props);
-            }
+                }
             this.Add("items", items.ToArray());
+            }
         }
     }
-}
