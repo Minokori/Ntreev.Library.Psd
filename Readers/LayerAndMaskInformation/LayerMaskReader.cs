@@ -19,10 +19,10 @@ namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class LayerMaskReader : ValueReader<LayerMask>
     {
-    private LayerMaskReader(PsdReader reader)
+    private LayerMaskReader(PsdBinaryReader reader)
         : base(reader, true, null) { }
 
-    public static LayerMask Read(PsdReader reader)
+    public static LayerMask Read(PsdBinaryReader reader)
         {
         var instance = new LayerMaskReader(reader);
         return instance.Value;

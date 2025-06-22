@@ -17,7 +17,7 @@
 
 namespace Ntreev.Library.Psd;
 
-internal class InternalDocument : PsdDocument
-    {
-    protected override void OnDisposed(EventArgs e) => throw new Exception();
-    }
+//internal class InternalDocument : PsdDocument
+//    {
+//    protected override void OnDisposed(EventArgs e) => throw new Exception();
+//    }

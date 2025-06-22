@@ -24,7 +24,7 @@ namespace Ntreev.Library.Psd.Structures
 {
     class StructureList : BaseStructure
     {
-        public StructureList(PsdReader reader)
+        public StructureList(PsdBinaryReader reader)
             : base(reader)
         {
 

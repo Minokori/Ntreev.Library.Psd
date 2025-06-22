@@ -23,7 +23,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("luni")]
 internal class Reader_luni : ResourceReaderBase
     {
-    public Reader_luni(PsdReader reader, long length)
+    public Reader_luni(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
     protected override IProperties ReadValue()

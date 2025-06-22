@@ -22,7 +22,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("lrFX")]
 internal class Reader_lrFX : ResourceReaderBase
     {
-    public Reader_lrFX(PsdReader reader, long length)
+    public Reader_lrFX(PsdBinaryReader reader, long length)
         : base(reader, length)
         {
 

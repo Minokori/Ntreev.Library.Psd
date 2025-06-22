@@ -17,7 +17,7 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class GlobalLayerMaskInfoReader(PsdReader reader) : ValueReader<object>(reader, true, null)
+internal class GlobalLayerMaskInfoReader(PsdBinaryReader reader) : ValueReader<object>(reader, true, null)
     {
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 

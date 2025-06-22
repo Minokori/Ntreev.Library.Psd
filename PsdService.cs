@@ -7,12 +7,12 @@ public static class PsdService
 
     public static ServiceProvider Services { get; } = GetServices();
 
-    public static PsdUriResolver Resolver => Services.GetRequiredService<PsdUriResolver>();
+    public static IDocumentManager Resolver => Services.GetRequiredService<IDocumentManager>();
 
     private static ServiceProvider GetServices()
         {
         var serviceProvider = new ServiceCollection()
-            .AddSingleton<PsdUriResolver, PathResolver>()
+            .AddSingleton<IDocumentManager, PsdDocumentManager>()
             .BuildServiceProvider();
 
         return serviceProvider;

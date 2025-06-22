@@ -2,7 +2,7 @@ namespace Ntreev.Library.Psd.Structures;
 
 internal class BaseStructure : Properties
     {
-    public BaseStructure(PsdReader reader)
+    public BaseStructure(PsdBinaryReader reader)
         {
         List<object> items = [];
         var count = reader.ReadInt32();

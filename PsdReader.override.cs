@@ -2,7 +2,7 @@ using System.Buffers.Binary;
 using System.Text;
 
 namespace Ntreev.Library.Psd;
-internal partial class PsdReader
+internal partial class PsdBinaryReader
     {
 
     #region 由于 PSD 存储采用大端, 所以需要重载读取方法 (BinaryReader使用小端读取)
@@ -87,7 +87,6 @@ internal partial class PsdReader
             {
             values[i] = ReadDouble();
             }
-
         return values;
         }
     #endregion

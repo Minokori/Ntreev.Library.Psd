@@ -9,7 +9,7 @@ public partial class PsdDocument : IPsdLayer, IDisposable
     private ImageResourcesSectionReader? imageResourcesSection;
     private LayerAndMaskInformationSectionReader? layerAndMaskSection;
     private ImageDataSectionReader? imageDataSection;
-    internal PsdReader BinaryReader { get; init; }
+    internal PsdBinaryReader BinaryReader { get; init; }
 
     public void Dispose()
         {
@@ -29,7 +29,6 @@ public partial class PsdDocument : IPsdLayer, IDisposable
 
     internal void InitSections()
         {
-
         fileHeaderSection = new FileHeaderSectionReader(BinaryReader);
         colorModeDataSection = new ColorModeDataSectionReader(BinaryReader);
         imageResourcesSection = new ImageResourcesSectionReader(BinaryReader);

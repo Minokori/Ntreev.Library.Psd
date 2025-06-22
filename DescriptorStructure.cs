@@ -23,13 +23,13 @@ internal class DescriptorStructure : Properties
     {
     private int Version { get; init; }
 
-    public DescriptorStructure(PsdReader reader)
+    public DescriptorStructure(PsdBinaryReader reader)
         : this(reader, true)
         {
 
         }
 
-    public DescriptorStructure(PsdReader reader, bool hasVersion)
+    public DescriptorStructure(PsdBinaryReader reader, bool hasVersion)
         {
         if (hasVersion == true)
             {

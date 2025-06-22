@@ -19,13 +19,13 @@ namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class LayerExtraRecordsReader : ValueReader<LayerRecords>
     {
-    private LayerExtraRecordsReader(PsdReader reader, LayerRecords records)
+    private LayerExtraRecordsReader(PsdBinaryReader reader, LayerRecords records)
         : base(reader, true, records)
         {
 
         }
 
-    public static LayerRecords Read(PsdReader reader, LayerRecords records)
+    public static LayerRecords Read(PsdBinaryReader reader, LayerRecords records)
         {
         LayerExtraRecordsReader instance = new(reader, records);
         return instance.Value;

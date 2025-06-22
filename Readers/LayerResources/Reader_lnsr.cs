@@ -23,7 +23,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("lnsr")]
 internal class Reader_lnsr : ResourceReaderBase
     {
-    public Reader_lnsr(PsdReader reader, long length)
+    public Reader_lnsr(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
     protected override IProperties ReadValue()

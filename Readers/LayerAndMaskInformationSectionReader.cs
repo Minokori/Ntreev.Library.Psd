@@ -19,7 +19,7 @@ using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 namespace Ntreev.Library.Psd.Readers;
 
-internal class LayerAndMaskInformationSectionReader(PsdReader reader, PsdDocument document)
+internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdDocument document)
     : LazyValueReader<LayerAndMaskInformationSection>(reader, document)
     {
     protected override LayerAndMaskInformationSection ReadValue()

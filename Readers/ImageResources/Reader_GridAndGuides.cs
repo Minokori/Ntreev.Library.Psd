@@ -21,7 +21,7 @@ using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.ImageResources;
 
 [ResourceID("1032", DisplayName = "GridAndGuides")]
-internal class Reader_GridAndGuides(PsdReader reader, long length) : ResourceReaderBase(reader, length)
+internal class Reader_GridAndGuides(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
     protected override IProperties ReadValue()
         {

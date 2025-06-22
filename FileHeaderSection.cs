@@ -20,7 +20,7 @@ public struct FileHeaderSection
     public static FileHeaderSection FromFile(string filename)
         {
         using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using var reader = new PsdReader(stream) { Uri = new(Path.GetDirectoryName(filename)) };
+        using var reader = new PsdBinaryReader(stream) { Uri = new(Path.GetDirectoryName(filename)) };
         return FileHeaderSectionReader.Read(reader);
         }
     }

@@ -30,7 +30,7 @@ namespace Ntreev.Library.Psd.Structures
 
             }
 
-        public StructureProperty(PsdReader reader)
+        public StructureProperty(PsdBinaryReader reader)
             {
             this.Add("Name", reader.ReadString());
             this.Add("ClassID", reader.ReadAsKey());

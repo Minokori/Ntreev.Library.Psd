@@ -1,42 +1,15 @@
 using System.Text;
 using Ntreev.Library.Psd.Exceptions;
-using Ntreev.Library.Psd.Services;
 
 namespace Ntreev.Library.Psd;
 
-internal partial class PsdReader(Stream stream, Uri? uri = null) : BinaryReader(stream)
+/// <summary>
+/// 读取 PSD 文件的二进制数据流的读取器。<para/>
+/// </summary>
+/// <param name="stream">PSD 文件的数据流</param>
+/// <param name="uri">PSD 文件的绝对 Uri. 若 <paramref name="stream"/> 没有对应的文件, 默认 Uri 为当前工作路径</param>
+internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryReader(stream)
     {
-
-    public static PsdUriResolver Resolver => PsdService.Resolver;
-    public int Version
-        {
-        get => field;
-        set
-            {
-            if (value is not 1 and not 2)
-                throw new InvalidFormatException(
-                    "Invalid PSD version. Only version 1 and 2 are supported."
-                );
-            field = value;
-            }
-        } = 1;
-
-    public long Position
-        {
-        get => BaseStream.Position;
-        set => BaseStream.Position = value;
-        }
-
-    public long Length => BaseStream.Length;
-
-    public Stream Stream => BaseStream;
-
-    public Uri? Uri
-        {
-        get;
-        init => field = uri ?? new Uri(Directory.GetCurrentDirectory());
-        }
-
     #region 以 "ReadAs" 开头的方法, 功能类似于 BinaryReader 的 "Read" 开头方法, 但会返回特定格式的字符串或数据
     /// <summary>
     /// 从流中读取一个 Pascal 字符串，字符串长度由第一个字节指定，后续字节为字符串内容。<para/>
@@ -87,98 +60,109 @@ internal partial class PsdReader(Stream stream, Uri? uri = null) : BinaryReader(
         return ReadAsAscii(length);
         }
 
+    /// <summary>
+    /// 根据 PSD 文件头内的 Version 读取一个 <see cref="int"/> 或 <see cref="long"/>, 通常作为数据结构流的长度.
+    /// </summary>
+    /// <returns>数据结构的字节长度</returns>
+    /// <remarks>
+    /// 一般而言, PSD 文件的 Version <b>始终</b>为 1.<para/>
+    /// PSB 文件的 Version 为 2, 但本程序集不支持 PSB 文件的读取.<para/>
+    /// </remarks>
+    public long ReadAsStreamLength() => Version == 1 ? ReadInt32() : ReadInt64();
+
+    /// <summary>
+    /// 读取一个 <see cref="short"/> 类型的值, 并作为 <see cref="ColorMode"/> 枚举类型返回。<para/>
+    /// </summary>
+    /// <returns><see cref="ColorMode"/></returns>
+    public ColorMode ReadAsColorMode() => (ColorMode)ReadInt16();
+
+    /// <summary>
+    /// 读取为长度为4个字节的 ASCII 字符串, 并作为 <see cref="BlendMode"/> 枚举类型返回。<para/>
+    /// </summary>
+    /// <returns><see cref="BlendMode"/></returns>
+    public BlendMode ReadAsBlendMode() => PsdUtility.ToBlendMode(ReadAsAscii(4));
+
+    /// <summary>
+    /// 读取一个字节, 并作为 <see cref="LayerFlags"/> 枚举类型返回。<para/>
+    /// </summary>
+    /// <returns><see cref="LayerFlags"/></returns>
+    public LayerFlags ReadAsLayerFlags() => (LayerFlags)ReadByte();
+
+    /// <summary>
+    /// 读取一个 <see cref="short"/> 类型的值, 并作为 <see cref="ChannelType"/> 枚举类型返回。<para/>
+    /// </summary>
+    /// <returns> <see cref="ChannelType"/></returns>
+    public ChannelType ReadAsChannelType() => (ChannelType)ReadInt16();
+
+    /// <summary>
+    /// 读取一个 <see cref="short"/> 类型的值, 并作为 <see cref="CompressionType"/> 枚举类型返回。<para/>
+    /// </summary>
+    /// <returns><see cref="CompressionType"/></returns>
+    public CompressionType ReadCompressionType() => (CompressionType)ReadInt16();
     #endregion
 
-
-    public long ReadLength() => Version == 1 ? ReadInt32() : ReadInt64();
-
-    public void Skip(char c)
-        {
-        var ch = ReadChar();
-        if (ch != c)
-            throw new NotSupportedException();
-        }
-
-    public void Skip(char c, int count)
-        {
-        for (var i = 0; i < count; i++)
-            {
-            Skip(c);
-            }
-        }
-
-    public ColorMode ReadColorMode() => (ColorMode)ReadInt16();
-
-    public BlendMode ReadBlendMode() => PsdUtility.ToBlendMode(ReadAsAscii(4));
-
-    public LayerFlags ReadLayerFlags() => (LayerFlags)ReadByte();
-
-    public ChannelType ReadChannelType() => (ChannelType)ReadInt16();
-
-    public CompressionType ReadCompressionType() => (CompressionType)ReadInt16();
-
-    //public void ReadDocumentHeader()
-    //    {
-    //    if (!ValidateDocumentSignature())
-    //        throw new InvalidFormatException("Invalid PSD file signature. Expected '8BPS'.");
-    //    Version = ReadInt16();
-    //    Skip(6);
-    //    }
-
-    /// 验证
-    public void ValidateSignature(string signature)
-        {
-        var s = ReadAsType();
-        if (s != signature)
-            throw new InvalidFormatException();
-        }
-
-    public void ValidateSignature() => ValidateSignature(false);
-
-    public void ValidateSignature(bool check64bit)
-        {
-        if (VerifySignature(check64bit) == false)
-            throw new InvalidFormatException();
-        }
-
-    //private bool ValidateDocumentSignature()
-    //    {
-    //    var signature = ReadAsType();
-    //    return signature == "8BPS";
-    //    }
-
-    public void ValidateInt16(short value, string name)
-        {
-        var x = ReadInt16();
-        if (x != value)
-            throw new InvalidFormatException($"The value of {name} is not {value}, but {x}.");
-        }
-
-    public void ValidateInt32(int value, string name)
-        {
-        var x = ReadInt32();
-        if (x != value)
-            throw new InvalidFormatException($"The value of {name} is not {value}, but {x}.");
-        }
+    #region Skip 方法. 功能类似于 Read 方法, 但不关心读取的内容, 只关心跳过多少字节
     /// <summary>
-    /// 读取类型并验证其是否与预期的类型匹配。<para/>
-    /// 该操作会导致流位置的变化，因此在调用此方法后，流位置将指向类型字符串之后的位置。
+    /// 跳过指定数量的指定字节
     /// </summary>
-    /// <param name="value"></param>
-    /// <param name="name"></param>
-    /// <exception cref="InvalidFormatException"></exception>
-    public void ValidateType(string value, string name = "")
+    /// <param name="c">要跳过的字节 (ascii 码形式)</param>
+    /// <param name="repeat">跳过多少次, 默认为 1</param>
+    /// <exception cref="NotSupportedException"></exception>
+    public void Skip(char c, int repeat = 1)
         {
-        var type = ReadAsType();
-        if (type != value)
+        for (var i = 0; i < repeat; i++)
             {
-            throw new InvalidFormatException(
-                $"Invalid type for {name}. Expected '{value}', but got '{type}'."
-            );
+            var readChar = ReadChar();
+            if (readChar != c)
+                throw new NotSupportedException(
+                    $"expect skip {c}, but met {readChar} at {i + 1}th position"
+                );
             }
         }
+    #endregion
+
+    #region Verify 方法. 用于验证读取的数据是否符合预期
+
+    /// <summary>
+    /// 验证读取的签名是否与预期的签名(之一)匹配。<para/>
+    /// 从字节流中读取 4 字节的 ASCII 字符串，并与提供的签名进行比较。<para/>
+    /// </summary>
+    /// <param name="signature">签名/类型, 每一个都是长度为 4 的 ASCII 字符串</param>
+    /// <exception cref="InvalidFormatException"></exception>
+    /// <remarks>
+    /// <b>注意: 该方法将移动字节流的 Position</b>
+    /// </remarks>
+    public void VerifySignatureIs(params string[] signature)
+        {
+        var readSignature = ReadAsType();
+        if (signature.Contains(readSignature))
+            return;
+        throw new InvalidFormatException(
+            $"Expected signature/type is one of {string.Join(", ", signature)}, but got '{readSignature}'."
+        );
+        }
+
+    /// <summary>
+    /// 验证读取的 <see cref="int"/> 或 <see cref="short"/> 值是否与预期的值匹配。<para/>
+    /// 从字节流中读取一个 <see cref="int"/> 或 <see cref="short"/> 值，并与提供的值进行比较。<para/>
+    /// </summary>
+    /// <typeparam name="T"> <see cref="int"/> 或 <see cref="short"/></typeparam>
+    /// <param name="value">要验证的值</param>
+    /// <exception cref="InvalidFormatException"></exception>
+    /// <remarks>
+    /// <b>注意: 该方法将移动字节流的 Position</b>
+    /// </remarks>
+    public void VerifyIntIs<T>(T value) where T : struct
+        {
+        switch (value)
+            {
+            case int intValue:
+                { if (intValue == ReadInt32()) return; break; }
+            case short shortValue:
+                { if (shortValue == ReadInt16()) return; break; }
+            }
+
+        throw new InvalidFormatException($"expect {typeof(T)} value {value}");
+        }
+    #endregion
     }
-
-
-
-

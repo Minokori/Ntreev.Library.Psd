@@ -17,14 +17,14 @@
 
 namespace Ntreev.Library.Psd.Readers;
 
-internal class ImageDataSectionReader(PsdReader reader, PsdDocument document) : LazyValueReader<Channel[]>(reader, document)
+internal class ImageDataSectionReader(PsdBinaryReader reader, PsdDocument document) : LazyValueReader<Channel[]>(reader, document)
     {
     protected override long InitStreamLength() => GlobalReader.Length - GlobalReader.Position;
 
     protected override Channel[] ReadValue() => ReadValue(GlobalReader, (PsdDocument)UserData!);
 
     // TODO 透明度消失疑似发生在这里
-    private static Channel[] ReadValue(PsdReader reader, PsdDocument document)
+    private static Channel[] ReadValue(PsdBinaryReader reader, PsdDocument document)
         {
         var channelCount = document.FileHeaderSection.NumberOfChannels;
         var width = document.Width;

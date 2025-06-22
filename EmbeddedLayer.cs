@@ -4,18 +4,19 @@ namespace Ntreev.Library.Psd;
 
 
 /// <summary>
-/// 植入的其他 PSD document.
+/// 嵌入的其他 PSD document.
 /// </summary>
 internal class EmbeddedLayer : ILinkedLayer
     {
-    private readonly PsdUriResolver resolver = PsdService.Resolver;
+
+    private readonly IDocumentManager resolver = PsdService.Resolver;
 
     public EmbeddedLayer(Guid id, Uri absoluteUri)
         {
         ID = id;
         AbsoluteUri = absoluteUri;
 
-        if (File.Exists(AbsoluteUri.LocalPath) == true)
+        if (File.Exists(AbsoluteUri.LocalPath))
             {
             var header = FileHeaderSection.FromFile(this.AbsoluteUri.LocalPath);
             Width = header.Width;
@@ -27,7 +28,7 @@ internal class EmbeddedLayer : ILinkedLayer
         {
         get
             {
-            field ??= resolver.GetDocument(this.AbsoluteUri);
+            field ??= resolver.GetDocument(AbsoluteUri);
             return field;
             }
         }

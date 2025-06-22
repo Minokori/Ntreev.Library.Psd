@@ -21,7 +21,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("lnk3")]
 internal class Reader_lnk3 : Reader_lnkD
     {
-    public Reader_lnk3(PsdReader reader, long length)
+    public Reader_lnk3(PsdBinaryReader reader, long length)
         : base(reader, length)
         {
 

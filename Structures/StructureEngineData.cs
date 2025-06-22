@@ -4,14 +4,14 @@ namespace Ntreev.Library.Psd.Structures;
 
 internal class StructureEngineData : Properties
     {
-    public StructureEngineData(PsdReader reader)
+    public StructureEngineData(PsdBinaryReader reader)
         {
         var length = reader.ReadInt32();
         reader.Skip('\n', 2);
         ReadProperties(reader, 0, this);
         }
 
-    private void ReadProperties(PsdReader reader, int level, Properties props)
+    private void ReadProperties(PsdBinaryReader reader, int level, Properties props)
         {
         reader.Skip('\t', level);
         var c = reader.ReadChar();
@@ -72,7 +72,7 @@ internal class StructureEngineData : Properties
                 }
             }
         }
-    private object ReadValue(PsdReader reader, int level)
+    private object ReadValue(PsdBinaryReader reader, int level)
         {
         var c = reader.ReadChar();
         if (c == ']')

@@ -14,26 +14,33 @@
 //WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 namespace Ntreev.Library.Psd.Services;
 
-public class PathResolver : PsdUriResolver
+
+/// <summary>
+/// <see cref="PsdDocument"/> 文档管理器接口, 支持通过绝对路径或文件名获取文档。
+/// </summary>
+public interface IDocumentManager
     {
-    private readonly Dictionary<Uri, PsdDocument> uriToDocuments = [];
+    abstract PsdDocument GetDocument(Uri absoluteUri);
+    abstract PsdDocument GetDocument(string filename);
 
-    public override PsdDocument GetDocument(Uri absoluteUri)
+    virtual Uri ResolveUri(Uri absoluteUri, string relativeUri)
         {
-        var filename = absoluteUri.LocalPath;
-        if (File.Exists(filename) == false)
-            throw new FileNotFoundException(string.Format("{0} 파일을 찾을 수 없습니다.", filename), filename);
-
-        if (uriToDocuments.ContainsKey(absoluteUri) == false)
+        // 绝对路径为空或不是绝对URI时，尝试将相对路径转换为绝对URI
+        if (absoluteUri == null || (!absoluteUri.IsAbsoluteUri && absoluteUri.OriginalString.Length == 0))
             {
-            var document = PsdDocument.Create(filename);
-            uriToDocuments.Add(absoluteUri, document);
+            Uri uri = new(relativeUri, UriKind.RelativeOrAbsolute);
+            if (!uri.IsAbsoluteUri && uri.OriginalString.Length > 0)
+                uri = new Uri(Path.GetFullPath(relativeUri));
+            return uri;
             }
 
-        return uriToDocuments[absoluteUri];
+        return relativeUri == null || relativeUri.Length == 0
+            ? absoluteUri
+            : !absoluteUri.IsAbsoluteUri ? throw new NotSupportedException("PSD_RelativeUriNotSupported") : new Uri(absoluteUri, relativeUri);
         }
+
+
     }
 

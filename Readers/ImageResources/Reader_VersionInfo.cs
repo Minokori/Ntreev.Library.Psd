@@ -22,7 +22,7 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 [ResourceID("1057", DisplayName = "Version")]
 internal class Reader_VersionInfo : ResourceReaderBase
     {
-    public Reader_VersionInfo(PsdReader reader, long length)
+    public Reader_VersionInfo(PsdBinaryReader reader, long length)
         : base(reader, length)
         {
 

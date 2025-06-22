@@ -35,7 +35,7 @@ partial class PsdLayer : IPsdLayer
 
     private static readonly PsdLayer[] _emptyChilds = [];
 
-    public PsdLayer(PsdReader reader, PsdDocument document)
+    public PsdLayer(PsdBinaryReader reader, PsdDocument document)
         {
         _document = document;
         _records = LayerRecordsReader.Read(reader);
@@ -53,7 +53,7 @@ partial class PsdLayer : IPsdLayer
         }
 
 
-    public void ReadChannels(PsdReader reader)
+    public void ReadChannels(PsdBinaryReader reader)
         {
         this._channelsReader = new ChannelsReader(reader, this._records.ChannelSize, this);
         }

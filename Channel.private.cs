@@ -3,7 +3,7 @@ internal partial class Channel
     {
 
 
-    private void PrivateReadData(PsdReader reader, int bps, CompressionType compressionType, int[] rlePackLengths)
+    private void PrivateReadData(PsdBinaryReader reader, int bps, CompressionType compressionType, int[] rlePackLengths)
         {
         var length = PsdUtility.DepthToPitch(bps, this.Width);
         this.Data = new byte[length * this.Height];

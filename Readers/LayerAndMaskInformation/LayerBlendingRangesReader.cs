@@ -19,10 +19,10 @@ namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class LayerBlendingRangesReader : ValueReader<LayerBlendingRanges>
     {
-    private LayerBlendingRangesReader(PsdReader reader)
+    private LayerBlendingRangesReader(PsdBinaryReader reader)
         : base(reader, true, null) { }
 
-    public static LayerBlendingRanges Read(PsdReader reader)
+    public static LayerBlendingRanges Read(PsdBinaryReader reader)
         {
         var instance = new LayerBlendingRangesReader(reader);
         return instance.Value;

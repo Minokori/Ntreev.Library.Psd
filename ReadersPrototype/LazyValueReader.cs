@@ -24,9 +24,9 @@ namespace Ntreev.Library.Psd;
 /// <typeparam name="T"></typeparam>
 internal abstract class LazyValueReader<T> : ValueReader<T>
     {
-    protected LazyValueReader(PsdReader reader, object? userData)
+    protected LazyValueReader(PsdBinaryReader reader, object? userData)
         : base(reader, true, userData) { }
 
-    protected LazyValueReader(PsdReader reader, long length, object? userData)
+    protected LazyValueReader(PsdBinaryReader reader, long length, object? userData)
         : base(reader, length, userData) { }
     }

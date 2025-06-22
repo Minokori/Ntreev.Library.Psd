@@ -23,9 +23,9 @@ namespace Ntreev.Library.Psd;
 /// </summary>
 internal abstract class LazyProperties : LazyValueReader<IProperties>, IProperties
     {
-    protected LazyProperties(PsdReader reader, object? userData) : base(reader, userData) { }
+    protected LazyProperties(PsdBinaryReader reader, object? userData) : base(reader, userData) { }
 
-    protected LazyProperties(PsdReader reader, long length, object? userData) : base(reader, length, userData) { }
+    protected LazyProperties(PsdBinaryReader reader, long length, object? userData) : base(reader, length, userData) { }
 
     public bool Contains(string property) => Value.Contains(property);
 

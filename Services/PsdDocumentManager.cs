@@ -15,17 +15,35 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace Ntreev.Library.Psd.Readers;
+namespace Ntreev.Library.Psd.Services;
 
-/// <summary>
-/// 颜色模式数据部分的读取器<para/>
-/// 只有索引颜色和双色调（请参阅文件头部分中的模式字段）具有颜色模式数据。对于所有其他模式，此部分只是 4 字节长度的字段，该字段设置为零
-/// </summary>
-/// <param name="reader"></param>
-internal class ColorModeDataSectionReader(PsdReader reader) : LazyValueReader<byte[]>(reader, null)
+public partial class PsdDocumentManager : Dictionary<Uri, PsdDocument>, IDictionary<string, PsdDocument>, IDocumentManager
     {
-    protected override long InitStreamLength() => GlobalReader.ReadInt32();
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="absoluteUri"></param>
+    /// <returns></returns>
+    /// <exception cref="FileNotFoundException"></exception>
+    public PsdDocument GetDocument(Uri absoluteUri)
+        {
+        var filename = absoluteUri.LocalPath;
+        if (File.Exists(filename) == false)
+            throw new FileNotFoundException(string.Format("{0} Not Found.", filename), filename);
 
-    protected override byte[] ReadValue() =>
-        StreamLength > 0 ? GlobalReader.ReadBytes((int)StreamLength) : [];
+        if (ContainsKey(absoluteUri) == false)
+            {
+            var document = new PsdDocument(filename);
+            Add(absoluteUri, document);
+            }
+
+        return this[absoluteUri];
+        }
+
+    public PsdDocument GetDocument(string filename)
+        {
+        var absoluteUri = new Uri(Path.GetFullPath(filename));
+        return GetDocument(absoluteUri);
+        }
+
     }

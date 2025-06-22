@@ -19,13 +19,13 @@ namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class LayerRecordsReader : ValueReader<LayerRecords>
     {
-    private LayerRecordsReader(PsdReader reader)
+    private LayerRecordsReader(PsdBinaryReader reader)
         : base(reader, false, null)
         {
 
         }
 
-    public static LayerRecords Read(PsdReader reader)
+    public static LayerRecords Read(PsdBinaryReader reader)
         {
         LayerRecordsReader instance = new(reader);
         return instance.Value;
@@ -48,18 +48,18 @@ internal class LayerRecordsReader : ValueReader<LayerRecords>
 
         for (var i = 0; i < channelCount; i++)
             {
-            records.Channels[i].Type = GlobalReader.ReadChannelType();
-            records.Channels[i].Size = GlobalReader.ReadLength();
+            records.Channels[i].Type = GlobalReader.ReadAsChannelType();
+            records.Channels[i].Size = GlobalReader.ReadAsStreamLength();
             records.Channels[i].Width = records.Width;
             records.Channels[i].Height = records.Height;
             }
 
-        GlobalReader.ValidateSignature();
+        GlobalReader.VerifySignatureIs("8BIM");
 
-        records.BlendMode = GlobalReader.ReadBlendMode();
+        records.BlendMode = GlobalReader.ReadAsBlendMode();
         records.Opacity = GlobalReader.ReadByte();
         records.Clipping = GlobalReader.ReadBoolean();
-        records.Flags = GlobalReader.ReadLayerFlags();
+        records.Flags = GlobalReader.ReadAsLayerFlags();
         records.Filter = GlobalReader.ReadByte();
 
         return records;

@@ -24,7 +24,7 @@ namespace Ntreev.Library.Psd.Structures
     {
     class StructureObjectArray : Properties
         {
-        public StructureObjectArray(PsdReader reader)
+        public StructureObjectArray(PsdBinaryReader reader)
             {
             int version = reader.ReadInt32();
             this.Add("Name", reader.ReadString());

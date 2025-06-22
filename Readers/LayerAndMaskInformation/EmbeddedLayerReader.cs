@@ -17,11 +17,11 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class EmbeddedLayerReader(PsdReader reader) : ValueReader<EmbeddedLayer>(reader, true, null)
+internal class EmbeddedLayerReader(PsdBinaryReader reader) : ValueReader<EmbeddedLayer>(reader, true, null)
     {
     protected override long InitStreamLength() => (GlobalReader.ReadInt64() + 3) & (~3);
 
-    private Uri ReadAboluteUri(PsdReader reader)
+    private Uri ReadAbsoluteUri(Uri uri)
         {
         var props = new DescriptorStructure(reader);
         if (props.Contains("fullPath") == true)
@@ -34,7 +34,7 @@ internal class EmbeddedLayerReader(PsdReader reader) : ValueReader<EmbeddedLayer
         if (props.Contains("relPath") == true)
             {
             var relativePath = props["relPath"] as string;
-            var absoluteUri = PsdReader.Resolver.ResolveUri(reader.Uri, relativePath);
+            var absoluteUri = PsdBinaryReader.Resolver.ResolveUri(uri, relativePath);
             if (File.Exists(absoluteUri.LocalPath) == true)
                 return absoluteUri;
             }
@@ -42,7 +42,7 @@ internal class EmbeddedLayerReader(PsdReader reader) : ValueReader<EmbeddedLayer
         if (props.Contains("Nm") == true)
             {
             var name = props["Nm"] as string;
-            var absoluteUri = PsdReader.Resolver.ResolveUri(reader.Uri, name);
+            var absoluteUri = PsdBinaryReader.Resolver.ResolveUri(uri, name);
             if (File.Exists(absoluteUri.LocalPath) == true)
                 return absoluteUri;
             }
@@ -52,7 +52,7 @@ internal class EmbeddedLayerReader(PsdReader reader) : ValueReader<EmbeddedLayer
 
     protected override EmbeddedLayer ReadValue()
         {
-        GlobalReader.ValidateSignature("liFE");
+        GlobalReader.VerifySignatureIs("liFE");
 
         var version = GlobalReader.ReadInt32();
 
@@ -63,7 +63,7 @@ internal class EmbeddedLayerReader(PsdReader reader) : ValueReader<EmbeddedLayer
 
         var length = GlobalReader.ReadInt64();
         IProperties? properties = GlobalReader.ReadBoolean() == true ? new DescriptorStructure(GlobalReader) : null;
-        var absoluteUri = ReadAboluteUri(GlobalReader);
+        var absoluteUri = ReadAbsoluteUri(GlobalReader.Uri);
 
         return new EmbeddedLayer(id, absoluteUri);
         }

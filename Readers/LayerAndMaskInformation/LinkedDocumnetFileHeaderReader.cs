@@ -17,7 +17,7 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LinkedDocumnetFileHeaderReader(PsdReader reader, long length)
+internal class LinkedDocumnetFileHeaderReader(PsdBinaryReader reader, long length)
     : LazyValueReader<FileHeaderSection>(reader, length, null)
     {
     protected override FileHeaderSection ReadValue()
@@ -29,7 +29,7 @@ internal class LinkedDocumnetFileHeaderReader(PsdReader reader, long length)
                 GlobalReader.Position,
                 this.StreamLength
             );
-            using var r = new PsdReader(stream) { Uri = GlobalReader.Uri };
+            using var r = new PsdBinaryReader(stream) { Uri = GlobalReader.Uri };
             return FileHeaderSectionReader.Read(r);
             }
         else
@@ -38,7 +38,7 @@ internal class LinkedDocumnetFileHeaderReader(PsdReader reader, long length)
             }
         }
 
-    private bool IsDocument(PsdReader reader)
+    private bool IsDocument(PsdBinaryReader reader)
         {
         var position = reader.Position;
         try

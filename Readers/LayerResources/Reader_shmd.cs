@@ -23,7 +23,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("shmd")]
 internal class Reader_shmd : ResourceReaderBase
     {
-    public Reader_shmd(PsdReader reader, long length)
+    public Reader_shmd(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
     protected override IProperties ReadValue()

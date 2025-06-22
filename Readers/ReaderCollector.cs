@@ -51,7 +51,7 @@ internal static class ReaderCollector
             }
         }
 
-    public static ResourceReaderBase CreateReader(string resourceID, PsdReader reader, long length)
+    public static ResourceReaderBase CreateReader(string resourceID, PsdBinaryReader reader, long length)
         {
         var readerType = typeof(EmptyResourceReader);
         if (Readers.ContainsKey(resourceID) == true)
@@ -62,7 +62,7 @@ internal static class ReaderCollector
         var readerInstance = TypeDescriptor.CreateInstance(
                 null,
                 readerType,
-                [typeof(PsdReader), typeof(long)],
+                [typeof(PsdBinaryReader), typeof(long)],
                 [reader, length]
             );
 

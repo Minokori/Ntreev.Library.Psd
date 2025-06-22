@@ -2,34 +2,60 @@ using Ntreev.Library.Psd.Exceptions;
 using Ntreev.Library.Psd.Services;
 namespace Ntreev.Library.Psd;
 
-internal partial class PsdReader
+internal partial class PsdBinaryReader
     {
+    /// <summary>
+    /// 持有的对单例 <see cref="IDocumentManager"/> 的引用。
+    /// </summary>
+    public static IDocumentManager Resolver => PsdService.Resolver;
 
-    //public long StartPosition
-    //    {
-    //    get => _reader.BaseStream.StartPosition;
-    //    set => _reader.BaseStream.StartPosition = value;
-    //    }
+    /// <summary>
+    /// PSD 文件的版本. 存在于 <see cref="FileHeaderSection"/> 中
+    /// </summary>
+    /// <remarks>
+    /// 始终等于 1。如果与此值不匹配，请不要尝试读取文件。PSB 为 2。
+    /// </remarks>
+    public int Version
+        {
+        get => field;
+        set
+            {
+            if (value is not 1 and not 2)
+                throw new InvalidFormatException(
+                    "Invalid PSD version. Only version 1 and 2 are supported."
+                );
+            field = value;
+            }
+        } = 1;
 
-    //public long StreamLength => _reader.BaseStream.StreamLength;
+    /// <summary>
+    /// 字节流当前的位置。<para/>
+    /// </summary>
+    public long Position
+        {
+        get => BaseStream.Position;
+        set => BaseStream.Position = value;
+        }
 
-    //public int Version
-    //    {
-    //    get => field;
-    //    set
-    //        {
-    //        if (value is not 1 and not 2)
-    //            throw new InvalidFormatException();
+    /// <summary>
+    /// 字节流的长度
+    /// </summary>
+    public long Length => BaseStream.Length;
 
-    //        field = value;
-    //        }
-    //    }
+    /// <summary>
+    /// 字节流
+    /// </summary>
+    public Stream Stream => BaseStream;
 
-    //public PsdUriResolver Resolver { get; } = resolver;
 
-    //public Stream Stream { get; } = stream;
-
-    //public Uri Uri { get; init; } = uri;
+    /// <summary>
+    /// PSD 文件的 URI。<para/>
+    /// </summary>
+    public Uri? Uri
+        {
+        get;
+        init => field = uri ?? new Uri(Directory.GetCurrentDirectory());
+        }
     }
 
 

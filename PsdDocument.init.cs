@@ -2,23 +2,18 @@ namespace Ntreev.Library.Psd;
 
 public partial class PsdDocument
     {
-    protected PsdDocument() { }
-    #region static classmethod for init
-
-    public static PsdDocument Create(string filename)
+    //在创建许多实例时, 推荐使用 Manager进行管理, 以避免频繁的资源分配和释放。
+    // 但如果只创建少量实例, 可以直接使用构造函数。
+    public PsdDocument(Stream stream, Uri? fileUri = null)
         {
-        FileInfo fileInfo = new(filename);
-        FileStream stream = new(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
-        return Create(stream, new Uri(fileInfo.DirectoryName!));
+        BinaryReader = new PsdBinaryReader(stream, fileUri ?? new Uri(Directory.GetCurrentDirectory()));
+        InitSections();
         }
 
-    public static PsdDocument Create(Stream stream, Uri? fileUri = null)
+    public PsdDocument(string filename)
+        : this(File.OpenRead(filename), new Uri(new FileInfo(filename).FullName))
         {
-        PsdReader reader = new(stream, fileUri);
-        PsdDocument document = new() { BinaryReader = reader };
-        document.InitSections();
-        return document;
         }
-    #endregion
+
     }
 

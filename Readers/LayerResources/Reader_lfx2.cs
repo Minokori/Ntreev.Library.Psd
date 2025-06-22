@@ -22,7 +22,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("lfx2", DisplayName = "Object-based effects layer info")]
 internal class Reader_lfx2 : ResourceReaderBase
     {
-    public Reader_lfx2(PsdReader reader, long length)
+    public Reader_lfx2(PsdBinaryReader reader, long length)
         : base(reader, length)
         {
 
@@ -30,7 +30,7 @@ internal class Reader_lfx2 : ResourceReaderBase
 
     protected override IProperties ReadValue()
         {
-        GlobalReader.ValidateInt32(0, "lfx2 Version");
+        GlobalReader.VerifyIntIs<int>(0);
         return new DescriptorStructure(GlobalReader, true);
         }
     }

@@ -7,27 +7,36 @@ internal partial class ValueReader<T>
     /// <summary>
     /// 值. (懒加载)
     /// </summary>
-    public T? Value
+    /// <remarks>
+    /// 访问该属性会检查缓存, 首次访问时会调用 <see cref="ReadValue"/> 方法从流中读取值.<para/>"
+    /// 后续访问将直接返回缓存的值.<para/>
+    /// </remarks>
+    public T Value
         {
         get
             {
             if (HasRead == false && StreamLength > 0) // 没有数据但应该有数据时, 读取数据
                 {
-                var position = GlobalReader.Position;
-                var version = GlobalReader.Version;
-                field = InitValue();
-                GlobalReader.Position = position;
-                GlobalReader.Version = version;
-                }
-            else if (HasRead == false && StreamLength <= 0) // 没有数据且不应该有数据时, 返回默认值
-                {
-                field = default!;
-                HasRead = true;
+                // 缓存
+                var globalPosition = GlobalReader.Position;
+
+                // 更新字节流的位置指针，从数据结构实际存在的位置开始读取
+                GlobalReader.Position = StartPosition;
+
+                // 读取值
+                Value = ReadValue();
+
+                // 恢复全局 BinaryReader 的位置和版本
+                GlobalReader.Position = globalPosition;
                 }
 
             return field;
             }
-        private set;
+        private set
+            {
+            field = value;
+            HasRead = true;
+            }
         }
 
     /// <summary>

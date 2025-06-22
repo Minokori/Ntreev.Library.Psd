@@ -6,7 +6,7 @@ internal partial class Channel : IChannel
     private ChannelType _type;
     private int[] _rlePackLengths = [];
 
-    public void ReadHeader(PsdReader reader, CompressionType compressionType)
+    public void ReadHeader(PsdBinaryReader reader, CompressionType compressionType)
         {
         if (compressionType != CompressionType.RLE)
             return;
@@ -28,7 +28,7 @@ internal partial class Channel : IChannel
             }
         }
 
-    public void Read(PsdReader reader, int bpp, CompressionType compressionType)
+    public void Read(PsdBinaryReader reader, int bpp, CompressionType compressionType)
         {
         switch (compressionType)
             {

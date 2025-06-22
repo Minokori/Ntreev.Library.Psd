@@ -17,7 +17,7 @@
 
 namespace Ntreev.Library.Psd.Readers;
 
-internal class ImageResourcesSectionReader(PsdReader reader) : LazyProperties(reader, null)
+internal class ImageResourcesSectionReader(PsdBinaryReader reader) : LazyProperties(reader, null)
     {
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 
@@ -27,7 +27,7 @@ internal class ImageResourcesSectionReader(PsdReader reader) : LazyProperties(re
 
         while (GlobalReader.Position < EndPosition)
             {
-            GlobalReader.ValidateSignature();
+            GlobalReader.VerifySignatureIs("8BIM");
 
             var resourceID = GlobalReader.ReadInt16().ToString();
             var name = GlobalReader.ReadAsPascalString(2);

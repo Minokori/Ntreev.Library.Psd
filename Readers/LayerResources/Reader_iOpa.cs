@@ -20,7 +20,7 @@ using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.LayerResources;
 
 [ResourceID("iOpa")]
-internal class Reader_iOpa(PsdReader reader, long length) : ResourceReaderBase(reader, length)
+internal class Reader_iOpa(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
     protected override IProperties ReadValue()
         {

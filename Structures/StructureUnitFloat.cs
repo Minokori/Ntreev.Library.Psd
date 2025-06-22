@@ -30,7 +30,7 @@ namespace Ntreev.Library.Psd.Structures
 
             }
 
-        public StructureUnitFloat(PsdReader reader)
+        public StructureUnitFloat(PsdBinaryReader reader)
             {
             string type = reader.ReadAsType();
 

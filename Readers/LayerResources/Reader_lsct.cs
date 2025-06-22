@@ -23,7 +23,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("lsct")]
 internal class Reader_lsct : ResourceReaderBase
     {
-    public Reader_lsct(PsdReader reader, long length)
+    public Reader_lsct(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
     protected override IProperties ReadValue()

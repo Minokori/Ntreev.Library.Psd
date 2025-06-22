@@ -17,19 +17,13 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LinkedLayerReader : ValueReader<LinkedLayer>
+internal class LinkedLayerReader(PsdBinaryReader reader) : ValueReader<LinkedLayer>(reader, true, null)
     {
-    public LinkedLayerReader(PsdReader reader)
-        : base(reader, true, null)
-        {
-
-        }
-
     protected override long InitStreamLength() => (GlobalReader.ReadInt64() + 3) & (~3);
 
     protected override LinkedLayer ReadValue()
         {
-        GlobalReader.ValidateSignature("liFD");
+        GlobalReader.VerifySignatureIs("liFD");
         var version = GlobalReader.ReadInt32();
 
         var id = new Guid(GlobalReader.ReadAsPascalString(1));
@@ -53,7 +47,7 @@ internal class LinkedLayerReader : ValueReader<LinkedLayer>
         return new LinkedLayer(name, id, documentReader, fileHeaderReader);
         }
 
-    private bool IsDocument(PsdReader reader)
+    private bool IsDocument(PsdBinaryReader reader)
         {
         var position = reader.Position;
         try

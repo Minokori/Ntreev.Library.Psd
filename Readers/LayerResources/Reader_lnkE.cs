@@ -22,7 +22,7 @@ using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.LayerResources;
 
 [ResourceID("lnkE")]
-internal class Reader_lnkE(PsdReader reader, long length) : ResourceReaderBase(reader, length)
+internal class Reader_lnkE(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
     protected override IProperties ReadValue()
         {

@@ -23,7 +23,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("lyid")]
 internal class Reader_lyid : ResourceReaderBase
     {
-    public Reader_lyid(PsdReader reader, long length)
+    public Reader_lyid(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
     protected override IProperties ReadValue()

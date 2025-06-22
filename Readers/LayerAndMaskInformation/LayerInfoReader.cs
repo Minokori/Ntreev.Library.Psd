@@ -18,7 +18,7 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LayerInfoReader(PsdReader reader, PsdDocument document) : ValueReader<PsdLayer[]>(reader, true, document)
+internal class LayerInfoReader(PsdBinaryReader reader, PsdDocument document) : ValueReader<PsdLayer[]>(reader, true, document)
     {
     protected override PsdLayer[] ReadValue()
         {

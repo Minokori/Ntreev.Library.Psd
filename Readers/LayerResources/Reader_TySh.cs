@@ -23,14 +23,15 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("TySh")]
 internal class Reader_TySh : ResourceReaderBase
     {
-    public Reader_TySh(PsdReader reader, long length)
+    public Reader_TySh(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
     protected override IProperties ReadValue()
         {
         var props = new Properties(7);
 
-        GlobalReader.ValidateInt16(1, "Typetool Version");
+        //GlobalReader.ValidateInt16(1, "Typetool Version");
+        GlobalReader.VerifyIntIs<short>(1);
         props["Transforms"] = GlobalReader.ReadDoubles(6);
         props["TextVersion"] = GlobalReader.ReadInt16();
         props["Text"] = new DescriptorStructure(GlobalReader);

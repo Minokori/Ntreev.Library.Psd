@@ -23,7 +23,7 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 [ResourceID("1050", DisplayName = "Slices")]
 internal class Reader_SlicesInfo : ResourceReaderBase
     {
-    public Reader_SlicesInfo(PsdReader reader, long length)
+    public Reader_SlicesInfo(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
     protected override IProperties ReadValue()
@@ -63,7 +63,7 @@ internal class Reader_SlicesInfo : ResourceReaderBase
         return props;
         }
 
-    private static Properties ReadSliceInfo(PsdReader reader)
+    private static Properties ReadSliceInfo(PsdBinaryReader reader)
         {
         var props = new Properties
             {

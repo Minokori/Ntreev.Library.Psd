@@ -20,7 +20,7 @@ using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.ImageResources;
 
 [ResourceID("1005", DisplayName = "Resolution")]
-internal class Reader_ResolutionInfo(PsdReader reader, long length) : ResourceReaderBase(reader, length)
+internal class Reader_ResolutionInfo(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
     protected override IProperties ReadValue()
         {

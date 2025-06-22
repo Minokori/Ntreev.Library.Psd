@@ -19,14 +19,14 @@ namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 
 /// <summary>
-/// 提供 <see cref="ReadValue(PsdReader, object, out Ntreev.Library.Psd.Channel[])"/> 方法读取通道的数据
+/// 提供 <see cref="ReadValue(PsdBinaryReader, object, out Ntreev.Library.Psd.Channel[])"/> 方法读取通道的数据
 /// <para/>
 /// 到 <paramref name="layer"/> 中
 /// </summary>
 /// <param name="reader"></param>
 /// <param name="length"></param>
 /// <param name="layer">Channels</param>
-internal class ChannelsReader(PsdReader reader, long length, PsdLayer layer) : LazyValueReader<Channel[]>(reader, length, layer)
+internal class ChannelsReader(PsdBinaryReader reader, long length, PsdLayer layer) : LazyValueReader<Channel[]>(reader, length, layer)
     {
     protected override Channel[] ReadValue()
         {
@@ -34,13 +34,12 @@ internal class ChannelsReader(PsdReader reader, long length, PsdLayer layer) : L
         var records = layer.Records;
 
         using MemoryStream stream = new(GlobalReader.ReadBytes((int)StreamLength));
-        using PsdReader r = new(stream) { Uri = GlobalReader.Uri };
-        r.Version = GlobalReader.Version;
+        using PsdBinaryReader r = new(stream) { Uri = GlobalReader.Uri, Version = GlobalReader.Version };
         ReadValue(r, layer.Depth, records.Channels);
         return records.Channels;
         }
 
-    private static void ReadValue(PsdReader reader, int depth, Channel[] channels)
+    private static void ReadValue(PsdBinaryReader reader, int depth, Channel[] channels)
         {
         foreach (var item in channels)
             {

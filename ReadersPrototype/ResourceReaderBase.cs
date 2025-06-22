@@ -17,7 +17,7 @@
 
 namespace Ntreev.Library.Psd.ReadersPrototype;
 
-internal abstract class ResourceReaderBase(PsdReader reader, long length) : LazyProperties(reader, length, null)
+internal abstract class ResourceReaderBase(PsdBinaryReader reader, long length) : LazyProperties(reader, length, null)
     {
     }
 

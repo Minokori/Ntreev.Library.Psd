@@ -23,7 +23,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("PlLd")]
 internal class Reader_PlLd : ResourceReaderBase
     {
-    public Reader_PlLd(PsdReader reader, long length)
+    public Reader_PlLd(PsdBinaryReader reader, long length)
         : base(reader, length)
         {
 
@@ -33,7 +33,7 @@ internal class Reader_PlLd : ResourceReaderBase
         {
         Properties props = [];
 
-        GlobalReader.ValidateType("plcL", "LayerResource PlLd");
+        GlobalReader.VerifySignatureIs("plcL");
         props["Version"] = GlobalReader.ReadInt32();
         props["UniqueID"] = GlobalReader.ReadAsPascalString(1);
         props["PageNumbers"] = GlobalReader.ReadInt32();
@@ -41,7 +41,7 @@ internal class Reader_PlLd : ResourceReaderBase
         props["AntiAlias"] = GlobalReader.ReadInt32();
         props["LayerType"] = GlobalReader.ReadInt32();
         props["Transformation"] = GlobalReader.ReadDoubles(8);
-        GlobalReader.ValidateInt32(0, "WarpVersion");
+        GlobalReader.VerifyIntIs<int>(0);
         props["Warp"] = new DescriptorStructure(GlobalReader);
 
         return props;

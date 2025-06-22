@@ -21,12 +21,12 @@ using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.LayerResources;
 
 [ResourceID("SoLd", DisplayName = "Placed Layer")]
-internal class Reader_SoLd(PsdReader reader, long length) : ResourceReaderBase(reader, length)
+internal class Reader_SoLd(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
     protected override IProperties ReadValue()
         {
-        GlobalReader.ValidateType("soLD", "SoLd ID");
-        GlobalReader.ValidateInt32(4, "SoLd Version");
+        GlobalReader.VerifySignatureIs("soLD");
+        GlobalReader.VerifyIntIs<int>(4);
         return new DescriptorStructure(GlobalReader, true);
         }
     }

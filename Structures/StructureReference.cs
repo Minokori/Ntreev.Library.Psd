@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Ntreev.Library.Psd.Structures
     {
-    class StructureReference(PsdReader reader) : BaseStructure(reader)
+    class StructureReference(PsdBinaryReader reader) : BaseStructure(reader)
         {
         }
     }

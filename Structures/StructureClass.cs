@@ -8,7 +8,7 @@ internal class StructureClass : Properties
 
         }
 
-    public StructureClass(PsdReader reader)
+    public StructureClass(PsdBinaryReader reader)
         {
         Add("Name", reader.ReadString());
         Add("ClassID", reader.ReadAsKey());
