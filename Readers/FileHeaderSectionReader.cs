@@ -14,6 +14,8 @@
 //WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+using Ntreev.Library.Psd.Exceptions;
+
 namespace Ntreev.Library.Psd.Readers;
 
 internal class FileHeaderSectionReader(PsdReader reader)
@@ -29,6 +31,9 @@ internal class FileHeaderSectionReader(PsdReader reader)
         {
         var value = new FileHeaderSection
             {
+            Signature = GlobalReader.ReadAsType(),
+            Version = GlobalReader.ReadInt16(),
+            Reserved = GlobalReader.ReadBytes(6).Sum(b => b),
             NumberOfChannels = GlobalReader.ReadInt16(),
             Height = GlobalReader.ReadInt32(),
             Width = GlobalReader.ReadInt32(),
@@ -36,7 +41,11 @@ internal class FileHeaderSectionReader(PsdReader reader)
             ColorMode = GlobalReader.ReadColorMode(),
             };
 
-        return value.Depth != 8
+        return value.Reserved != 0
+            ? throw new InvalidFormatException("Reserved bytes in PSD file header must be zero.")
+            : value.Signature != "8BPS"
+            ? throw new InvalidFormatException("Invalid PSD file signature. Expected '8BPS'.")
+            : value.Depth != 8
             ? throw new NotSupportedException("only support 8 Bit Channel")
             : value;
         }

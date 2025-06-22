@@ -1,20 +1,3 @@
-//Released under the MIT License.
-//
-//Copyright (c) 2015 Ntreev Soft co., Ltd.
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
-//rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
-//persons to whom the Software is furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in all copies or substantial portions of the 
-//Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
-//WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-//OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 using System.Collections;
 
 namespace Ntreev.Library.Psd.Structures;
@@ -25,7 +8,7 @@ internal class StructureEngineData : Properties
         {
         var length = reader.ReadInt32();
         reader.Skip('\n', 2);
-        this.ReadProperties(reader, 0, this);
+        ReadProperties(reader, 0, this);
         }
 
     private void ReadProperties(PsdReader reader, int level, Properties props)
@@ -79,7 +62,7 @@ internal class StructureEngineData : Properties
                     }
                 else if (c == ' ')
                     {
-                    var value = this.ReadValue(reader, level + 1);
+                    var value = ReadValue(reader, level + 1);
                     props.Add(name, value);
                     }
                 else
@@ -89,7 +72,6 @@ internal class StructureEngineData : Properties
                 }
             }
         }
-    // BUG
     private object ReadValue(PsdReader reader, int level)
         {
         var c = reader.ReadChar();
@@ -181,20 +163,17 @@ internal class StructureEngineData : Properties
             while (c is not (char)10 and not ' ');
 
                 {
-                int f;
-                if (int.TryParse(value, out f) == true)
+                if (int.TryParse(value, out var f))
                     return f;
                 }
 
                 {
-                float f;
-                if (float.TryParse(value, out f) == true)
+                if (float.TryParse(value, out var f))
                     return f;
                 }
 
                 {
-                bool f;
-                if (bool.TryParse(value, out f) == true)
+                if (bool.TryParse(value, out var f))
                     return f;
                 }
 

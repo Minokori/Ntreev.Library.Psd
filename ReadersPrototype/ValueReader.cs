@@ -33,7 +33,7 @@ internal abstract partial class ValueReader<T>
         GlobalReader.Position = StartPosition;
         GlobalReader.Version = ReaderVersion;
 
-        // 从 reader 提供的字节流中读取值到 value 中
+        // 从 BinarayReader 提供的字节流中读取值到 value 中
         var value = ReadValue();
 
         // 更新字节流指针，便于继续读取

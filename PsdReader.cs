@@ -4,7 +4,7 @@ using Ntreev.Library.Psd.Services;
 
 namespace Ntreev.Library.Psd;
 
-internal partial class PsdReader(Stream stream) : BinaryReader(stream)
+internal partial class PsdReader(Stream stream, Uri? uri = null) : BinaryReader(stream)
     {
 
     public static PsdUriResolver Resolver => PsdService.Resolver;
@@ -31,7 +31,11 @@ internal partial class PsdReader(Stream stream) : BinaryReader(stream)
 
     public Stream Stream => BaseStream;
 
-    public Uri? Uri { get; init; }
+    public Uri? Uri
+        {
+        get;
+        init => field = uri ?? new Uri(Directory.GetCurrentDirectory());
+        }
 
     #region 以 "ReadAs" 开头的方法, 功能类似于 BinaryReader 的 "Read" 开头方法, 但会返回特定格式的字符串或数据
     /// <summary>
@@ -113,13 +117,13 @@ internal partial class PsdReader(Stream stream) : BinaryReader(stream)
 
     public CompressionType ReadCompressionType() => (CompressionType)ReadInt16();
 
-    public void ReadDocumentHeader()
-        {
-        if (!ValidateDocumentSignature())
-            throw new InvalidFormatException("Invalid PSD file signature. Expected '8BPS'.");
-        Version = ReadInt16();
-        Skip(6);
-        }
+    //public void ReadDocumentHeader()
+    //    {
+    //    if (!ValidateDocumentSignature())
+    //        throw new InvalidFormatException("Invalid PSD file signature. Expected '8BPS'.");
+    //    Version = ReadInt16();
+    //    Skip(6);
+    //    }
 
     /// 验证
     public void ValidateSignature(string signature)
@@ -137,11 +141,11 @@ internal partial class PsdReader(Stream stream) : BinaryReader(stream)
             throw new InvalidFormatException();
         }
 
-    private bool ValidateDocumentSignature()
-        {
-        var signature = ReadAsType();
-        return signature == "8BPS";
-        }
+    //private bool ValidateDocumentSignature()
+    //    {
+    //    var signature = ReadAsType();
+    //    return signature == "8BPS";
+    //    }
 
     public void ValidateInt16(short value, string name)
         {

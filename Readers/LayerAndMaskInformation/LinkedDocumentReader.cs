@@ -17,19 +17,23 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LinkedDocumentReader(PsdReader reader, long length) : LazyValueReader<PsdDocument>(reader, length, null)
+internal class LinkedDocumentReader(PsdReader reader, long length)
+    : LazyValueReader<PsdDocument>(reader, length, null)
     {
     protected override PsdDocument ReadValue()
         {
-        if (this.IsDocument(GlobalReader) == true)
+        if (IsDocument() == true)
             {
             using Stream stream = new RangeStream(
                 GlobalReader.Stream,
                 GlobalReader.Position,
-                this.StreamLength
+                StreamLength
             );
-            PsdDocument document = new InternalDocument();
-            document.Read(stream, PsdReader.Resolver, GlobalReader.Uri);
+
+            var document = PsdDocument.Create(stream, GlobalReader.Uri);
+            //using PsdReader streamReader = new(stream, GlobalReader.Uri);
+            //PsdDocument document = new InternalDocument() { BinaryReader = streamReader };
+            document.InitSections();
             return document;
             }
         else
@@ -38,16 +42,16 @@ internal class LinkedDocumentReader(PsdReader reader, long length) : LazyValueRe
             }
         }
 
-    private bool IsDocument(PsdReader reader)
+    private bool IsDocument()
         {
-        var position = reader.Position;
+        var position = GlobalReader.Position;
         try
             {
-            return reader.ReadAsType() == "8BPS";
+            return GlobalReader.ReadAsType() == "8BPS";
             }
         finally
             {
-            reader.Position = position;
+            GlobalReader.Position = position;
             }
         }
     }

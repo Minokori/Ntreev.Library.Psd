@@ -69,6 +69,8 @@ internal partial class PsdReader
         var name = Encoding.Unicode.GetString(bytes, 0, charNumber * 2);
         return name!;
         }
+
+    public override char ReadChar() => (char)ReadByte();
     #endregion
 
 

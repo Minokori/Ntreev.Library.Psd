@@ -30,7 +30,6 @@ internal class LinkedDocumnetFileHeaderReader(PsdReader reader, long length)
                 this.StreamLength
             );
             using var r = new PsdReader(stream) { Uri = GlobalReader.Uri };
-            r.ReadDocumentHeader();
             return FileHeaderSectionReader.Read(r);
             }
         else
