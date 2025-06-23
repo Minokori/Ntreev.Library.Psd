@@ -20,14 +20,8 @@ using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.LayerResources;
 
 [ResourceID("fxrp")]
-internal class Reader_fxrp : ResourceReaderBase
+internal class Reader_fxrp(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    public Reader_fxrp(PsdBinaryReader reader, long length)
-        : base(reader, length)
-        {
-
-        }
-
     protected override IProperties ReadValue()
         {
         var props = new Properties

@@ -132,12 +132,12 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
     /// <remarks>
     /// <b>注意: 该方法将移动字节流的 Position</b>
     /// </remarks>
-    public void VerifySignatureIs(params string[] signature)
+    public string VerifySignatureIs(params string[] signature)
         {
         var readSignature = ReadAsType();
-        if (signature.Contains(readSignature))
-            return;
-        throw new InvalidFormatException(
+        return signature.Contains(readSignature)
+            ? readSignature
+            : throw new InvalidFormatException(
             $"Expected signature/type is one of {string.Join(", ", signature)}, but got '{readSignature}'."
         );
         }
@@ -152,14 +152,14 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
     /// <remarks>
     /// <b>注意: 该方法将移动字节流的 Position</b>
     /// </remarks>
-    public void VerifyIntIs<T>(T value) where T : struct
+    public int VerifyIntIs<T>(T value) where T : struct
         {
         switch (value)
             {
             case int intValue:
-                { if (intValue == ReadInt32()) return; break; }
+                { if (intValue == ReadInt32()) return intValue; break; }
             case short shortValue:
-                { if (shortValue == ReadInt16()) return; break; }
+                { if (shortValue == ReadInt16()) return shortValue; break; }
             }
 
         throw new InvalidFormatException($"expect {typeof(T)} value {value}");

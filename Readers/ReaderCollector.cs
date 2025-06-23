@@ -22,15 +22,25 @@ using Ntreev.Library.Psd.ReadersPrototype;
 
 namespace Ntreev.Library.Psd.Readers;
 
+/// <summary>
+/// 静态类型, 用于通过反射自动创建继承自 <see cref="ResourceReaderBase"/> 的实例。
+/// </summary>
 internal static class ReaderCollector
     {
+    /// <summary>
+    /// 保存 资源ID (长度为4的字符串) - 读取器类型 的映射关系。
+    /// </summary>
     private static Dictionary<string, Type> Readers { get; }
 
+
+    /// <summary>
+    /// 静态构造函数, 在类加载时自动查找当前程序集中的所有 <see cref="ResourceReaderBase"/> 的子类。
+    /// </summary>
     static ReaderCollector()
         {
         var assembly = typeof(ResourceReaderBase).Assembly;
 
-        var query = assembly?
+        var query = assembly
             .GetTypes()
             .Where(item =>
                 typeof(ResourceReaderBase).IsAssignableFrom(item)
@@ -42,22 +52,17 @@ internal static class ReaderCollector
         foreach (var readerType in query!)
             {
             var attributes = readerType.GetCustomAttributes(typeof(ResourceIDAttribute), true);
-
             if (attributes.Length == 0)
                 continue;
-
             var resourceID = (ResourceIDAttribute)attributes.First();
             Readers.Add(resourceID.ID, readerType);
             }
         }
 
+
     public static ResourceReaderBase CreateReader(string resourceID, PsdBinaryReader reader, long length)
         {
-        var readerType = typeof(EmptyResourceReader);
-        if (Readers.ContainsKey(resourceID) == true)
-            {
-            readerType = Readers[resourceID];
-            }
+        var readerType = Readers.TryGetValue(resourceID, out var type) ? type : typeof(EmptyResourceReader);
 
         var readerInstance = TypeDescriptor.CreateInstance(
                 null,
@@ -71,10 +76,9 @@ internal static class ReaderCollector
 
     public static string GetDisplayName(Type type)
         {
-        var attrs = type.GetCustomAttributes(typeof(ResourceIDAttribute), true);
-
-        var attr = attrs.First() as ResourceIDAttribute;
-        return attr.DisplayName;
+        var resourceIds = type.GetCustomAttributes(typeof(ResourceIDAttribute), true);
+        var resourceId = resourceIds.First() as ResourceIDAttribute;
+        return resourceId?.DisplayName ?? "";
         }
 
     public static string GetDisplayName(string resourceID) =>
