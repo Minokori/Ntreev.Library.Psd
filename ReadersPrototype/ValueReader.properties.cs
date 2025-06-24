@@ -47,7 +47,7 @@ internal partial class ValueReader<T>
     /// <summary>
     /// 值在整个文档二进制流的开始位置
     /// </summary>
-    public long StartPosition { get; init; }
+    public long StartPosition { get; protected set; }
 
     /// <summary>
     /// 值在整个文档二进制流的结束位置

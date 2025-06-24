@@ -53,6 +53,12 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
     /// <returns></returns>
     public string ReadAsType() => ReadAsAscii(4);
 
+    /// <summary>
+    /// 读取 Descripter 的 Key<para/>
+    /// 读取一个 <see cref="int"/>, 若为0, 则后续是一个 长度为4 的ascii 字符串<para/>
+    /// 若不为零, 则后续是长度为该int 的 ascii 字符串
+    /// </summary>
+    /// <returns></returns>
     public string ReadAsKey()
         {
         var length = ReadInt32();
@@ -61,12 +67,12 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
         }
 
     /// <summary>
-    /// 根据 PSD 文件头内的 Version 读取一个 <see cref="int"/> 或 <see cref="long"/>, 通常作为数据结构流的长度.
+    /// 根据 PSD 文件头内的 DescriptorVersion 读取一个 <see cref="int"/> 或 <see cref="long"/>, 通常作为数据结构流的长度.
     /// </summary>
     /// <returns>数据结构的字节长度</returns>
     /// <remarks>
-    /// 一般而言, PSD 文件的 Version <b>始终</b>为 1.<para/>
-    /// PSB 文件的 Version 为 2, 但本程序集不支持 PSB 文件的读取.<para/>
+    /// 一般而言, PSD 文件的 DescriptorVersion <b>始终</b>为 1.<para/>
+    /// PSB 文件的 DescriptorVersion 为 2, 但本程序集不支持 PSB 文件的读取.<para/>
     /// </remarks>
     public long ReadAsStreamLength() => Version == 1 ? ReadInt32() : ReadInt64();
 

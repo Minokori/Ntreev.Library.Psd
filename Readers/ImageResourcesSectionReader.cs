@@ -15,11 +15,18 @@ internal class ImageResourcesSectionReader(PsdBinaryReader reader) : LazyPropert
             _ = GlobalReader.ReadAsPascalString(2);//Name: Pascal string, padded to make the size even
             long length = GlobalReader.ReadInt32().PadToEven();// Actual size of resource data that follows (even)
 
-            using var resourceReader = ReaderCollector.CreateReader(resourceID, GlobalReader, length);
-            var resourceName = ReaderCollector.GetDisplayName(resourceID);
+            var resourceReader = ReaderCollector.CreateReader(resourceID, GlobalReader, length);
 
-            props[resourceName] = resourceReader.Value;
+            if (resourceReader.Count > 0)
+                {
+                props[ReaderCollector.GetDisplayName(resourceID)] = resourceReader;
+                }
+
+
+
             }
+
+
 
         return props;
         }

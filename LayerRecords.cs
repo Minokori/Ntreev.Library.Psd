@@ -17,67 +17,63 @@
 
 namespace Ntreev.Library.Psd;
 
-class LayerRecords
+internal class LayerRecords
     {
-    private Channel[] channels;
-
-    private LayerMask layerMask;
     private LayerBlendingRanges blendingRanges;
-    private IProperties resources;
     private string name;
-    private SectionType sectionType;
-    private Guid placedID;
     private int version;
 
     public void SetExtraRecords(LayerMask layerMask, LayerBlendingRanges blendingRanges, IProperties resources, string name)
         {
-        this.layerMask = layerMask;
+        this.Mask = layerMask;
         this.blendingRanges = blendingRanges;
-        this.resources = resources;
+        this.Resources = resources;
         this.name = name;
 
-        this.resources.TryGetValue<string>(ref this.name, "luni.Name");
-        this.resources.TryGetValue<int>(ref this.version, "lyvr.Version");
-        if (this.resources.Contains("lsct.SectionType") == true)
-            this.sectionType = (SectionType)this.resources.ToInt32("lsct.SectionType");
-        if (this.resources.Contains("lsdk.SectionType") == true)
-            this.sectionType = (SectionType)this.resources.ToInt32("lsdk.SectionType");
+        this.Resources.TryGetValue<string>(ref this.name, "luni.Name");
+        this.Resources.TryGetValue<int>(ref this.version, "lyvr.Version");
+        if (this.Resources.Contains("lsct.SectionType") == true)
+            this.SectionType = (SectionType)this.Resources.ToInt32("lsct.SectionType");
+        if (this.Resources.Contains("lsdk.SectionType") == true)
+            this.SectionType = (SectionType)this.Resources.ToInt32("lsdk.SectionType");
 
-        if (this.resources.Contains("SoLd.Idnt") == true)
-            this.placedID = this.resources.ToGuid("SoLd.Idnt");
-        else if (this.resources.Contains("SoLE.Idnt") == true)
-            this.placedID = this.resources.ToGuid("SoLE.Idnt");
+        if (this.Resources.Contains("SoLd.Idnt") == true)
+            this.PlacedID = this.Resources.ToGuid("SoLd.Idnt");
+        else if (this.Resources.Contains("SoLE.Idnt") == true)
+            this.PlacedID = this.Resources.ToGuid("SoLE.Idnt");
 
-        foreach (var item in this.channels)
+        foreach (var item in this.Channels)
             {
             switch (item.Type)
                 {
                 case ChannelType.Mask:
+                    {
+                    if (this.Mask != null)
                         {
-                        if (this.layerMask != null)
-                            {
-                            item.Width = this.layerMask.Width;
-                            item.Height = this.layerMask.Height;
-                            }
+                        item.Width = this.Mask.Width;
+                        item.Height = this.Mask.Height;
                         }
-                    break;
+                    }
+
+                break;
                 case ChannelType.Alpha:
+                    {
+                    if (this.Resources.Contains("iOpa") == true)
                         {
-                        if (this.resources.Contains("iOpa") == true)
-                            {
-                            byte opa = this.resources.ToByte("iOpa", "Opacity");
-                            item.Opacity = opa / 255.0f;
-                            }
+                        var opa = this.Resources.ToByte("iOpa", "Opacity");
+                        item.Opacity = opa / 255.0f;
                         }
-                    break;
+                    }
+
+                break;
                 }
             }
         }
 
     public void ValidateSize()
         {
-        int width = this.Right - Left;
-        int height = this.Bottom - this.Top;
+        var width = this.Right - Left;
+        var height = this.Bottom - this.Top;
 
         if ((width > 0x3000) || (height > 0x3000))
             {
@@ -93,24 +89,13 @@ class LayerRecords
 
     public int Bottom { get; set; }
 
-    public int Width
-        {
-        get { return this.Right - this.Left; }
-        }
+    public int Width => this.Right - this.Left;
 
-    public int Height
-        {
-        get { return this.Bottom - this.Top; }
-        }
+    public int Height => this.Bottom - this.Top;
 
     public int ChannelCount
         {
-        get
-            {
-            if (this.channels == null)
-                return 0;
-            return this.channels.Length;
-            }
+        get => this.Channels == null ? 0 : Channels.Length;
         set
             {
             if (value > 0x38)
@@ -118,18 +103,15 @@ class LayerRecords
                 throw new Exception(string.Format("Too many channels : {0}", value));
                 }
 
-            this.channels = new Channel[value];
-            for (int i = 0; i < value; i++)
+            this.Channels = new Channel[value];
+            for (var i = 0; i < value; i++)
                 {
-                this.channels[i] = new Channel();
+                this.Channels[i] = new Channel();
                 }
             }
         }
 
-    public Channel[] Channels
-        {
-        get { return this.channels; }
-        }
+    public Channel[] Channels { get; private set; }
 
     public BlendMode BlendMode { get; set; }
 
@@ -141,43 +123,19 @@ class LayerRecords
 
     public int Filter { get; set; }
 
-    public long ChannelSize
-        {
-        get { return this.channels.Select(item => item.Size).Aggregate((v, n) => v + n); }
-        }
+    public long ChannelSize => this.Channels.Select(item => item.Size).Aggregate((v, n) => v + n);
 
-    public SectionType SectionType
-        {
-        get { return this.sectionType; }
-        }
+    public SectionType SectionType { get; private set; }
 
-    public Guid PlacedID
-        {
-        get { return this.placedID; }
-        }
+    public Guid PlacedID { get; private set; }
 
-    public string Name
-        {
-        get { return this.name; }
-        }
+    public string Name => this.name;
 
-    public LayerMask Mask
-        {
-        get { return this.layerMask; }
-        }
+    public LayerMask Mask { get; private set; }
 
-    public object BlendingRanges
-        {
-        get { return this.blendingRanges; }
-        }
+    public object BlendingRanges => this.blendingRanges;
 
-    public IProperties Resources
-        {
-        get { return this.resources; }
-        }
+    public IProperties Resources { get; private set; }
 
-    public int Version
-        {
-        get { return this.version; }
-        }
+    public int Version => this.version;
     }

@@ -18,22 +18,20 @@
 using Ntreev.Library.Psd.Attributes;
 using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.ImageResources;
-
+/// <summary>
+/// DescriptorVersion Info
+/// </summary>
+/// <param name="reader"></param>
+/// <param name="length"></param>
 [ResourceID("1057", DisplayName = "Version")]
-internal class Reader_VersionInfo : ResourceReaderBase
+internal class VersionInfoReader(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    public Reader_VersionInfo(PsdBinaryReader reader, long length)
-        : base(reader, length)
-        {
-
-        }
-
     protected override IProperties ReadValue()
         {
         var props = new Properties(5)
             {
             ["Version"] = GlobalReader.ReadInt32(),
-            ["HasCompatibilityImage"] = GlobalReader.ReadBoolean(),
+            ["HasRealMergedData"] = GlobalReader.ReadBoolean(),
             ["WriterName"] = GlobalReader.ReadString(),
             ["ReaderName"] = GlobalReader.ReadString(),
             ["FileVersion"] = GlobalReader.ReadInt32()

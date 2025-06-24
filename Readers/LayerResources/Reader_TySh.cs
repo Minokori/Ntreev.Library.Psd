@@ -30,7 +30,7 @@ internal class Reader_TySh : ResourceReaderBase
         {
         var props = new Properties(7);
 
-        //GlobalReader.ValidateInt16(1, "Typetool Version");
+        //GlobalReader.ValidateInt16(1, "Typetool DescriptorVersion");
         GlobalReader.VerifyIntIs<short>(1);
         props["Transforms"] = GlobalReader.ReadDoubles(6);
         props["TextVersion"] = GlobalReader.ReadInt16();

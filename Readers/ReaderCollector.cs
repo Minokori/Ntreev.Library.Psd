@@ -32,6 +32,8 @@ internal static class ReaderCollector
     /// </summary>
     private static Dictionary<string, Type> Readers { get; }
 
+    private static Dictionary<string, ResourceReaderBase> CacheReaders { get; }
+
 
     /// <summary>
     /// 静态构造函数, 在类加载时自动查找当前程序集中的所有 <see cref="ResourceReaderBase"/> 的子类。
@@ -48,6 +50,7 @@ internal static class ReaderCollector
             );
 
         Readers = new Dictionary<string, Type>(query!.Count());
+        CacheReaders = new Dictionary<string, ResourceReaderBase>(query!.Count());
 
         foreach (var readerType in query!)
             {
@@ -70,7 +73,6 @@ internal static class ReaderCollector
                 [typeof(PsdBinaryReader), typeof(long)],
                 [reader, length]
             );
-
         return (ResourceReaderBase)readerInstance!;
         }
 

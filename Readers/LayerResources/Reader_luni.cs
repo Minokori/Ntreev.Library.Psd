@@ -21,11 +21,8 @@ using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.LayerResources;
 
 [ResourceID("luni")]
-internal class Reader_luni : ResourceReaderBase
+internal class Reader_luni(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    public Reader_luni(PsdBinaryReader reader, long length)
-        : base(reader, length) { }
-
     protected override IProperties ReadValue()
         {
         var props = new Properties { ["Name"] = GlobalReader.ReadString() };

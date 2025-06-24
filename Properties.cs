@@ -1,8 +1,9 @@
 using System.Collections;
 
 namespace Ntreev.Library.Psd;
-
+// propreties 中某个 key-value的 value 可能是 一个 array, 这导致其元素没有key, contains 为了这种情况做了优化
 internal class Properties(int capacity = 0) : Dictionary<string, object>(capacity), IProperties
+
     {
     public bool Contains(string property)
         {

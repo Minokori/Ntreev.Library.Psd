@@ -20,37 +20,50 @@ using Ntreev.Library.Psd.ReadersPrototype;
 
 namespace Ntreev.Library.Psd.Readers.ImageResources;
 
+/// <summary>
+/// 切片资源格式
+/// </summary>
+/// <param name="reader"></param>
+/// <param name="length"></param>
 [ResourceID("1050", DisplayName = "Slices")]
-internal class Reader_SlicesInfo : ResourceReaderBase
+internal class SlicesInfoReader(PsdBinaryReader reader, long length)
+    : ResourceReaderBase(reader, length)
     {
-    public Reader_SlicesInfo(PsdBinaryReader reader, long length)
-        : base(reader, length) { }
-
     protected override IProperties ReadValue()
         {
         Properties props = [];
 
         var version = GlobalReader.ReadInt32();
-        if (version == 6)
+        if (version == 6)  // Photoshop<=7.0
             {
-            var r1 = GlobalReader.ReadInt32();
-            var r2 = GlobalReader.ReadInt32();
-            var r3 = GlobalReader.ReadInt32();
-            var r4 = GlobalReader.ReadInt32();
-            var text = GlobalReader.ReadString();
+            //Bounding rectangle for all of the slices: top, left, bottom, right of all the slices
+            _ = GlobalReader.ReadInt32();
+            _ = GlobalReader.ReadInt32();
+            _ = GlobalReader.ReadInt32();
+            _ = GlobalReader.ReadInt32();
+
+            // Name of group of slices
+            _ = GlobalReader.ReadString();
+
+            // Number of slices to follow
             var count = GlobalReader.ReadInt32();
 
-            var slices = new List<IProperties>(count);
+
+            // slice resource blocks
+            var slices = new List<Properties>(count);
             for (var i = 0; i < count; i++)
                 {
-                slices.Add(ReadSliceInfo(GlobalReader));
+                slices.Add(ReadSliceResourceBlock(GlobalReader));
                 }
             }
 
+        // Photoshop>=CS
             {
-            var descriptor = new DescriptorStructure(GlobalReader) as IProperties;
+            DescriptorStructure descriptor = new(GlobalReader);//as IProperties;
 
             var items = descriptor["slices.Items[0]"] as object[];
+
+            // 没有读取, 仅仅是处理 descriptor 中的切片信息
             var slices = new List<IProperties>(items.Length);
             foreach (var item in items)
                 {
@@ -63,17 +76,19 @@ internal class Reader_SlicesInfo : ResourceReaderBase
         return props;
         }
 
-    private static Properties ReadSliceInfo(PsdBinaryReader reader)
+    private static Properties ReadSliceResourceBlock(PsdBinaryReader reader)
         {
         var props = new Properties
             {
             ["ID"] = reader.ReadInt32(),
             ["GroupID"] = reader.ReadInt32(),
             };
+
+
         var origin = reader.ReadInt32();
         if (origin == 1)
             {
-            var asso = reader.ReadInt32();
+            var associatedLayerId = reader.ReadInt32();
             }
 
         props["Name"] = reader.ReadString();
@@ -89,12 +104,12 @@ internal class Reader_SlicesInfo : ResourceReaderBase
         props["Message"] = reader.ReadString();
         props["AltTag"] = reader.ReadString();
 
-        var b = reader.ReadBoolean();
+        var isCellTextHtml = reader.ReadBoolean();
 
         var cellText = reader.ReadString();
 
-        props["HorzAlign"] = reader.ReadInt32();
-        props["VertAlign"] = reader.ReadInt32();
+        props["Horizontal Alignment"] = reader.ReadInt32();
+        props["Vertical Alignment"] = reader.ReadInt32();
 
         props["Alpha"] = reader.ReadByte();
         props["Red"] = reader.ReadByte();

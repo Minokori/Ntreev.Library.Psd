@@ -17,16 +17,13 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LayerResourceReader : LazyProperties
+internal class LayerResourceReader(PsdBinaryReader reader, long length) : LazyProperties(reader, length, null)
     {
-    public LayerResourceReader(PsdBinaryReader reader, long length)
-        : base(reader, length, null) { }
-
     protected override IProperties ReadValue()
         {
         Properties props = [];
 
-        while (GlobalReader.Position < this.EndPosition)
+        while (GlobalReader.Position < EndPosition)
             {
             GlobalReader.VerifySignatureIs("8BIM");
             var resourceID = GlobalReader.ReadAsType();

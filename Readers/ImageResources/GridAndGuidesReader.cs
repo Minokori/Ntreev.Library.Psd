@@ -19,20 +19,41 @@ using Ntreev.Library.Psd.ReadersPrototype;
 
 namespace Ntreev.Library.Psd.Readers.ImageResources;
 
-[ResourceID("1005", DisplayName = "Resolution")]
-internal class Reader_ResolutionInfo(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
+/// <summary>
+/// 图像的网格和参考线信息读取器
+/// </summary>
+/// <param name="reader"></param>
+/// <param name="length"></param>
+[ResourceID("1032", DisplayName = "GridAndGuides")]
+internal class GridAndGuidesReader(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
     protected override IProperties ReadValue()
         {
-        var props = new Properties(6)
+        Properties props = [];
+
+        _ = GlobalReader.VerifyIntIs<int>(1); // version
+
+        props["HorizontalGrid"] = GlobalReader.ReadInt32();
+        props["VerticalGrid"] = GlobalReader.ReadInt32();
+
+        var guideCount = GlobalReader.ReadInt32();
+
+        List<int> horizontalGrids = [];
+        List<int> verticalGrids = [];
+
+        for (var i = 0; i < guideCount; i++)
             {
-            ["HorizontalRes"] = GlobalReader.ReadInt16(),
-            ["HorizontalResUnit"] = GlobalReader.ReadInt32(),
-            ["WidthUnit"] = GlobalReader.ReadInt16(),
-            ["VerticalRes"] = GlobalReader.ReadInt16(),
-            ["VerticalResUnit"] = GlobalReader.ReadInt32(),
-            ["HeightUnit"] = GlobalReader.ReadInt16(),
-            };
+            var n = GlobalReader.ReadInt32();
+            var t = GlobalReader.ReadByte();
+
+            if (t == 0)
+                verticalGrids.Add(n);
+            else
+                horizontalGrids.Add(n);
+            }
+
+        props["HorizontalGuides"] = horizontalGrids.ToArray();
+        props["VerticalGuides"] = verticalGrids.ToArray();
 
         return props;
         }

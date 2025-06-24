@@ -24,27 +24,42 @@ internal static class StructureReader
         {
         return ostype switch
             {
-                "obj " => new StructureReference(reader),
-                "Objc" => new DescriptorStructure(reader, false),
-                "VlLs" => new StructureList(reader),
+                // base types
                 "doub" => reader.ReadDouble(),
-                "UntF" => new StructureUnitFloat(reader),
                 "TEXT" => reader.ReadString(),
-                "enum" => new StructureEnumerate(reader),
                 "long" => reader.ReadInt32(),
                 "bool" => reader.ReadBoolean(),
-                "GlbO" => new DescriptorStructure(reader, false),
+                "comp" => reader.ReadInt64(),
+                // dictionary (basetype inside) 不依赖其他的结构
+                // 考虑拼接出来
+                "prop" => new StructureProperty(reader),
+                "UntF" => new StructureUnitFloat(reader),
                 "type" => new StructureClass(reader),
                 "GlbC" => new StructureClass(reader),
-                "alis" => new StructureAlias(reader),
-                "tdta" => new StructureUnknownOSType("Cannot read RawData"),
-                "prop" => new StructureProperty(reader),
                 "Clss" => new StructureClass(reader),
-                "Enmr" => new StructureEnumerate(reader),
+                "enum" => new StructureEnumerate(reader),
+                "Enmr" => new StructureEnumerateReference(reader),//TODO 和文档描述不一致,修改前和上面一行一样
+                "alis" => new StructureAlias(reader),
                 "rele" => new StructureOffset(reader),
-                "Idnt" => new StructureUnknownOSType("Cannot read Identifier"),
-                "indx" => new StructureUnknownOSType("Cannot read Index"),
-                "name" => new StructureUnknownOSType("Cannot read Name"),
+
+                //依赖其他的Structure
+                "obj" => new StructureReference(reader),
+                //会导致递归调用
+                "VlLs" => new StructureList(reader),
+                "Objc" => new DescriptorStructure(reader, false),
+                "GlbO" => new DescriptorStructure(reader, false),
+
+                // 不受支持的
+                "tdta" => new StructureUnknownOSType("Cannot read RawData"),
+
+
+                // in "obj"
+                // obj :prop, clss, enmr, rele, idnt, indx, name
+                //"Idnt" => new StructureUnknownOSType("Cannot read Identifier"),
+                //"indx" => new StructureUnknownOSType("Cannot read Index"),
+                //"name" => new StructureUnknownOSType("Cannot read Name"),
+
+                //
                 "ObAr" => new StructureObjectArray(reader),
                 _ => throw new NotSupportedException(ostype),
                 };

@@ -17,7 +17,7 @@
 
 
 namespace Ntreev.Library.Psd;
-
+// TODO 替换掉IP
 /// <summary>
 /// 针对 <see cref="IProperties"/> 的懒加载实现"/>
 /// </summary>
