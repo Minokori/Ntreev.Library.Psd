@@ -24,7 +24,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("lnkE")]
 internal class Reader_lnkE(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         Properties props = [];
         List<EmbeddedLayer> linkedLayers = [];

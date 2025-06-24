@@ -23,7 +23,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("SoLd", DisplayName = "Placed Layer")]
 internal class Reader_SoLd(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         GlobalReader.VerifySignatureIs("soLD");
         GlobalReader.VerifyIntIs<int>(4);

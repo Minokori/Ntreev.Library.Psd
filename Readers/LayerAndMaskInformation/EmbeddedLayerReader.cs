@@ -62,7 +62,7 @@ internal class EmbeddedLayerReader(PsdBinaryReader reader) : ValueReader<Embedde
         var creator = GlobalReader.ReadAsType();
 
         var length = GlobalReader.ReadInt64();
-        IProperties? properties = GlobalReader.ReadBoolean() == true ? new DescriptorStructure(GlobalReader) : null;
+        Properties? properties = GlobalReader.ReadBoolean() == true ? new DescriptorStructure(GlobalReader) : null;
         var absoluteUri = ReadAbsoluteUri(GlobalReader.Uri);
 
         return new EmbeddedLayer(id, absoluteUri);

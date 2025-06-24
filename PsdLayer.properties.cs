@@ -5,66 +5,56 @@ internal partial class PsdLayer
 
     public Channel[] Channels => _channelsReader.Value;
 
-    public SectionType SectionType => _records.SectionType;
+    public SectionType SectionType => Records.SectionType;
 
-    public string Name => _records.Name;
+    public string Name => Records.Name;
 
-    public bool IsVisible => (_records.Flags & LayerFlags.Visible) != LayerFlags.Visible;
+    public bool IsVisible => (Records.Flags & LayerFlags.Visible) != LayerFlags.Visible;
 
-    public float Opacity => ((float)_records.Opacity) / 255f;
+    public float Opacity => Records.Opacity / 255f;
 
-    public int Left => _left;
+    public int Left { get; private set; }
 
-    public int Top => _top;
+    public int Top { get; private set; }
 
-    public int Right => _right;
+    public int Right { get; private set; }
 
-    public int Bottom => _bottom;
+    public int Bottom { get; private set; }
 
-    public int Width => _right - _left;
+    public int Width => Right - Left;
 
-    public int Height => _bottom - _top;
+    public int Height => Bottom - Top;
 
-    public int Depth => _document.FileHeaderSection.Depth;
+    public int Depth => Document.FileHeaderSection.Depth;
 
-    public bool IsClipping => _records.Clipping;
+    public bool IsClipping => Records.Clipping;
 
-    public BlendMode BlendMode => _records.BlendMode;
+    public BlendMode BlendMode => Records.BlendMode;
 
-    public PsdLayer Parent
-        {
-        get => _parent;
-        set { _parent = value; }
-        }
+    public PsdLayer Parent { get; set; }
 
     public PsdLayer[] Childs
-        {
-        get
-            {
-            if (_childs == null)
-                return _emptyChilds;
-            return _childs;
-            }
-        set => _childs = value;
-        }
+        { get => field == null ? _emptyChilds : (field);
+        set;
+        } = [];
 
-    public IProperties Resources => _records.Resources;
+    public IEnumerable<KeyValuePair<string, object>> Resources => Records.Resources;
 
-    public PsdDocument Document => _document;
+    public PsdDocument Document { get; }
 
-    public LayerRecords Records => _records;
+    public LayerRecords Records { get; }
 
     public ILinkedLayer LinkedLayer
         {
         get
             {
-            Guid placeID = _records.PlacedID;
+            var placeID = Records.PlacedID;
 
             if (placeID == Guid.Empty)
                 return null;
 
-            _linkedLayer ??= _document.LinkedLayers.Where(i => i.ID == placeID && i.HasDocument).FirstOrDefault();
-            return _linkedLayer;
+            field ??= Document.LinkedLayers.Where(i => i.ID == placeID && i.HasDocument).FirstOrDefault();
+            return field;
             }
         }
 
@@ -72,36 +62,20 @@ internal partial class PsdLayer
         {
         get
             {
-            if (_records.SectionType != SectionType.Normal)
+            if (Records.SectionType != SectionType.Normal)
                 return false;
-            if (Width == 0 || Height == 0)
-                return false;
-            return true;
+            return Width != 0 && Height != 0;
             }
         }
 
-    public bool HasMask => _records.Mask != null;
+    public bool HasMask => Records.Mask != null;
     #region IPsdLayer
 
-    IPsdLayer IPsdLayer.Parent
-        {
-        get
-            {
-            if (_parent == null)
-                return _document;
-            return _parent;
-            }
-        }
+    IPsdLayer IPsdLayer.Parent => Parent == null ? Document : Parent;
 
-    IChannel[] IImageSource.Channels
-        {
-        get { return _channelsReader.Value; }
-        }
+    IChannel[] IImageSource.Channels => _channelsReader.Value;
 
-    IPsdLayer[] IPsdLayer.Childs
-        {
-        get { return Childs; }
-        }
+    IPsdLayer[] IPsdLayer.Childs => Childs;
 
     #endregion
     }

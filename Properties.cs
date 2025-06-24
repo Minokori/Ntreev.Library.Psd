@@ -1,10 +1,14 @@
 using System.Collections;
+using System.Text.Json.Nodes;
 
 namespace Ntreev.Library.Psd;
 // propreties 中某个 key-value的 value 可能是 一个 array, 这导致其元素没有key, contains 为了这种情况做了优化
-internal class Properties(int capacity = 0) : Dictionary<string, object>(capacity), IProperties
+public class Properties(int capacity = 0) : Dictionary<string, object>(capacity)
 
     {
+    private JsonObject node = [];
+
+
     public bool Contains(string property)
         {
         var subKeys = property.Split(['.', '[', ']'], StringSplitOptions.RemoveEmptyEntries);
@@ -55,9 +59,9 @@ internal class Properties(int capacity = 0) : Dictionary<string, object>(capacit
                 var props = value as IDictionary<string, object>;
                 value = props[item];
                 }
-            else if ((value is IProperties) == true)
+            else if ((value is Properties) == true)
                 {
-                var props = value as IProperties;
+                var props = value as Properties;
                 value = props[item];
                 }
             }
@@ -71,12 +75,6 @@ internal class Properties(int capacity = 0) : Dictionary<string, object>(capacit
         }
 
     #region IProperties
-
-    IEnumerator<KeyValuePair<string, object>> IEnumerable<
-        KeyValuePair<string, object>
-    >.GetEnumerator() => GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     #endregion
     }

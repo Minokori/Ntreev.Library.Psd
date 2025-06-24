@@ -17,29 +17,152 @@
 
 namespace Ntreev.Library.Psd;
 
-public static class IPropertiesExtension
+//public static class IPropertiesExtension
+//    {
+//    public static bool Contains(this IProperties props, string property, params string[] properties) => props.Contains(GeneratePropertyName(property, properties));
+
+//    public static T ToValue<T>(this IProperties props, string property, params string[] properties) => (T)props[GeneratePropertyName(property, properties)];
+
+//    public static Guid ToGuid(this IProperties props, string property, params string[] properties) => new(props.ToString(property, properties));
+
+//    public static string ToString(this IProperties props, string property, params string[] properties) => ToValue<string>(props, property, properties);
+
+//    public static byte ToByte(this IProperties props, string property, params string[] properties) => ToValue<byte>(props, property, properties);
+
+//    public static int ToInt32(this IProperties props, string property, params string[] properties) => ToValue<int>(props, property, properties);
+
+//    public static float ToSingle(this IProperties props, string property, params string[] properties) => ToValue<float>(props, property, properties);
+
+//    public static double ToDouble(this IProperties props, string property, params string[] properties) => ToValue<double>(props, property, properties);
+
+//    public static bool ToBoolean(this IProperties props, string property, params string[] properties) => ToValue<bool>(props, property, properties);
+
+
+
+//    public static bool TryGetValue<T>(this IProperties props, ref T value, string property, params string[] properties)
+//        {
+//        var propertyName = GeneratePropertyName(property, properties);
+//        if (props.Contains(propertyName) == false)
+//            return false;
+//        value = props.ToValue<T>(propertyName);
+//        return true;
+//        }
+
+//    /// <summary>
+//    /// 生成 prop.subprop1.subprop2 的属性名称
+//    /// </summary>
+//    /// <param name="property"></param>
+//    /// <param name="properties"></param>
+//    /// <returns></returns>
+//    private static string GeneratePropertyName(string property, params string[] properties)
+//        {
+//        if (properties.Length == 0)
+//            return property;
+
+//        var pname = property + "." + string.Join(".", properties);
+//        return pname;
+//        }
+//    }
+
+public static class IKVExtension
     {
-    public static bool Contains(this IProperties props, string property, params string[] properties) => props.Contains(GeneratePropertyName(property, properties));
 
-    public static T ToValue<T>(this IProperties props, string property, params string[] properties) => (T)props[GeneratePropertyName(property, properties)];
+    public static bool Contains(this IEnumerable<KeyValuePair<string, object>> props, string property)
+        {
+        if (string.IsNullOrEmpty(property))
+            return false;
 
-    public static Guid ToGuid(this IProperties props, string property, params string[] properties) => new Guid(props.ToString(property, properties));
+        var parts = property.Split('.');
+        object? current = null;
+        var currentProps = props;
 
-    public static string ToString(this IProperties props, string property, params string[] properties) => ToValue<string>(props, property, properties);
+        for (var i = 0; i < parts.Length; i++)
+            {
+            var part = parts[i];
+            var found = currentProps.FirstOrDefault(kv => kv.Key == part);
+            if (found.Key == null)
+                return false;
 
-    public static byte ToByte(this IProperties props, string property, params string[] properties) => ToValue<byte>(props, property, properties);
+            if (i == parts.Length - 1)
+                return true;
 
-    public static int ToInt32(this IProperties props, string property, params string[] properties) => ToValue<int>(props, property, properties);
+            // 进入下一层嵌套
+            if (found.Value is IEnumerable<KeyValuePair<string, object>> nested)
+                {
+                currentProps = nested;
+                }
+            else if (found.Value is Properties nestedProps)
+                {
+                currentProps = nestedProps;
+                }
+            else
+                {
+                return false;
+                }
+            }
 
-    public static float ToSingle(this IProperties props, string property, params string[] properties) => ToValue<float>(props, property, properties);
+        return false;
+        }
 
-    public static double ToDouble(this IProperties props, string property, params string[] properties) => ToValue<double>(props, property, properties);
+    public static T ToValue<T>(this IEnumerable<KeyValuePair<string, object>> props, string property, params string[] properties)
+        {
+        var propertyName = GeneratePropertyName(property, properties);
+        if (string.IsNullOrEmpty(propertyName))
+            throw new ArgumentNullException(nameof(propertyName));
 
-    public static bool ToBoolean(this IProperties props, string property, params string[] properties) => ToValue<bool>(props, property, properties);
+        var parts = propertyName.Split('.');
+        object? current = null;
+        var currentProps = props;
+
+        for (var i = 0; i < parts.Length; i++)
+            {
+            var part = parts[i];
+            var found = currentProps.FirstOrDefault(kv => kv.Key == part);
+
+            if (found.Key == null)
+                throw new KeyNotFoundException($"Property '{propertyName}' not found.");
+
+            if (i == parts.Length - 1)
+                {
+                current = found.Value;
+                }
+            else
+                {
+                currentProps = found.Value is IEnumerable<KeyValuePair<string, object>> nested
+                    ? nested
+                    : found.Value is Properties nestedProps
+                        ? (IEnumerable<KeyValuePair<string, object>>)nestedProps
+                        : throw new InvalidOperationException($"Property '{part}' is not a nested property.");
+                }
+            }
+
+        if (current is T t)
+            return t;
+
+        return current is IConvertible
+            ? (T)Convert.ChangeType(current, typeof(T))
+            : current is not null
+            ? (T)current
+            : throw new InvalidCastException($"Cannot convert property '{propertyName}' to type '{typeof(T)}'.");
+        }
+
+    public static Guid ToGuid(this IEnumerable<KeyValuePair<string, object>> props, string property, params string[] properties) => new(props.ToString(property, properties));
+
+    public static string ToString(this IEnumerable<KeyValuePair<string, object>> props, string property, params string[] properties) => ToValue<string>(props, property, properties);
+
+    public static byte ToByte(this IEnumerable<KeyValuePair<string, object>> props, string property, params string[] properties) => ToValue<byte>(props, property, properties);
+
+    public static int ToInt32(this IEnumerable<KeyValuePair<string, object>> props, string property, params string[] properties) => ToValue<int>(props, property, properties);
+
+    public static float ToSingle(this IEnumerable<KeyValuePair<string, object>> props, string property, params string[] properties) => ToValue<float>(props, property, properties);
+
+    public static double ToDouble(this IEnumerable<KeyValuePair<string, object>> props, string property, params string[] properties) => ToValue<double>(props, property, properties);
+
+    public static bool ToBoolean(this IEnumerable<KeyValuePair<string, object>> props, string property, params string[] properties) => ToValue<bool>(props, property, properties);
 
 
 
-    public static bool TryGetValue<T>(this IProperties props, ref T value, string property, params string[] properties)
+    public static bool TryGetValue<T>(this IEnumerable<KeyValuePair<string, object>> props, ref T value, string property, params string[] properties)
         {
         var propertyName = GeneratePropertyName(property, properties);
         if (props.Contains(propertyName) == false)
@@ -48,6 +171,12 @@ public static class IPropertiesExtension
         return true;
         }
 
+    /// <summary>
+    /// 生成 prop.subprop1.subprop2 的属性名称
+    /// </summary>
+    /// <param name="property"></param>
+    /// <param name="properties"></param>
+    /// <returns></returns>
     private static string GeneratePropertyName(string property, params string[] properties)
         {
         if (properties.Length == 0)
@@ -57,4 +186,3 @@ public static class IPropertiesExtension
         return pname;
         }
     }
-

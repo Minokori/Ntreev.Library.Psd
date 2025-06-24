@@ -20,43 +20,28 @@ using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 namespace Ntreev.Library.Psd;
 
-partial class PsdLayer : IPsdLayer
+internal partial class PsdLayer : IPsdLayer
     {
-    private readonly PsdDocument _document;
-    private readonly LayerRecords _records;
-
-    private int _left, _top, _right, _bottom;
-
-    private PsdLayer[] _childs = [];
-    private PsdLayer _parent;
-    private ILinkedLayer _linkedLayer;
-
     private ChannelsReader _channelsReader;
 
     private static readonly PsdLayer[] _emptyChilds = [];
 
     public PsdLayer(PsdBinaryReader reader, PsdDocument document)
         {
-        _document = document;
-        _records = LayerRecordsReader.Read(reader);
-        _records = LayerExtraRecordsReader.Read(reader, this._records);
+        Document = document;
+        Records = LayerRecordsReader.Read(reader);
+        Records = LayerExtraRecordsReader.Read(reader, this.Records);
 
-        _left = _records.Left;
-        _top = _records.Top;
-        _right = _records.Right;
-        _bottom = _records.Bottom;
+        Left = Records.Left;
+        Top = Records.Top;
+        Right = Records.Right;
+        Bottom = Records.Bottom;
         }
 
-    public override string ToString()
-        {
-        return this.Name;
-        }
+    public override string ToString() => this.Name;
 
 
-    public void ReadChannels(PsdBinaryReader reader)
-        {
-        this._channelsReader = new ChannelsReader(reader, this._records.ChannelSize, this);
-        }
+    public void ReadChannels(PsdBinaryReader reader) => this._channelsReader = new ChannelsReader(reader, this.Records.ChannelSize, this);
 
 
     /// <summary>
@@ -64,16 +49,16 @@ partial class PsdLayer : IPsdLayer
     /// </summary>
     public void ComputeBounds()
         {
-        SectionType sectionType = this._records.SectionType;
-        if (sectionType != SectionType.Opend && sectionType != SectionType.Closed)
+        var sectionType = this.Records.SectionType;
+        if (sectionType is not SectionType.Opend and not SectionType.Closed)
             return;
 
-        int left = int.MaxValue;
-        int top = int.MaxValue;
-        int right = int.MinValue;
-        int bottom = int.MinValue;
+        var left = int.MaxValue;
+        var top = int.MaxValue;
+        var right = int.MinValue;
+        var bottom = int.MinValue;
 
-        bool isSet = false;
+        var isSet = false;
 
         foreach (var item in this.Descendants())
             {
@@ -83,14 +68,14 @@ partial class PsdLayer : IPsdLayer
             // 일반 레이어인데 비어 있을때
             if (item.Resources.Contains("PlLd.Transformation"))
                 {
-                double[] transforms = (double[])item.Resources["PlLd.Transformation"];
+                var transforms = item.Resources.ToValue<double[]>("PlLd", "Transformation");
                 double[] xx = [transforms[0], transforms[2], transforms[4], transforms[6],];
                 double[] yy = [transforms[1], transforms[3], transforms[5], transforms[7],];
 
-                int l = (int)Math.Ceiling(xx.Min());
-                int r = (int)Math.Ceiling(xx.Max());
-                int t = (int)Math.Ceiling(yy.Min());
-                int b = (int)Math.Ceiling(yy.Max());
+                var l = (int)Math.Ceiling(xx.Min());
+                var r = (int)Math.Ceiling(xx.Max());
+                var t = (int)Math.Ceiling(yy.Min());
+                var b = (int)Math.Ceiling(yy.Max());
                 left = Math.Min(l, left);
                 top = Math.Min(t, top);
                 right = Math.Max(r, right);
@@ -103,16 +88,17 @@ partial class PsdLayer : IPsdLayer
                 right = Math.Max(item.Right, right);
                 bottom = Math.Max(item.Bottom, bottom);
                 }
+
             isSet = true;
             }
 
         if (isSet == false)
             return;
 
-        this._left = left;
-        this._top = top;
-        this._right = right;
-        this._bottom = bottom;
+        this.Left = left;
+        this.Top = top;
+        this.Right = right;
+        this.Bottom = bottom;
         }
 
 

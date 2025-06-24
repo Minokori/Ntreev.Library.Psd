@@ -15,61 +15,49 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Psd.Readers;
 using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Ntreev.Library.Psd
+namespace Ntreev.Library.Psd;
+
+internal class LayerAndMaskInformationSection
     {
-    class LayerAndMaskInformationSection
+    private readonly LayerInfoReader layerInfo;
+    private readonly GlobalLayerMaskInfoReader globalLayerMask;
+
+    public LayerAndMaskInformationSection(LayerInfoReader layerInfo, GlobalLayerMaskInfoReader globalLayerMask, IEnumerable<KeyValuePair<string, object>> documentResources)
         {
-        private readonly LayerInfoReader layerInfo;
-        private readonly GlobalLayerMaskInfoReader globalLayerMask;
-        private readonly IProperties documentResources;
+        this.layerInfo = layerInfo;
+        this.globalLayerMask = globalLayerMask;
+        this.Resources = documentResources;
+        }
 
-        private ILinkedLayer[] linkedLayers;
+    public PsdLayer[] Layers => this.layerInfo.Value;
 
-        public LayerAndMaskInformationSection(LayerInfoReader layerInfo, GlobalLayerMaskInfoReader globalLayerMask, IProperties documentResources)
+    public ILinkedLayer[] LinkedLayers
+        {
+        get
             {
-            this.layerInfo = layerInfo;
-            this.globalLayerMask = globalLayerMask;
-            this.documentResources = documentResources;
-            }
-
-        public PsdLayer[] Layers
-            {
-            get { return this.layerInfo.Value; }
-            }
-
-        public ILinkedLayer[] LinkedLayers
-            {
-            get
+            if (field == null)
                 {
-                if (this.linkedLayers == null)
+                List<ILinkedLayer> list = [];
+                string[] ids = ["lnk2", "lnk3", "lnkD", "lnkE",];
+
+                foreach (var item in ids)
                     {
-                    List<ILinkedLayer> list = [];
-                    string[] ids = ["lnk2", "lnk3", "lnkD", "lnkE",];
-
-                    foreach (var item in ids)
+                    if (this.Resources.Contains(item))
                         {
-                        if (this.documentResources.Contains(item))
-                            {
-                            var items = this.documentResources.ToValue<ILinkedLayer[]>(item, "Items");
-                            list.AddRange(items);
-                            }
+                        var items = this.Resources.ToValue<ILinkedLayer[]>(item, "Items");
+                        list.AddRange(items);
                         }
-                    this.linkedLayers = [.. list];
                     }
-                return this.linkedLayers;
-                }
-            }
 
-        public IProperties Resources
-            {
-            get { return this.documentResources; }
+                field = [.. list];
+                }
+
+            return field;
             }
         }
+
+    public IEnumerable<KeyValuePair<string, object>> Resources { get; }
     }
+

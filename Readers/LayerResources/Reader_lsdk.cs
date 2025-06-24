@@ -23,7 +23,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("lsdk")]
 internal class Reader_lsdk(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var props = new Properties { ["SectionType"] = GlobalReader.ReadInt32() };
         return props;

@@ -22,7 +22,7 @@ namespace Ntreev.Library.Psd.Readers.LayerResources;
 [ResourceID("iOpa")]
 internal class Reader_iOpa(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var props = new Properties { ["Opacity"] = GlobalReader.ReadByte() };
         return props;

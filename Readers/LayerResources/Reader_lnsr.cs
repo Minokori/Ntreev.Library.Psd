@@ -26,7 +26,7 @@ internal class Reader_lnsr : ResourceReaderBase
     public Reader_lnsr(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var props = new Properties { ["Name"] = GlobalReader.ReadAsAscii(4) };
         return props;

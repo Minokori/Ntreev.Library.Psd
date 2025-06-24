@@ -11,7 +11,7 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 [ResourceID("1005", DisplayName = "Resolution")]
 internal class ResolutionInfoReader(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var props = new Properties(6)
             {

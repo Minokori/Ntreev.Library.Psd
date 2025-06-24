@@ -29,7 +29,7 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 internal class SlicesInfoReader(PsdBinaryReader reader, long length)
     : ResourceReaderBase(reader, length)
     {
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         Properties props = [];
 
@@ -64,10 +64,10 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
             var items = descriptor["slices.Items[0]"] as object[];
 
             // 没有读取, 仅仅是处理 descriptor 中的切片信息
-            var slices = new List<IProperties>(items.Length);
+            var slices = new List<Properties>(items.Length);
             foreach (var item in items)
                 {
-                slices.Add(ReadSliceInfo(item as IProperties));
+                slices.Add(ReadSliceInfo(item as Properties));
                 }
 
             props["Items"] = slices.ToArray();
@@ -119,7 +119,7 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
         return props;
         }
 
-    private static Properties ReadSliceInfo(IProperties properties)
+    private static Properties ReadSliceInfo(Properties properties)
         {
         var props = new Properties
             {

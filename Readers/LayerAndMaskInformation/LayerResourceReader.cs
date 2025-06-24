@@ -19,7 +19,7 @@ namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class LayerResourceReader(PsdBinaryReader reader, long length) : LazyProperties(reader, length, null)
     {
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         Properties props = [];
 

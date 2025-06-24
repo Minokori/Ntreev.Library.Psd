@@ -21,7 +21,7 @@ internal class DocumentResourceReader(PsdBinaryReader reader, long length) : Laz
     {
     private static readonly string[] doubleTypeKeys = ["LMsk", "Lr16", "Lr32", "Layr", "Mt16", "Mt32", "Mtrn", "Alph", "FMsk", "lnk2", "FEid", "FXid", "PxSD", "lnkE", "extd",];
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         Properties props = [];
 

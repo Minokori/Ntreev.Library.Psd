@@ -26,7 +26,7 @@ internal class Reader_lyvr : ResourceReaderBase
     public Reader_lyvr(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var props = new Properties { ["Version"] = GlobalReader.ReadInt32() };
         return props;

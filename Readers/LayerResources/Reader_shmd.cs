@@ -26,7 +26,7 @@ internal class Reader_shmd : ResourceReaderBase
     public Reader_shmd(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         Properties props = [];
 

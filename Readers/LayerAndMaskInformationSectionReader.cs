@@ -30,7 +30,7 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
 
         if (GlobalReader.Position + 4 >= EndPosition)
             {
-            return new LayerAndMaskInformationSection(layerInfo, null, new Properties());
+            return new LayerAndMaskInformationSection(layerInfo, null, []);
             }
         else
             {
@@ -39,7 +39,7 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
                 GlobalReader,
                 EndPosition - GlobalReader.Position
             );
-
+            // TODO
             return new LayerAndMaskInformationSection(layerInfo, globalLayerMask, documentResource);
             }
         }

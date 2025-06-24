@@ -4,7 +4,7 @@ internal class ImageResourcesSectionReader(PsdBinaryReader reader) : LazyPropert
     {
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         Properties props = [];
 

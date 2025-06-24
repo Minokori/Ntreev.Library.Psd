@@ -28,7 +28,7 @@ internal class Reader_lfx2 : ResourceReaderBase
 
         }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         GlobalReader.VerifyIntIs<int>(0);
         return new DescriptorStructure(GlobalReader, true);

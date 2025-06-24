@@ -26,7 +26,7 @@ internal class Reader_lsct : ResourceReaderBase
     public Reader_lsct(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var props = new Properties { ["SectionType"] = (SectionType)GlobalReader.ReadInt32() };
         return props;

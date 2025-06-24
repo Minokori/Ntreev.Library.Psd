@@ -28,7 +28,7 @@ internal class Reader_lrFX : ResourceReaderBase
 
         }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var value = new Properties();
 

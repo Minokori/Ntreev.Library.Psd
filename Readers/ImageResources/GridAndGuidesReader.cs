@@ -27,7 +27,7 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 [ResourceID("1032", DisplayName = "GridAndGuides")]
 internal class GridAndGuidesReader(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         Properties props = [];
 

@@ -39,7 +39,9 @@ internal class LayerExtraRecordsReader : ValueReader<LayerRecords>
         var mask = LayerMaskReader.Read(GlobalReader);
         var blendingRanges = LayerBlendingRangesReader.Read(GlobalReader);
         var name = GlobalReader.ReadAsPascalString(4);
-        IProperties resources = new LayerResourceReader(GlobalReader, EndPosition - GlobalReader.Position);
+
+        //IProperties-> IEnumerable<KeyValuePair<string,object>>
+        IEnumerable<KeyValuePair<string, object>> resources = new LayerResourceReader(GlobalReader, EndPosition - GlobalReader.Position);
 
         records.SetExtraRecords(mask, blendingRanges, resources, name);
 

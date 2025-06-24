@@ -29,7 +29,7 @@ internal class Reader_PlLd : ResourceReaderBase
 
         }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         Properties props = [];
 

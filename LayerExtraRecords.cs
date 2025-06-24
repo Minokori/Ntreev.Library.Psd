@@ -20,14 +20,13 @@ using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 namespace Ntreev.Library.Psd;
 
-class LayerExtraRecords
+internal class LayerExtraRecords
     {
     private readonly LayerMaskReader layerMask;
     private readonly LayerBlendingRangesReader blendingRanges;
     private readonly LayerResourceReader resources;
     private readonly string name;
     private readonly SectionType sectionType;
-    private readonly Guid placedID;
 
     public LayerExtraRecords(
         LayerMaskReader layerMask,
@@ -45,38 +44,20 @@ class LayerExtraRecords
         this.resources.TryGetValue<SectionType>(ref this.sectionType, "lsct.SectionType");
 
         if (this.resources.Contains("SoLd.Idnt") == true)
-            this.placedID = this.resources.ToGuid("SoLd.Idnt");
+            this.PlacedID = this.resources.ToGuid("SoLd.Idnt");
         else if (this.resources.Contains("SoLE.Idnt") == true)
-            this.placedID = this.resources.ToGuid("SoLE.Idnt");
+            this.PlacedID = this.resources.ToGuid("SoLE.Idnt");
         }
 
-    public SectionType SectionType
-        {
-        get { return this.sectionType; }
-        }
+    public SectionType SectionType => this.sectionType;
 
-    public Guid PlacedID
-        {
-        get { return this.placedID; }
-        }
+    public Guid PlacedID { get; }
 
-    public string Name
-        {
-        get { return this.name; }
-        }
+    public string Name => this.name;
 
-    public LayerMask Mask
-        {
-        get { return this.layerMask.Value; }
-        }
+    public LayerMask Mask => this.layerMask.Value;
 
-    public object BlendingRanges
-        {
-        get { return this.blendingRanges.Value; }
-        }
+    public object BlendingRanges => this.blendingRanges.Value;
 
-    public IProperties Resources
-        {
-        get { return this.resources.Value; }
-        }
+    public Properties Resources => this.resources.Value;
     }

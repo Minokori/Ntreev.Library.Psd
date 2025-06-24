@@ -26,7 +26,7 @@ internal class Reader_TySh : ResourceReaderBase
     public Reader_TySh(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var props = new Properties(7);
 

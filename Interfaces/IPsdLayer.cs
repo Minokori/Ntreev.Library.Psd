@@ -35,7 +35,7 @@ public interface IPsdLayer : IImageSource
 
     IPsdLayer Parent { get; }
 
-    IProperties Resources { get; }
+    IEnumerable<KeyValuePair<string, object>> Resources { get; }
 
     PsdDocument Document { get; }
 

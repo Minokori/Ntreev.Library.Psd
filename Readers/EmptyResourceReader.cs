@@ -4,6 +4,6 @@ namespace Ntreev.Library.Psd.Readers;
 
 internal class EmptyResourceReader(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    protected override IProperties ReadValue() => new Properties();
+    protected override Properties ReadValue() => [];
     }
 

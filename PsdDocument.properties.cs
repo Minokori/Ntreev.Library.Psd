@@ -16,9 +16,9 @@ public partial class PsdDocument
 
     public IEnumerable<ILinkedLayer> LinkedLayers => layerAndMaskSection.Value.LinkedLayers;
 
-    public IProperties Resources => layerAndMaskSection.Value.Resources;
+    public IEnumerable<KeyValuePair<string, object>> Resources => layerAndMaskSection.Value.Resources;
 
-    public IProperties ImageResources => imageResourcesSection;
+    public IEnumerable<KeyValuePair<string, object>> ImageResources => imageResourcesSection;
 
     public bool HasImage =>
         imageResourcesSection.Contains("Version") != false

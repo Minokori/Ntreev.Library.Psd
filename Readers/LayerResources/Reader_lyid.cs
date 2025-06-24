@@ -26,7 +26,7 @@ internal class Reader_lyid : ResourceReaderBase
     public Reader_lyid(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var props = new Properties { ["ID"] = GlobalReader.ReadInt32() };
         return props;

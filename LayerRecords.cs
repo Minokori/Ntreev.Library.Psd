@@ -23,7 +23,9 @@ internal class LayerRecords
     private string name;
     private int version;
 
-    public void SetExtraRecords(LayerMask layerMask, LayerBlendingRanges blendingRanges, IProperties resources, string name)
+
+    // IProp -> IEnumerable<KeyValuePair<string, object>>
+    public void SetExtraRecords(LayerMask layerMask, LayerBlendingRanges blendingRanges, IEnumerable<KeyValuePair<string, object>> resources, string name)
         {
         this.Mask = layerMask;
         this.blendingRanges = blendingRanges;
@@ -135,7 +137,8 @@ internal class LayerRecords
 
     public object BlendingRanges => this.blendingRanges;
 
-    public IProperties Resources { get; private set; }
+    // TODO
+    public IEnumerable<KeyValuePair<string, object>> Resources { get; private set; }
 
     public int Version => this.version;
     }

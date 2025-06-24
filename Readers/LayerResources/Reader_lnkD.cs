@@ -27,7 +27,7 @@ internal class Reader_lnkD : ResourceReaderBase
     public Reader_lnkD(PsdBinaryReader reader, long length)
         : base(reader, length) { }
 
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         Properties props = [];
         List<LinkedLayer> linkedLayers = [];

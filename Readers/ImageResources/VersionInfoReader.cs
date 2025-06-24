@@ -26,7 +26,7 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 [ResourceID("1057", DisplayName = "Version")]
 internal class VersionInfoReader(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    protected override IProperties ReadValue()
+    protected override Properties ReadValue()
         {
         var props = new Properties(5)
             {
