@@ -15,6 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.LayerResources;
@@ -26,7 +27,8 @@ internal class Reader_fxrp(PsdBinaryReader reader, long length) : ResourceReader
         {
         var props = new Properties
             {
-            ["RefernecePoint"] = GlobalReader.ReadDoubles(2)
+            //["RefernecePoint"] = GlobalReader.ReadDoubles(2)
+            ["RefernecePoint"] = new JArray(GlobalReader.ReadDoubles(2))
             };
         return props;
         }

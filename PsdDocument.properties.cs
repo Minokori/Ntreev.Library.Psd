@@ -16,13 +16,15 @@ public partial class PsdDocument
 
     public IEnumerable<ILinkedLayer> LinkedLayers => layerAndMaskSection.Value.LinkedLayers;
 
-    public IEnumerable<KeyValuePair<string, object>> Resources => layerAndMaskSection.Value.Resources;
+    public Properties Resources => layerAndMaskSection.Value.Resources;
 
-    public IEnumerable<KeyValuePair<string, object>> ImageResources => imageResourcesSection;
+    // TODO
+    public Properties ImageResources => imageResourcesSection.Value;
 
+    //TODO
     public bool HasImage =>
-        imageResourcesSection.Contains("Version") != false
-        && imageResourcesSection.ToBoolean("Version", "HasCompatibilityImage");
+        imageResourcesSection.Value.Contains("Version") != false
+        && imageResourcesSection.Value.ToBoolean("Version", "HasCompatibilityImage");
 
     #region IPsdLayer
 

@@ -63,11 +63,23 @@ internal class StructureEngineData : Properties
                 else if (c == ' ')
                     {
                     var value = ReadValue(reader, level + 1);
-                    props.Add(name, value);
-                    }
-                else
-                    {
-                    //assert false;
+                    //props.Add(name, value);
+                    if (value is float f)
+                        {
+                        props[name] = f;
+                        }
+                    else if (value is int i)
+                        {
+                        props[name] = i;
+                        }
+                    else if (value is string str)
+                        {
+                        props[name] = str;
+                        }
+                    else
+                        {
+                        //assert false;
+                        }
                     }
                 }
             }
@@ -180,5 +192,6 @@ internal class StructureEngineData : Properties
             return value;
             }
         }
+
     }
 

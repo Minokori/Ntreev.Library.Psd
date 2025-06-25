@@ -27,14 +27,17 @@ internal class Reader_lnkE(PsdBinaryReader reader, long length) : ResourceReader
     protected override Properties ReadValue()
         {
         Properties props = [];
-        List<EmbeddedLayer> linkedLayers = [];
+        List<ILinkedLayer> linkedLayers = [];
+
+        //List<EmbeddedLayer> linkedLayers = [];
         while (GlobalReader.Position < EndPosition)
             {
             var r = new EmbeddedLayerReader(GlobalReader);
             linkedLayers.Add(r.Value);
             }
 
-        props["Items"] = linkedLayers.ToArray();
+        // props["Items"] = linkedLayers.ToArray();
+        props.AddLayers(linkedLayers);
         return props;
         }
     }

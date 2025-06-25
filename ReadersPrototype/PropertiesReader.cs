@@ -15,30 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 namespace Ntreev.Library.Psd;
-// TODO 替换掉IP
 /// <summary>
-/// 针对 <see cref="IProperties"/> 的懒加载实现"/>
+/// 针对 <see cref="Properties"/> 的reader/>
 /// </summary>
-internal abstract class LazyProperties : ValueReader<Properties>, IEnumerable<KeyValuePair<string, object>>
-//internal abstract class LazyProperties : LazyValueReader<IProperties>, IProperties
+//internal abstract class PropertiesReader : ValueReader<JObject>
+internal abstract class PropertiesReader : ValueReader<Properties>
     {
-    protected LazyProperties(PsdBinaryReader reader, object? userData) : base(reader, true, userData) { }
+    protected PropertiesReader(PsdBinaryReader reader, object? userData) : base(reader, true, userData) { }
 
-    protected LazyProperties(PsdBinaryReader reader, long length, object? userData) : base(reader, length, userData) { }
-
-    public bool Contains(string property) => Value.Contains(property);
-
-    public object this[string property] => Value[property];
-
-    public int Count => Value.Count;
-
-    #region IProperties
-
-    IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator() => Value.GetEnumerator();
-
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => Value.GetEnumerator();
-
-    #endregion
+    protected PropertiesReader(PsdBinaryReader reader, long length, object? userData) : base(reader, length, userData) { }
     }

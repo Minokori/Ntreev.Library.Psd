@@ -22,22 +22,21 @@ using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.LayerResources;
 
 [ResourceID("lnkD")]
-internal class Reader_lnkD : ResourceReaderBase
+internal class Reader_lnkD(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
     {
-    public Reader_lnkD(PsdBinaryReader reader, long length)
-        : base(reader, length) { }
-
     protected override Properties ReadValue()
         {
         Properties props = [];
-        List<LinkedLayer> linkedLayers = [];
-        while (GlobalReader.Position < this.EndPosition)
+        List<ILinkedLayer> linkedLayers = [];
+        while (GlobalReader.Position < EndPosition)
             {
             var r = new LinkedLayerReader(GlobalReader);
             linkedLayers.Add(r.Value);
             }
 
-        props["Items"] = linkedLayers.ToArray();
+        //props["Items"] = linkedLayers.ToArray();
+        // TODO System.ArgumentException:“Could not determine JSON object type for type Ntreev.Library.Psd.LinkedLayer.”
+        props.AddLayers(linkedLayers);
         return props;
         }
     }

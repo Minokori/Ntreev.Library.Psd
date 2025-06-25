@@ -15,6 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd.Structures;
 
 internal class StructureObjectArray : Properties
@@ -36,20 +38,18 @@ internal class StructureObjectArray : Properties
 
                 ["Type1"] = reader.ReadAsKey(),
                 ["EnumName"] = reader.ReadAsType(),
-                ["Type2"] = PsdUtility.ToUnitType(reader.ReadAsType()),
-                ["Values"] = reader.ReadDoubles(reader.ReadInt32())
-                };
-            //props.Add("Type1", reader.ReadAsKey());
-            //props.Add("EnumName", reader.ReadAsType());
+                //["Type2"] = PsdUtility.ToUnitType(reader.ReadAsType()),
+                ["Type2"] = Enum.GetName(PsdUtility.ToUnitType(reader.ReadAsType())),
+                //["Values"] = reader.ReadDoubles(reader.ReadInt32())
 
-            //props.Add("Type2", PsdUtility.ToUnitType(reader.ReadAsType()));
-            //var d4 = reader.ReadInt32();
-            //props.Add("Values", reader.ReadDoubles(d4));
+                ["Values"] = new JArray(reader.ReadDoubles(reader.ReadInt32()))
+                };
 
             items[i] = props;
             }
 
-        Add("items", items);
+        //Add("items", items);
+        Add("items", new JArray(items));
         }
     }
 

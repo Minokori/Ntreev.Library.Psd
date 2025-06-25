@@ -17,7 +17,7 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class DocumentResourceReader(PsdBinaryReader reader, long length) : LazyProperties(reader, length, null)
+internal class DocumentResourceReader(PsdBinaryReader reader, long length) : PropertiesReader(reader, length, null)
     {
     private static readonly string[] doubleTypeKeys = ["LMsk", "Lr16", "Lr32", "Layr", "Mt16", "Mt32", "Mtrn", "Alph", "FMsk", "lnk2", "FEid", "FXid", "PxSD", "lnkE", "extd",];
 
@@ -34,7 +34,7 @@ internal class DocumentResourceReader(PsdBinaryReader reader, long length) : Laz
             var resourceReader = ReaderCollector.CreateReader(resourceID, GlobalReader, length);
             var resourceName = ReaderCollector.GetDisplayName(resourceID);
 
-            props[resourceName] = resourceReader;
+            props[resourceName] = resourceReader.Value;
             }
 
         return props;

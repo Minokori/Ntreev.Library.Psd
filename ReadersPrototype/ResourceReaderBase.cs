@@ -19,8 +19,7 @@ using System.Diagnostics;
 
 namespace Ntreev.Library.Psd.ReadersPrototype;
 
-// TODO 添加一个入参 long startPosition
-internal abstract class ResourceReaderBase(PsdBinaryReader reader, long length) : LazyProperties(reader, length, null), IDisposable
+internal abstract class ResourceReaderBase(PsdBinaryReader reader, long length) : PropertiesReader(reader, length, null), IDisposable
     {
     public void Dispose() => Debug.WriteLine("ResourceReaderBase disposed.");
     }

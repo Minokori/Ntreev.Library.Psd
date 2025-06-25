@@ -17,27 +17,20 @@
 
 namespace Ntreev.Library.Psd;
 
-internal class LayerRecords
+internal partial class LayerRecords
     {
-    private LayerBlendingRanges blendingRanges;
     private string name;
     private int version;
 
-
-    // IEnumerable<KeyValuePair<string, object>> -> Properties
-    public void SetExtraRecords(LayerMask layerMask, LayerBlendingRanges blendingRanges, IEnumerable<KeyValuePair<string, object>> resources, string name)
+    public void NewSetExtraRecords(Properties resources)
         {
-        this.Mask = layerMask;
-        this.blendingRanges = blendingRanges;
         this.Resources = resources;
-        this.name = name;
-
         this.Resources.TryGetValue<string>(ref this.name, "luni.Name");
         this.Resources.TryGetValue<int>(ref this.version, "lyvr.Version");
         if (this.Resources.Contains("lsct.SectionType") == true)
-            this.SectionType = (SectionType)this.Resources.ToInt32("lsct.SectionType");
+            this.SectionType = Enum.Parse<SectionType>(this.Resources.ToString("lsct.SectionType"));
         if (this.Resources.Contains("lsdk.SectionType") == true)
-            this.SectionType = (SectionType)this.Resources.ToInt32("lsdk.SectionType");
+            this.SectionType = Enum.Parse<SectionType>(this.Resources.ToString("lsdk.SectionType"));
 
         if (this.Resources.Contains("SoLd.Idnt") == true)
             this.PlacedID = this.Resources.ToGuid("SoLd.Idnt");
@@ -72,6 +65,7 @@ internal class LayerRecords
             }
         }
 
+
     public void ValidateSize()
         {
         if ((Width > 0x3000) || (Height > 0x3000))
@@ -80,62 +74,4 @@ internal class LayerRecords
             }
         }
 
-    public int Left { get; set; }
-
-    public int Top { get; set; }
-
-    public int Right { get; set; }
-
-    public int Bottom { get; set; }
-
-    public int Width => Right - Left;
-
-    public int Height => Bottom - Top;
-
-    public int ChannelCount
-        {
-        get => this.Channels == null ? 0 : Channels.Length;
-        set
-            {
-            if (value > 0x38)
-                {
-                throw new Exception(string.Format("Too many channels : {0}", value));
-                }
-
-            this.Channels = new Channel[value];
-            for (var i = 0; i < value; i++)
-                {
-                this.Channels[i] = new Channel();
-                }
-            }
-        }
-
-    public Channel[] Channels { get; private set; }
-
-    public BlendMode BlendMode { get; set; }
-
-    public byte Opacity { get; set; }
-
-    public bool Clipping { get; set; }
-
-    public LayerFlags Flags { get; set; }
-
-    public int Filter { get; set; }
-
-    public long ChannelSize => this.Channels.Select(item => item.Size).Aggregate((v, n) => v + n);
-
-    public SectionType SectionType { get; private set; }
-
-    public Guid PlacedID { get; private set; }
-
-    public string Name => this.name;
-
-    public LayerMask Mask { get; private set; }
-
-    public object BlendingRanges => this.blendingRanges;
-
-    // TODO
-    public IEnumerable<KeyValuePair<string, object>> Resources { get; private set; }
-
-    public int Version => this.version;
     }

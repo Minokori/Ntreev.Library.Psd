@@ -21,7 +21,8 @@ internal class StructureUnitFloat : Properties
     {
     public StructureUnitFloat(PsdBinaryReader reader) : base(2)
         {
-        Add("Type", PsdUtility.ToUnitType(reader.ReadAsType()));
+        //Add("Type", PsdUtility.ToUnitType(reader.ReadAsType()));
+        Add("Type", Enum.GetName(PsdUtility.ToUnitType(reader.ReadAsType())));
         Add("Value", reader.ReadDouble());
         }
     }

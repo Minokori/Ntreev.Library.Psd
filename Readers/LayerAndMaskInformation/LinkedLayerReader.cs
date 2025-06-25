@@ -23,10 +23,10 @@ internal class LinkedLayerReader(PsdBinaryReader reader) : ValueReader<LinkedLay
 
     protected override LinkedLayer ReadValue()
         {
-        GlobalReader.VerifySignatureIs("liFD");
+        _ = GlobalReader.VerifySignatureIs("liFD");
         var version = GlobalReader.ReadInt32();
 
-        var id = new Guid(GlobalReader.ReadAsPascalString(1));
+        var id = new Guid(GlobalReader.ReadAsPascalString());
         var name = GlobalReader.ReadString();
         var type = GlobalReader.ReadAsType();
         var creator = GlobalReader.ReadAsType();

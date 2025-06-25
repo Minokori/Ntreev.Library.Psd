@@ -26,14 +26,16 @@ internal class EmbeddedLayerReader(PsdBinaryReader reader) : ValueReader<Embedde
         var props = new DescriptorStructure(reader);
         if (props.Contains("fullPath") == true)
             {
-            var absoluteUri = new Uri(props["fullPath"] as string);
+            //            var absoluteUri = new Uri(props["fullPath"] as string);
+            var absoluteUri = new Uri(props["fullPath"].ToObject<string>());
             if (File.Exists(absoluteUri.LocalPath) == true)
                 return absoluteUri;
             }
 
         if (props.Contains("relPath") == true)
             {
-            var relativePath = props["relPath"] as string;
+            //var relativePath = props["relPath"] as string;
+            var relativePath = props["relPath"].ToObject<string>();
             var absoluteUri = PsdBinaryReader.Resolver.ResolveUri(uri, relativePath);
             if (File.Exists(absoluteUri.LocalPath) == true)
                 return absoluteUri;
@@ -41,13 +43,16 @@ internal class EmbeddedLayerReader(PsdBinaryReader reader) : ValueReader<Embedde
 
         if (props.Contains("Nm") == true)
             {
-            var name = props["Nm"] as string;
+            //var name = props["Nm"] as string;
+            var name = props["Nm"].ToObject<string>();
             var absoluteUri = PsdBinaryReader.Resolver.ResolveUri(uri, name);
             if (File.Exists(absoluteUri.LocalPath) == true)
                 return absoluteUri;
             }
 
-        return props.Contains("fullPath") == true ? new Uri(props["fullPath"] as string) : null;
+        //return props.Contains("fullPath") == true ? new Uri(props["fullPath"] as string) : null;
+        return props.Contains("fullPath") == true ? new Uri(props["fullPath"].ToObject<string>()) : null;
+
         }
 
     protected override EmbeddedLayer ReadValue()

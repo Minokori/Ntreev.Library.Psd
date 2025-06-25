@@ -42,7 +42,7 @@ internal partial class ValueReader<T>
     /// <summary>
     /// 值占用的字节长度
     /// </summary>
-    public long StreamLength { get; init; }
+    public long StreamLength { get; set; }
 
     /// <summary>
     /// 值在整个文档二进制流的开始位置

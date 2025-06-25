@@ -15,6 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 using Ntreev.Library.Psd.ReadersPrototype;
 
@@ -30,14 +31,15 @@ internal class Reader_TySh : ResourceReaderBase
         {
         var props = new Properties(7);
 
-        //GlobalReader.ValidateInt16(1, "Typetool DescriptorVersion");
         GlobalReader.VerifyIntIs<short>(1);
-        props["Transforms"] = GlobalReader.ReadDoubles(6);
+        //props["Transforms"] = GlobalReader.ReadDoubles(6);
+        props["Transforms"] = new JArray(GlobalReader.ReadDoubles(6));
         props["TextVersion"] = GlobalReader.ReadInt16();
         props["Text"] = new DescriptorStructure(GlobalReader);
         props["WarpVersion"] = GlobalReader.ReadInt16();
         props["Warp"] = new DescriptorStructure(GlobalReader);
-        props["Bounds"] = GlobalReader.ReadDoubles(2);
+        //props["Bounds"] = GlobalReader.ReadDoubles(2);
+        props["Bounds"] = new JArray(GlobalReader.ReadDoubles(2));
 
         return props;
         }

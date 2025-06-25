@@ -17,7 +17,7 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
     /// </summary>
     /// <param name="alignmentSize">对齐长度</param>
     /// <returns>Pascal 字符串</returns>
-    public string ReadAsPascalString(int alignmentSize)
+    public string ReadAsPascalString(int alignmentSize = 1)
         {
         var count = ReadByte();
         if (count == 0)

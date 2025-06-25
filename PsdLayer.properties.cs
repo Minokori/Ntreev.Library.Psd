@@ -39,7 +39,7 @@ internal partial class PsdLayer
         set;
         } = [];
 
-    public IEnumerable<KeyValuePair<string, object>> Resources => Records.Resources;
+    public Properties Resources => Records.Resources;
 
     public PsdDocument Document { get; }
 
@@ -59,15 +59,7 @@ internal partial class PsdLayer
             }
         }
 
-    public bool HasImage
-        {
-        get
-            {
-            if (Records.SectionType != SectionType.Normal)
-                return false;
-            return Width != 0 && Height != 0;
-            }
-        }
+    public bool HasImage => Records.SectionType == SectionType.Normal && Width != 0 && Height != 0;
 
     public bool HasMask => Records.Mask != null;
     #region IPsdLayer

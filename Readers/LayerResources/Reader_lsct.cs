@@ -28,7 +28,8 @@ internal class Reader_lsct : ResourceReaderBase
 
     protected override Properties ReadValue()
         {
-        var props = new Properties { ["SectionType"] = (SectionType)GlobalReader.ReadInt32() };
+        //var props = new Properties { ["SectionType"] = (SectionType)GlobalReader.ReadInt32() };
+        var props = new Properties { ["SectionType"] = Enum.GetName((SectionType)GlobalReader.ReadInt32()) };
         return props;
         }
     }

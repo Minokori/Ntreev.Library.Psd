@@ -1,3 +1,5 @@
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd.Structures;
 
 // TODO : 需要重构, 目前的实现方式不符合预期
@@ -13,8 +15,9 @@ internal class StructureList : Properties
             var value = StructureReader.Read(type, reader);
             items.Add(value);
             }
+        //        Add("Items", items.ToArray());
 
-        Add("Items", items.ToArray());
+        Add("Items", new JArray(items));
         }
     }
 

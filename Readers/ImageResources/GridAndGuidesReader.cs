@@ -32,17 +32,14 @@ internal class GridAndGuidesReader(PsdBinaryReader reader, long length) : Resour
     protected override Properties ReadValue()
         {
         Properties props = [];
-        JObject node = [];
 
         _ = GlobalReader.VerifyIntIs<int>(1); // version
 
         var h = GlobalReader.ReadInt32();
         props["HorizontalGrid"] = h;
-        node["HorizontalGrid"] = h;
 
         var v = GlobalReader.ReadInt32();
         props["VerticalGrid"] = v;
-        node["VerticalGrid"] = v;
 
         var guideCount = GlobalReader.ReadInt32();
 
@@ -62,14 +59,12 @@ internal class GridAndGuidesReader(PsdBinaryReader reader, long length) : Resour
 
 
 
-        props["HorizontalGuides"] = horizontalGrids.ToArray();
-        node["HorizontalGuides"] = new JArray(horizontalGrids);
-        props["VerticalGuides"] = verticalGrids.ToArray();
-        node["VerticalGuides"] = new JArray(verticalGrids);
+        //props["HorizontalGuides"] = horizontalGrids.ToArray();
+        //props["VerticalGuides"] = verticalGrids.ToArray();
+        props["HorizontalGuides"] = new JArray(horizontalGrids);
+        props["VerticalGuides"] = new JArray(verticalGrids);
 
 
-
-        Debug.WriteLine($"GridAndGuides: {node}");
 
         return props;
         }

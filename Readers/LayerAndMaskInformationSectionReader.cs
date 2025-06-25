@@ -40,7 +40,7 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
                 EndPosition - GlobalReader.Position
             );
             // TODO
-            return new LayerAndMaskInformationSection(layerInfo, globalLayerMask, documentResource);
+            return new LayerAndMaskInformationSection(layerInfo, globalLayerMask, documentResource.Value);
             }
         }
     }

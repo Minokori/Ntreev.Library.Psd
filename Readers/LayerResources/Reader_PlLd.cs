@@ -15,6 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 using Ntreev.Library.Psd.ReadersPrototype;
 
@@ -40,7 +41,9 @@ internal class Reader_PlLd : ResourceReaderBase
         props["Pages"] = GlobalReader.ReadInt32();
         props["AntiAlias"] = GlobalReader.ReadInt32();
         props["LayerType"] = GlobalReader.ReadInt32();
-        props["Transformation"] = GlobalReader.ReadDoubles(8);
+
+        //props["Transformation"] = GlobalReader.ReadDoubles(8);
+        props["Transformation"] = new JArray(GlobalReader.ReadDoubles(8));
         GlobalReader.VerifyIntIs<int>(0);
         props["Warp"] = new DescriptorStructure(GlobalReader);
 

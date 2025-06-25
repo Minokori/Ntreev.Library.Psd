@@ -30,8 +30,6 @@ internal partial class PsdLayer : IPsdLayer
         {
         Document = document;
         Records = LayerRecordsReader.Read(reader);
-        Records = LayerExtraRecordsReader.Read(reader, this.Records);
-
         Left = Records.Left;
         Top = Records.Top;
         Right = Records.Right;

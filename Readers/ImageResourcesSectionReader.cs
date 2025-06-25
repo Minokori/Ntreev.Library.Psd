@@ -1,6 +1,6 @@
 namespace Ntreev.Library.Psd.Readers;
 
-internal class ImageResourcesSectionReader(PsdBinaryReader reader) : LazyProperties(reader, null)
+internal class ImageResourcesSectionReader(PsdBinaryReader reader) : PropertiesReader(reader, null)
     {
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 
@@ -17,9 +17,9 @@ internal class ImageResourcesSectionReader(PsdBinaryReader reader) : LazyPropert
 
             var resourceReader = ReaderCollector.CreateReader(resourceID, GlobalReader, length);
 
-            if (resourceReader.Count > 0)
+            if (resourceReader.Value.Count > 0)
                 {
-                props[ReaderCollector.GetDisplayName(resourceID)] = resourceReader;
+                props[ReaderCollector.GetDisplayName(resourceID)] = resourceReader.Value;
                 }
 
 
