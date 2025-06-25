@@ -18,7 +18,7 @@
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class LinkedDocumentReader(PsdBinaryReader reader, long length)
-    : LazyValueReader<PsdDocument>(reader, length, null)
+    : ValueReader<PsdDocument>(reader, length, null)
     {
     protected override PsdDocument ReadValue()
         {

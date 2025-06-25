@@ -26,7 +26,7 @@ namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 /// <param name="reader"></param>
 /// <param name="length"></param>
 /// <param name="layer">Channels</param>
-internal class ChannelsReader(PsdBinaryReader reader, long length, PsdLayer layer) : LazyValueReader<Channel[]>(reader, length, layer)
+internal class ChannelsReader(PsdBinaryReader reader, long length, PsdLayer layer) : ValueReader<Channel[]>(reader, length, layer)
     {
     protected override Channel[] ReadValue()
         {

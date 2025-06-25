@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 using Ntreev.Library.Psd.ReadersPrototype;
 
@@ -23,6 +25,16 @@ internal class ResolutionInfoReader(PsdBinaryReader reader, long length) : Resou
             ["HeightUnit"] = GlobalReader.ReadInt16(),
             };
 
+        JObject json = new()
+            {
+            ["HorizontalRes"] = (short)props["HorizontalRes"],
+            ["HorizontalResUnit"] = (int)props["HorizontalResUnit"],
+            ["WidthUnit"] = (short)props["WidthUnit"],
+            ["VerticalRes"] = (short)props["VerticalRes"],
+            ["VerticalResUnit"] = (int)props["VerticalResUnit"],
+            ["HeightUnit"] = (short)props["HeightUnit"]
+            };
+        Debug.WriteLine($"ResolutionInfo: {json}");
         return props;
         }
     }

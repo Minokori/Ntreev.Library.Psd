@@ -17,7 +17,7 @@
 
 namespace Ntreev.Library.Psd.Readers;
 
-internal class ImageDataSectionReader(PsdBinaryReader reader, PsdDocument document) : LazyValueReader<Channel[]>(reader, document)
+internal class ImageDataSectionReader(PsdBinaryReader reader, PsdDocument document) : ValueReader<Channel[]>(reader, true, document)
     {
     protected override long InitStreamLength() => GlobalReader.Length - GlobalReader.Position;
 

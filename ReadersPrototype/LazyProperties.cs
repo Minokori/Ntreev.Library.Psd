@@ -21,10 +21,10 @@ namespace Ntreev.Library.Psd;
 /// <summary>
 /// 针对 <see cref="IProperties"/> 的懒加载实现"/>
 /// </summary>
-internal abstract class LazyProperties : LazyValueReader<Properties>, IEnumerable<KeyValuePair<string, object>>
+internal abstract class LazyProperties : ValueReader<Properties>, IEnumerable<KeyValuePair<string, object>>
 //internal abstract class LazyProperties : LazyValueReader<IProperties>, IProperties
     {
-    protected LazyProperties(PsdBinaryReader reader, object? userData) : base(reader, userData) { }
+    protected LazyProperties(PsdBinaryReader reader, object? userData) : base(reader, true, userData) { }
 
     protected LazyProperties(PsdBinaryReader reader, long length, object? userData) : base(reader, length, userData) { }
 

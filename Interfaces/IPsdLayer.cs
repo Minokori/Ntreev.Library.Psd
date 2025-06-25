@@ -23,6 +23,8 @@ namespace Ntreev.Library.Psd;
 /// </summary>
 public interface IPsdLayer : IImageSource
     {
+
+
     BlendMode BlendMode { get; }
 
     IPsdLayer[] Childs { get; }

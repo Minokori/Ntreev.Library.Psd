@@ -18,7 +18,7 @@
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class LinkedDocumnetFileHeaderReader(PsdBinaryReader reader, long length)
-    : LazyValueReader<FileHeaderSection>(reader, length, null)
+    : ValueReader<FileHeaderSection>(reader, length, null)
     {
     protected override FileHeaderSection ReadValue()
         {

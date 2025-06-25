@@ -1,12 +1,16 @@
 namespace Ntreev.Library.Psd;
+
 internal partial class Channel
     {
-
-
-    private void PrivateReadData(PsdBinaryReader reader, int bps, CompressionType compressionType, int[] rlePackLengths)
+    private void PrivateReadData(
+        PsdBinaryReader reader,
+        int bps,
+        CompressionType compressionType,
+        int[] rlePackLengths
+    )
         {
         var length = PsdUtility.DepthToPitch(bps, this.Width);
-        this.Data = new byte[length * this.Height];
+        this.Data = new byte[length * Height];
         switch (compressionType)
             {
             case CompressionType.Raw:
@@ -15,7 +19,7 @@ internal partial class Channel
 
             case CompressionType.RLE:
                 //逐行读取
-                for (var i = 0; i < this.Height; i++)
+                for (var i = 0; i < Height; i++)
                     {
                     var buffer = new byte[rlePackLengths[i]];
                     var dst = new byte[length];
@@ -71,7 +75,9 @@ internal partial class Channel
 
                     if (num3 > num5)
                         {
-                        throw new Exception(string.Format("Overrun in packbits replicate of {0} chars", num3 - num5));
+                        throw new Exception(
+                            string.Format("Overrun in packbits replicate of {0} chars", num3 - num5)
+                        );
                         }
 
                     num4 = src[index];
@@ -126,4 +132,3 @@ internal partial class Channel
             }
         }
     }
-

@@ -34,7 +34,8 @@ internal partial class PsdLayer
     public PsdLayer Parent { get; set; }
 
     public PsdLayer[] Childs
-        { get => field == null ? _emptyChilds : (field);
+        {
+        get => (field) ?? _emptyChilds;
         set;
         } = [];
 

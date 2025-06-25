@@ -19,17 +19,10 @@ using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 namespace Ntreev.Library.Psd;
 
-internal class LayerAndMaskInformationSection
+internal class LayerAndMaskInformationSection(LayerInfoReader layerInfo, GlobalLayerMaskInfoReader globalLayerMask, IEnumerable<KeyValuePair<string, object>> documentResources)
     {
-    private readonly LayerInfoReader layerInfo;
-    private readonly GlobalLayerMaskInfoReader globalLayerMask;
-
-    public LayerAndMaskInformationSection(LayerInfoReader layerInfo, GlobalLayerMaskInfoReader globalLayerMask, IEnumerable<KeyValuePair<string, object>> documentResources)
-        {
-        this.layerInfo = layerInfo;
-        this.globalLayerMask = globalLayerMask;
-        this.Resources = documentResources;
-        }
+    private readonly LayerInfoReader layerInfo = layerInfo;
+    private readonly GlobalLayerMaskInfoReader globalLayerMask = globalLayerMask;
 
     public PsdLayer[] Layers => this.layerInfo.Value;
 
@@ -58,6 +51,6 @@ internal class LayerAndMaskInformationSection
             }
         }
 
-    public IEnumerable<KeyValuePair<string, object>> Resources { get; }
+    public IEnumerable<KeyValuePair<string, object>> Resources { get; } = documentResources;
     }
 

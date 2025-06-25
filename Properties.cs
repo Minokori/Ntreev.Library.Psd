@@ -1,14 +1,11 @@
 using System.Collections;
-using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 
 namespace Ntreev.Library.Psd;
 // propreties 中某个 key-value的 value 可能是 一个 array, 这导致其元素没有key, contains 为了这种情况做了优化
 public class Properties(int capacity = 0) : Dictionary<string, object>(capacity)
 
     {
-    private JsonObject node = [];
-
-
     public bool Contains(string property)
         {
         var subKeys = property.Split(['.', '[', ']'], StringSplitOptions.RemoveEmptyEntries);
@@ -73,8 +70,10 @@ public class Properties(int capacity = 0) : Dictionary<string, object>(capacity)
         get => GetProperty(property);
         set => Add(property, value);
         }
+    }
 
-    #region IProperties
 
-    #endregion
+public class NewProp : JObject
+    {
+
     }

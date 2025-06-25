@@ -16,54 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace Ntreev.Library.Psd;
-
-//public static class IPropertiesExtension
-//    {
-//    public static bool Contains(this IProperties props, string property, params string[] properties) => props.Contains(GeneratePropertyName(property, properties));
-
-//    public static T ToValue<T>(this IProperties props, string property, params string[] properties) => (T)props[GeneratePropertyName(property, properties)];
-
-//    public static Guid ToGuid(this IProperties props, string property, params string[] properties) => new(props.ToString(property, properties));
-
-//    public static string ToString(this IProperties props, string property, params string[] properties) => ToValue<string>(props, property, properties);
-
-//    public static byte ToByte(this IProperties props, string property, params string[] properties) => ToValue<byte>(props, property, properties);
-
-//    public static int ToInt32(this IProperties props, string property, params string[] properties) => ToValue<int>(props, property, properties);
-
-//    public static float ToSingle(this IProperties props, string property, params string[] properties) => ToValue<float>(props, property, properties);
-
-//    public static double ToDouble(this IProperties props, string property, params string[] properties) => ToValue<double>(props, property, properties);
-
-//    public static bool ToBoolean(this IProperties props, string property, params string[] properties) => ToValue<bool>(props, property, properties);
-
-
-
-//    public static bool TryGetValue<T>(this IProperties props, ref T value, string property, params string[] properties)
-//        {
-//        var propertyName = GeneratePropertyName(property, properties);
-//        if (props.Contains(propertyName) == false)
-//            return false;
-//        value = props.ToValue<T>(propertyName);
-//        return true;
-//        }
-
-//    /// <summary>
-//    /// 生成 prop.subprop1.subprop2 的属性名称
-//    /// </summary>
-//    /// <param name="property"></param>
-//    /// <param name="properties"></param>
-//    /// <returns></returns>
-//    private static string GeneratePropertyName(string property, params string[] properties)
-//        {
-//        if (properties.Length == 0)
-//            return property;
-
-//        var pname = property + "." + string.Join(".", properties);
-//        return pname;
-//        }
-//    }
-
 public static class IKVExtension
     {
 

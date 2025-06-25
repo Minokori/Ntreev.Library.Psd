@@ -24,7 +24,7 @@ internal class LayerRecords
     private int version;
 
 
-    // IProp -> IEnumerable<KeyValuePair<string, object>>
+    // IEnumerable<KeyValuePair<string, object>> -> Properties
     public void SetExtraRecords(LayerMask layerMask, LayerBlendingRanges blendingRanges, IEnumerable<KeyValuePair<string, object>> resources, string name)
         {
         this.Mask = layerMask;
@@ -74,12 +74,9 @@ internal class LayerRecords
 
     public void ValidateSize()
         {
-        var width = this.Right - Left;
-        var height = this.Bottom - this.Top;
-
-        if ((width > 0x3000) || (height > 0x3000))
+        if ((Width > 0x3000) || (Height > 0x3000))
             {
-            throw new NotSupportedException(string.Format("Invalidated size ({0}, {1})", width, height));
+            throw new NotSupportedException($"Invalidated size ({Width}, {Height})");
             }
         }
 
@@ -91,9 +88,9 @@ internal class LayerRecords
 
     public int Bottom { get; set; }
 
-    public int Width => this.Right - this.Left;
+    public int Width => Right - Left;
 
-    public int Height => this.Bottom - this.Top;
+    public int Height => Bottom - Top;
 
     public int ChannelCount
         {

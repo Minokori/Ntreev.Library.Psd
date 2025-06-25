@@ -2,8 +2,8 @@ namespace Ntreev.Library.Psd;
 
 internal partial class Channel : IChannel
     {
-    private byte[] _data = [];
-    private ChannelType _type;
+
+
     private int[] _rlePackLengths = [];
 
     public void ReadHeader(PsdBinaryReader reader, CompressionType compressionType)
