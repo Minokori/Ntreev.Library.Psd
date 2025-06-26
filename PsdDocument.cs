@@ -5,9 +5,6 @@ namespace Ntreev.Library.Psd;
 
 public partial class PsdDocument : IPsdLayer, IDisposable
     {
-    private FileHeaderSectionReader? fileHeaderSection;
-    private ColorModeDataSectionReader? colorModeDataSection;
-    private ImageResourcesSectionReader? imageResourcesSection;
     private LayerAndMaskInformationSectionReader? layerAndMaskSection;
     private ImageDataSectionReader? imageDataSection;
     internal PsdBinaryReader BinaryReader { get; init; }
@@ -30,14 +27,17 @@ public partial class PsdDocument : IPsdLayer, IDisposable
 
     internal void InitSections()
         {
-        fileHeaderSection = new FileHeaderSectionReader(BinaryReader);
-        colorModeDataSection = new ColorModeDataSectionReader(BinaryReader);
-        imageResourcesSection = new ImageResourcesSectionReader(BinaryReader);
+        FileHeaderSection = new FileHeaderSectionReader(BinaryReader).Value;
+
+        ColorModeDataSection = new()
+            {
+            ["ColorModeData"] = new ColorModeDataSectionReader(BinaryReader).Value
+            };
+        ImageResources = new ImageResourcesSectionReader(BinaryReader).Value;
 
         layerAndMaskSection = new LayerAndMaskInformationSectionReader(BinaryReader, this);
         imageDataSection = new ImageDataSectionReader(BinaryReader, this);
 
-        var a = imageResourcesSection.Value;
-        Debug.WriteLine(a);
+        Debug.WriteLine(ImageResources);
         }
     }

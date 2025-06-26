@@ -17,11 +17,8 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LayerBlendingRangesReader : ValueReader<LayerBlendingRanges>
+internal class LayerBlendingRangesReader(PsdBinaryReader reader) : ValueReader<LayerBlendingRanges>(reader, true, null)
     {
-    private LayerBlendingRangesReader(PsdBinaryReader reader)
-        : base(reader, true, null) { }
-
     public static LayerBlendingRanges Read(PsdBinaryReader reader)
         {
         var instance = new LayerBlendingRangesReader(reader);
@@ -30,5 +27,5 @@ internal class LayerBlendingRangesReader : ValueReader<LayerBlendingRanges>
 
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 
-    protected override LayerBlendingRanges ReadValue() => new();
+    protected override LayerBlendingRanges ReadValue() => [];
     }

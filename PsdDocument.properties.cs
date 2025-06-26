@@ -2,15 +2,17 @@ namespace Ntreev.Library.Psd;
 
 public partial class PsdDocument
     {
-    public FileHeaderSection FileHeaderSection => fileHeaderSection.Value;
+    public FileHeaderSection FileHeaderSection { get; private set; }
 
-    public byte[] ColorModeData => colorModeDataSection.Value;
+    public Properties ColorModeDataSection { get; private set; }
 
-    public int Width => fileHeaderSection.Value.Width;
+    public byte[] ColorModeData => ColorModeDataSection["ColorMode"]!.ToObject<byte[]>()!;
 
-    public int Height => fileHeaderSection.Value.Height;
+    public int Width => FileHeaderSection.Width;
 
-    public int Depth => fileHeaderSection.Value.Depth;
+    public int Height => FileHeaderSection.Height;
+
+    public int Depth => FileHeaderSection.Depth;
 
     public IPsdLayer[] Childs => layerAndMaskSection.Value.Layers;
 
@@ -19,12 +21,12 @@ public partial class PsdDocument
     public Properties Resources => layerAndMaskSection.Value.Resources;
 
     // TODO
-    public Properties ImageResources => imageResourcesSection.Value;
+    public Properties ImageResources { get; private set; }
 
     //TODO
     public bool HasImage =>
-        imageResourcesSection.Value.Contains("Version") != false
-        && imageResourcesSection.Value.ToBoolean("Version", "HasCompatibilityImage");
+        ImageResources.Contains("Version") != false
+        && ImageResources.SelectToken("Version.HasRealMergedData").ToObject<bool>();
 
     #region IPsdLayer
 

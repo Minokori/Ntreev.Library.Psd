@@ -15,53 +15,67 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LayerRecordsReader : ValueReader<LayerRecords>
+internal class LayerRecordsReader(PsdBinaryReader reader) : ValueReader<LayerRecords>(reader, false, null), IDisposable
     {
-    private LayerRecordsReader(PsdBinaryReader reader)
-        : base(reader, false, null) { }
 
-    public static LayerRecords Read(PsdBinaryReader reader)
-        {
-        LayerRecordsReader instance = new(reader);
-        return instance.Value;
-        }
+    public void Dispose() { }
 
     protected override LayerRecords ReadValue()
         {
         LayerRecords records = new()
             {
-            Top = GlobalReader.ReadInt32(),
-            Left = GlobalReader.ReadInt32(),
-            Bottom = GlobalReader.ReadInt32(),
-            Right = GlobalReader.ReadInt32(),
-            ChannelCount = GlobalReader.ReadUInt16(),
+            ["Top"] = GlobalReader.ReadInt32(),
+            ["Left"] = GlobalReader.ReadInt32(),
+            ["Bottom"] = GlobalReader.ReadInt32(),
+            ["Right"] = GlobalReader.ReadInt32(),
+            ["ChannelCount"] = GlobalReader.ReadUInt16(),
             };
         records.ValidateSize();
 
+        records["ChannelID"] = new JArray();
+        records["ChannelDataLength"] = new JArray();
+
+        records.Channels = new Channel[records.ChannelCount];
         for (var i = 0; i < records.ChannelCount; i++)
             {
-            records.Channels[i].Type = GlobalReader.ReadAsChannelType();
-            records.Channels[i].Size = GlobalReader.ReadAsStreamLength();
+            records.Channels[i] = new();
+            }
+
+        for (var i = 0; i < records.ChannelCount; i++)
+            {
+            var id = GlobalReader.ReadAsChannelType();
+            records.Channels[i].Type = id;
+            (records["ChannelID"] as JArray)!.Add(Enum.GetName(id));
+            var l = GlobalReader.ReadAsStreamLength();
+            records.Channels[i].Size = l;
+            (records["ChannelDataLength"] as JArray)!.Add(l);
             records.Channels[i].Width = records.Width;
             records.Channels[i].Height = records.Height;
             }
 
         _ = GlobalReader.VerifySignatureIs("8BIM");
 
-        records.BlendMode = GlobalReader.ReadAsBlendMode();
-        records.Opacity = GlobalReader.ReadByte();
-        records.Clipping = GlobalReader.ReadBoolean();
-        records.Flags = GlobalReader.ReadAsLayerFlags();
-        records.Filler = GlobalReader.ReadByte();
+        records["BlendMode"] = Enum.GetName(GlobalReader.ReadAsBlendMode());
+        records["Opacity"] = GlobalReader.ReadByte();
+        records["Clipping"] = GlobalReader.ReadBoolean();
+        // TODO : LayerFlags
+        records["Flags"] = (byte)GlobalReader.ReadAsLayerFlags();
+        records["Filler"] = GlobalReader.ReadByte();
 
         StreamLength += 16 + 2 + (6 * records.ChannelCount) + 4 + 4 + 1 + 1 + 1 + 1 + 4 + GlobalReader.ReadInt32();
-        records.Mask = LayerMaskReader.Read(GlobalReader);
-        records.BlendingRanges = LayerBlendingRangesReader.Read(GlobalReader);
+
+
+        records["Mask"] = new LayerMaskReader(GlobalReader).Value;
+        records["BlendingRanges"] = new LayerBlendingRangesReader(GlobalReader).Value;
         var name = GlobalReader.ReadAsPascalString(4);
+
+
         var resources = new LayerResourceReader(GlobalReader, EndPosition - GlobalReader.Position).Value;
-        records.NewSetExtraRecords(resources);
+        records.AddRangeRecords(resources);
         //
         return records;
         }

@@ -18,7 +18,7 @@ internal class EmbeddedLayer : ILinkedLayer
 
         if (File.Exists(AbsoluteUri.LocalPath))
             {
-            var header = FileHeaderSection.FromFile(this.AbsoluteUri.LocalPath);
+            var header = FileHeaderSection.FromFile(AbsoluteUri.LocalPath);
             Width = header.Width;
             Height = header.Height;
             }
@@ -39,7 +39,7 @@ internal class EmbeddedLayer : ILinkedLayer
 
     public Guid ID { get; }
 
-    public string Name => this.AbsoluteUri.LocalPath;
+    public string Name => AbsoluteUri.LocalPath;
 
     public int Width { get; }
 

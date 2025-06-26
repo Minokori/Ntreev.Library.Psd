@@ -17,21 +17,22 @@
 
 namespace Ntreev.Library.Psd;
 
-internal class LayerMask
+
+/// <summary>
+/// 图层蒙版数据 <para/>
+/// 可以是 40 字节、24 字节或   4 字节（如果没有图层掩码）。
+/// </summary>
+internal class LayerMask : Properties
     {
-    public int Left { get; set; }
+    public int Top => this["Top"]!.ToObject<int>()!;
+    public int Left => this["Left"]!.ToObject<int>()!;
+    public int Bottom => this["Bottom"]!.ToObject<int>()!;
+    public int Right => this["Right"]!.ToObject<int>()!;
+    public byte Color => this["Color"]!.ToObject<byte>()!;
 
-    public int Top { get; set; }
+    public byte Flags => this["Flags"]!.ToObject<byte>()!;
 
-    public int Right { get; set; }
+    public int Width => Right - Left;
 
-    public int Bottom { get; set; }
-
-    public byte Color { get; set; }
-
-    public byte Flag { get; set; }
-
-    public int Width => this.Right - this.Left;
-
-    public int Height => this.Bottom - this.Top;
+    public int Height => Bottom - Top;
     }

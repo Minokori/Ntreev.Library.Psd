@@ -1,3 +1,6 @@
 namespace Ntreev.Library.Psd;
 
-class LayerBlendingRanges { }
+internal class LayerBlendingRanges : Properties
+    {
+
+    }

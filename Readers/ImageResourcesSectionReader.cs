@@ -7,7 +7,6 @@ internal class ImageResourcesSectionReader(PsdBinaryReader reader) : PropertiesR
     protected override Properties ReadValue()
         {
         Properties props = [];
-
         while (GlobalReader.Position < EndPosition)
             {
             _ = GlobalReader.VerifySignatureIs("8BIM"); // signature, 4 bytes
@@ -16,17 +15,11 @@ internal class ImageResourcesSectionReader(PsdBinaryReader reader) : PropertiesR
             long length = GlobalReader.ReadInt32().PadToEven();// Actual size of resource data that follows (even)
 
             var resourceReader = ReaderCollector.CreateReader(resourceID, GlobalReader, length);
-
             if (resourceReader.Value.Count > 0)
                 {
                 props[ReaderCollector.GetDisplayName(resourceID)] = resourceReader.Value;
                 }
-
-
-
             }
-
-
 
         return props;
         }

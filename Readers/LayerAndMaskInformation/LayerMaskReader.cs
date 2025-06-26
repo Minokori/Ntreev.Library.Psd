@@ -17,29 +17,22 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LayerMaskReader : ValueReader<LayerMask>
+internal class LayerMaskReader(PsdBinaryReader reader) : ValueReader<LayerMask>(reader, true, null)
     {
-    private LayerMaskReader(PsdBinaryReader reader)
-        : base(reader, true, null) { }
-
-    public static LayerMask Read(PsdBinaryReader reader)
-        {
-        var instance = new LayerMaskReader(reader);
-        return instance.Value;
-        }
-
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 
+    // TODO
+    // Flags 后面的数据没有读取, 可能存在问题
     protected override LayerMask ReadValue()
         {
         return new()
             {
-            Top = GlobalReader.ReadInt32(),
-            Left = GlobalReader.ReadInt32(),
-            Bottom = GlobalReader.ReadInt32(),
-            Right = GlobalReader.ReadInt32(),
-            Color = GlobalReader.ReadByte(),
-            Flag = GlobalReader.ReadByte(),
+            ["Top"] = GlobalReader.ReadInt32(),
+            ["Left"] = GlobalReader.ReadInt32(),
+            ["Bottom"] = GlobalReader.ReadInt32(),
+            ["Right"] = GlobalReader.ReadInt32(),
+            ["Color"] = GlobalReader.ReadByte(),
+            ["Flags"] = GlobalReader.ReadByte(),
             };
         }
     }

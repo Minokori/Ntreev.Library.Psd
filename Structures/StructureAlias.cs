@@ -19,5 +19,5 @@ namespace Ntreev.Library.Psd.Structures;
 
 internal class StructureAlias : Properties
     {
-    public StructureAlias(PsdBinaryReader reader) : base(1) => Add("Alias", reader.ReadAsAscii(reader.ReadInt32()));
+    public StructureAlias(PsdBinaryReader reader) : base() => Add("Alias", reader.ReadAsAscii(reader.ReadInt32()));
     }

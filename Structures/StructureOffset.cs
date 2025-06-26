@@ -19,7 +19,7 @@ namespace Ntreev.Library.Psd.Structures;
 
 internal class StructureOffset : Properties
     {
-    public StructureOffset(PsdBinaryReader reader) : base(3)
+    public StructureOffset(PsdBinaryReader reader) : base()
         {
         Add("Name", reader.ReadString());
         Add("ClassID", reader.ReadAsKey());

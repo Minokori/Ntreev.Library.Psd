@@ -25,6 +25,8 @@ internal class LayerInfoReader(PsdBinaryReader reader, PsdDocument document) : V
         var document = (PsdDocument)UserData!;
         var layerCount = Math.Abs((int)GlobalReader.ReadInt16());
 
+
+        // PSDLayer 包括了 LayerRecords 和 Channel image data
         var layers = new PsdLayer[layerCount];
         for (var i = 0; i < layerCount; i++)
             {

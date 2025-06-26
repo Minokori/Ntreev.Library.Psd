@@ -14,7 +14,6 @@
 //WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 using Ntreev.Library.Psd.ReadersPrototype;
@@ -34,12 +33,8 @@ internal class GridAndGuidesReader(PsdBinaryReader reader, long length) : Resour
         Properties props = [];
 
         _ = GlobalReader.VerifyIntIs<int>(1); // version
-
-        var h = GlobalReader.ReadInt32();
-        props["HorizontalGrid"] = h;
-
-        var v = GlobalReader.ReadInt32();
-        props["VerticalGrid"] = v;
+        props["HorizontalGrid"] = GlobalReader.ReadInt32();
+        props["VerticalGrid"] = GlobalReader.ReadInt32();
 
         var guideCount = GlobalReader.ReadInt32();
 
@@ -56,15 +51,8 @@ internal class GridAndGuidesReader(PsdBinaryReader reader, long length) : Resour
             else
                 horizontalGrids.Add(n);
             }
-
-
-
-        //props["HorizontalGuides"] = horizontalGrids.ToArray();
-        //props["VerticalGuides"] = verticalGrids.ToArray();
         props["HorizontalGuides"] = new JArray(horizontalGrids);
         props["VerticalGuides"] = new JArray(verticalGrids);
-
-
 
         return props;
         }

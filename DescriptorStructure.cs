@@ -44,13 +44,6 @@ internal class DescriptorStructure : Properties
             var osType = reader.ReadAsType();
 
             // item type
-
-            //Add(
-            //    key.Trim(),
-            //    key == "EngineData"
-            //        ? new StructureEngineData(reader)
-            //        : StructureReader.Read(osType, reader)
-            //);
             if (key == "EngineData")
                 {
                 Add(key.Trim(), new StructureEngineData(reader));

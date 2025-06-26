@@ -1,4 +1,4 @@
-﻿namespace Ntreev.Library.Psd;
+namespace Ntreev.Library.Psd;
 
 /// <summary>
 /// 图层可视性

@@ -51,15 +51,6 @@ internal static class StructureReader
 
                 // 不受支持的
                 "tdta" => new StructureUnknownOSType("Cannot read RawData"),
-
-
-                // in "obj"
-                // obj :prop, clss, enmr, rele, idnt, indx, name
-                //"Idnt" => new StructureUnknownOSType("Cannot read Identifier"),
-                //"indx" => new StructureUnknownOSType("Cannot read Index"),
-                //"name" => new StructureUnknownOSType("Cannot read Name"),
-
-                //
                 "ObAr" => new StructureObjectArray(reader),
                 _ => throw new NotSupportedException(ostype),
                 };

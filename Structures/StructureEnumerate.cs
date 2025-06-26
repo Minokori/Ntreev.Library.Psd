@@ -19,7 +19,7 @@ namespace Ntreev.Library.Psd.Structures;
 
 internal class StructureEnumerate : Properties
     {
-    public StructureEnumerate(PsdBinaryReader reader) : base(2)
+    public StructureEnumerate(PsdBinaryReader reader) : base()
         {
         Add("Type", reader.ReadAsKey());
         Add("Enum", reader.ReadAsKey());

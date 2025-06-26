@@ -29,16 +29,14 @@ internal class Reader_TySh : ResourceReaderBase
 
     protected override Properties ReadValue()
         {
-        var props = new Properties(7);
+        var props = new Properties();
 
         GlobalReader.VerifyIntIs<short>(1);
-        //props["Transforms"] = GlobalReader.ReadDoubles(6);
         props["Transforms"] = new JArray(GlobalReader.ReadDoubles(6));
         props["TextVersion"] = GlobalReader.ReadInt16();
         props["Text"] = new DescriptorStructure(GlobalReader);
         props["WarpVersion"] = GlobalReader.ReadInt16();
         props["Warp"] = new DescriptorStructure(GlobalReader);
-        //props["Bounds"] = GlobalReader.ReadDoubles(2);
         props["Bounds"] = new JArray(GlobalReader.ReadDoubles(2));
 
         return props;

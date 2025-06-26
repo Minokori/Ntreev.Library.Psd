@@ -22,7 +22,7 @@ namespace Ntreev.Library.Psd.Structures;
 /// </summary>
 internal class StructureProperty : Properties
     {
-    public StructureProperty(PsdBinaryReader reader) : base(3)
+    public StructureProperty(PsdBinaryReader reader) : base()
         {
         Add("Name", reader.ReadString());
         Add("ClassID", reader.ReadAsKey());

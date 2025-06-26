@@ -1,20 +1,3 @@
-//Released under the MIT License.
-//
-//Copyright (c) 2015 Ntreev Soft co., Ltd.
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
-//rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-//persons to whom the Software is furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
-//Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-//WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-//OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 using Ntreev.Library.Psd.ReadersPrototype;
@@ -62,17 +45,14 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
             {
             DescriptorStructure descriptor = new(GlobalReader);//as IProperties;
 
-            // TODO
             var items = descriptor.SelectTokens("slices.Items[0]");
-            //var items = descriptor["slices.Items[0]"] as object[];
 
-            // 没有读取, 仅仅是处理 descriptor 中的切片信息
             var slices = new List<Properties>(items.Count());//items.Length
             foreach (var item in items)
                 {
                 slices.Add(ReadSliceInfo(item as Properties));
                 }
-            //props["Items"] = slices.ToArray()
+
             props["Items"] = new JArray(slices);
             }
 
@@ -126,27 +106,16 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
         {
         var props = new Properties
             {
-            ["ID"] = (int)properties["sliceID"],
-            ["GroupID"] = (int)properties["groupID"],
+            ["ID"] = properties["sliceID"],
+            ["GroupID"] = properties["groupID"],
             };
         if (properties.Contains("Nm") == true)
-
-            //props["Name"] = properties["Nm"] as string;
             props["Name"] = properties["Nm"];
 
-        //props["Left"] = (int)properties["bounds.Left"];
-        //props["Top"] = (int)properties["bounds.Top"];
-        //props["Right"] = (int)properties["bounds.Rght"];
-        //props["Bottom"] = (int)properties["bounds.Btom"];
         props["Left"] = properties.SelectToken("bounds.Left");
         props["Top"] = properties.SelectToken("bounds.Top");
         props["Right"] = properties.SelectToken("bounds.Rght");
         props["Bottom"] = properties.SelectToken("bounds.Btom");
-
-        //props["Url"] = properties["url"] as string;
-        //props["Target"] = properties["null"] as string;
-        //props["Message"] = properties["Msge"] as string;
-        //props["AltTag"] = properties["altTag"] as string;
         props["Url"] = properties["url"];
         props["Target"] = properties["null"];
         props["Message"] = properties["Msge"];
@@ -154,10 +123,10 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
 
         if (properties.Contains("bgColor") == true)
             {
-            props["Alpha"] = (byte)(int)properties["bgColor.alpha"];
-            props["Red"] = (byte)(int)properties["bgColor.Rd"];
-            props["Green"] = (byte)(int)properties["bgColor.Grn"];
-            props["Blue"] = (byte)(int)properties["bgColor.Bl"];
+            props["Alpha"] = properties.SelectToken("bgColor.alpha");
+            props["Red"] = properties.SelectToken("bgColor.Rd");
+            props["Green"] = properties.SelectToken("bgColor.Grn");
+            props["Blue"] = properties.SelectToken("bgColor.Bl");
             }
 
         return props;

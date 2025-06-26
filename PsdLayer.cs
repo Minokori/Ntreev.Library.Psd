@@ -2,19 +2,18 @@
 //
 //Copyright (c) 2015 Ntreev Soft co., Ltd.
 //
-//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
-//rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
+//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+//rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
 //persons to whom the Software is furnished to do so, subject to the following conditions:
 //
-//The above copyright notice and this permission notice shall be included in all copies or substantial portions of the 
+//The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
 //Software.
 //
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
-//WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+//WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+//COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 
 using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
@@ -29,7 +28,9 @@ internal partial class PsdLayer : IPsdLayer
     public PsdLayer(PsdBinaryReader reader, PsdDocument document)
         {
         Document = document;
-        Records = LayerRecordsReader.Read(reader);
+
+        // 读取 LayerRecords
+        Records = new LayerRecordsReader(reader).Value;
         Left = Records.Left;
         Top = Records.Top;
         Right = Records.Right;
@@ -38,9 +39,8 @@ internal partial class PsdLayer : IPsdLayer
 
     public override string ToString() => this.Name;
 
-
-    public void ReadChannels(PsdBinaryReader reader) => this._channelsReader = new ChannelsReader(reader, this.Records.ChannelSize, this);
-
+    public void ReadChannels(PsdBinaryReader reader) =>
+        this._channelsReader = new ChannelsReader(reader, this.Records.ChannelSize, this);
 
     /// <summary>
     /// 计算边距
@@ -67,8 +67,8 @@ internal partial class PsdLayer : IPsdLayer
             if (item.Resources.Contains("PlLd.Transformation"))
                 {
                 var transforms = item.Resources.ToValue<double[]>("PlLd", "Transformation");
-                double[] xx = [transforms[0], transforms[2], transforms[4], transforms[6],];
-                double[] yy = [transforms[1], transforms[3], transforms[5], transforms[7],];
+                double[] xx = [transforms[0], transforms[2], transforms[4], transforms[6]];
+                double[] yy = [transforms[1], transforms[3], transforms[5], transforms[7]];
 
                 var l = (int)Math.Ceiling(xx.Min());
                 var r = (int)Math.Ceiling(xx.Max());
@@ -98,8 +98,4 @@ internal partial class PsdLayer : IPsdLayer
         this.Right = right;
         this.Bottom = bottom;
         }
-
-
     }
-
-
