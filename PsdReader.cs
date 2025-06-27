@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Ntreev.Library.Psd.Exceptions;
 
@@ -13,26 +14,30 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
     #region 以 "ReadAs" 开头的方法, 功能类似于 BinaryReader 的 "Read" 开头方法, 但会返回特定格式的字符串或数据
     /// <summary>
     /// 从流中读取一个 Pascal 字符串，字符串长度由第一个字节指定，后续字节为字符串内容。<para/>
-    /// 该 Pascal 字符串的长度必须是 <paramref name="alignmentSize"/> 的倍数。
+    /// 读取的长度必须是 <paramref name="alignmentSize"/> 的倍数。
     /// </summary>
     /// <param name="alignmentSize">对齐长度</param>
     /// <returns>Pascal 字符串</returns>
-    public string ReadAsPascalString(int alignmentSize = 1)
+    public string ReadAsPascalString(byte alignmentSize = 1)
         {
         var count = ReadByte();
         if (count == 0)
             {
-            BaseStream.Position += alignmentSize - 1; // 至少读取 length 个字节, count已经读取了一个字节, 因此再读取 length -1 个
+            _ = ReadBytes(alignmentSize - 1); // 至少读取 alignmentSize 个字节, count已经读取了一个字节, 因此再读取 alignmentSize -1 个
             return string.Empty;
             }
 
         var bytes = ReadBytes(count);
         var text = Encoding.UTF8.GetString(bytes);
-        for (var totalLength = count + 1; (totalLength % alignmentSize) != 0; totalLength++)
+        var totalLength = count + 1;
+        var padding = (alignmentSize - (totalLength % alignmentSize)) % alignmentSize;
+        //count += (byte)(alignmentSize - ((count + 1) % alignmentSize)); // 确保 count 是 alignmentSize 的倍数
+        if (padding > 0)
             {
-            BaseStream.Position += 1L; // 跳过填充字节
+            _ = ReadBytes(padding); // 读取填充字节
             }
 
+        Debug.WriteLine(Encoding.Default.GetString(bytes));
         return text;
         }
 
@@ -104,7 +109,7 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
     /// 读取一个 <see cref="short"/> 类型的值, 并作为 <see cref="CompressionType"/> 枚举类型返回。<para/>
     /// </summary>
     /// <returns><see cref="CompressionType"/></returns>
-    public CompressionType ReadCompressionType() => (CompressionType)ReadInt16();
+    public CompressionType ReadAsCompressionType() => (CompressionType)ReadInt16();
     #endregion
 
     #region Skip 方法. 功能类似于 Read 方法, 但不关心读取的内容, 只关心跳过多少字节

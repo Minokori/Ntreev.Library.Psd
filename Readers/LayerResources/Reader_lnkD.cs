@@ -34,8 +34,6 @@ internal class Reader_lnkD(PsdBinaryReader reader, long length) : ResourceReader
             linkedLayers.Add(r.Value);
             }
 
-        //props["Items"] = linkedLayers.ToArray();
-        // TODO System.ArgumentException:“Could not determine JSON object type for type Ntreev.Library.Psd.LinkedLayer.”
         props.AddLayers(linkedLayers);
         return props;
         }

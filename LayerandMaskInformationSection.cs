@@ -15,16 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 namespace Ntreev.Library.Psd;
 
-internal class LayerAndMaskInformationSection(LayerInfoReader layerInfo, GlobalLayerMaskInfoReader globalLayerMask, Properties documentResources)
+internal class LayerAndMaskInformationSection(JObject layerInfo, GlobalLayerMaskInfoReader globalLayerMask, Properties documentResources)
     {
-    private readonly LayerInfoReader layerInfo = layerInfo;
+    private readonly JObject layerInfo = layerInfo;
     private readonly GlobalLayerMaskInfoReader globalLayerMask = globalLayerMask;
 
-    public PsdLayer[] Layers => this.layerInfo.Value;
+    public PsdLayer[] Layers { get; init; }
 
     public ILinkedLayer[] LinkedLayers
         {

@@ -15,17 +15,32 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LayerBlendingRangesReader(PsdBinaryReader reader) : ValueReader<LayerBlendingRanges>(reader, true, null)
+internal class LayerBlendingRangesReader(PsdBinaryReader reader)
+    : ValueReader<LayerBlendingRanges>(reader, true, null)
     {
-    public static LayerBlendingRanges Read(PsdBinaryReader reader)
-        {
-        var instance = new LayerBlendingRangesReader(reader);
-        return instance.Value;
-        }
 
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
+    protected override LayerBlendingRanges ReadValue()
+        {
+        var blendingRanges = new LayerBlendingRanges()
+            {
+            ["CompositeGrayBlendSource"] = GlobalReader.ReadInt32(),
+            ["CompositeGrayDestinationRange"] = GlobalReader.ReadInt32(),
+            };
+        var channelSourceRange = new JArray();
+        var channelDestinationRange = new JArray();
+        while (GlobalReader.Position < EndPosition)
+            {
+            channelSourceRange.Add(GlobalReader.ReadInt32());
+            channelDestinationRange.Add(GlobalReader.ReadInt32());
+            }
 
-    protected override LayerBlendingRanges ReadValue() => [];
+        blendingRanges["ChannelSourceRange"] = channelSourceRange;
+        blendingRanges["ChannelDestinationRange"] = channelDestinationRange;
+        return blendingRanges;
+        }
     }

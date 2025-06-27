@@ -11,10 +11,7 @@ public partial class PsdDocument : IPsdLayer, IDisposable
 
     public void Dispose()
         {
-        if (BinaryReader == null)
-            return;
-
-        BinaryReader.Dispose();
+        BinaryReader?.Dispose();
         OnDisposed(EventArgs.Empty);
 
         // Suppress finalization to comply with CA1816

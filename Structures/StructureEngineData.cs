@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text;
 
 namespace Ntreev.Library.Psd.Structures;
 
@@ -84,37 +85,38 @@ internal class StructureEngineData : Properties
                 }
             }
         }
+
     private object ReadValue(PsdBinaryReader reader, int level)
         {
         var c = reader.ReadChar();
-        if (c == ']')
+        if (c == ']')//93
             {
             return null;
             }
-        else if (c == '(')
+        else if (c == '(')//99
             {
             // unicode string
             var text = string.Empty;
 
-            var stringSignature = reader.ReadInt16() & 0xFFFF;
-
+            var stringSignature = reader.ReadInt16();
+            stringSignature = (short)(stringSignature & 0xFFFF);
             //assert stringSignature == 0xFEFF;
             while (true)
                 {
                 var b1 = reader.ReadChar();
-                if (b1 == ')')
+                if (b1 == ')') // 41
                     {
-                    reader.Skip('\n');
+                    reader.Skip('\n');//10
                     return text;
                     }
 
                 var b2 = reader.ReadChar();
-                if (b2 == '\\')
+                if (b2 == '\\')//92
                     {
                     b2 = reader.ReadChar();
                     }
 
-                if (b2 == 13)
+                if (b2 == 13) //'\r'
                     {
                     text += '\n';
                     }
@@ -191,6 +193,58 @@ internal class StructureEngineData : Properties
 
             return value;
             }
+        }
+
+
+    private object ReadValue2(PsdBinaryReader reader, int level)
+        {
+        var c = reader.ReadChar();
+        if (c == ']')
+            {
+            return null;
+            }
+        else if (c == '(')
+            {
+            // 读取 BOM
+            var bom = reader.ReadInt16();
+            if ((bom & 0xFFFF) != 0xFEFF)
+                throw new InvalidDataException("字符串缺少 UTF-16 BE BOM");
+
+            // 用内存流收集字节
+            using var ms = new MemoryStream();
+            while (true)
+                {
+                var b1 = reader.ReadChar();
+                if (b1 == ')')
+                    {
+                    reader.Skip('\n');
+                    break;
+                    }
+
+                var b2 = reader.ReadChar();
+                if (b2 == '\\')
+                    {
+                    b2 = reader.ReadChar();
+                    }
+
+                if (b2 == 13)
+                    {
+                    ms.WriteByte(0x00);
+                    ms.WriteByte((byte)'\n');
+                    }
+                else
+                    {
+                    ms.WriteByte((byte)b1);
+                    ms.WriteByte((byte)b2);
+                    }
+                }
+            // 解码为字符串
+            ms.Position = 0;
+            return Encoding.BigEndianUnicode.GetString(ms.ToArray());
+            }
+        // 其它分支同原方法...
+        // 可根据需要补充
+        return null;
         }
 
     }

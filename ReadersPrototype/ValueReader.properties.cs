@@ -40,7 +40,7 @@ internal partial class ValueReader<T>
         }
 
     /// <summary>
-    /// 值占用的字节长度
+    /// 值占用的字节长度 (包括)
     /// </summary>
     public long StreamLength { get; set; }
 

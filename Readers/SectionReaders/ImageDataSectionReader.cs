@@ -24,6 +24,7 @@ internal class ImageDataSectionReader(PsdBinaryReader reader, PsdDocument docume
     protected override Channel[] ReadValue() => ReadValue(GlobalReader, (PsdDocument)UserData!);
 
     // TODO 透明度消失疑似发生在这里
+    // channel.Read() api 变了, 应注意初始化 其 Depth
     private static Channel[] ReadValue(PsdBinaryReader reader, PsdDocument document)
         {
         var channelCount = document.FileHeaderSection.NumberOfChannels;
@@ -39,13 +40,13 @@ internal class ImageDataSectionReader(PsdBinaryReader reader, PsdDocument docume
         for (var i = 0; i < channels.Length; i++)
             {
             var type = i < types.Length ? types[i] : ChannelType.Mask;
-            channels[i] = new Channel(type, width, height, 0);
-            channels[i].ReadHeader(reader, compressionType);
+            channels[i] = new Channel(type, width, height, 0) { Depth = depth, CompressionType = compressionType };
+            channels[i].RlePackLengths = channels[i].ReadHeader(reader, compressionType);
             }
 
         for (var i = 0; i < channels.Length; i++)
             {
-            channels[i].Read(reader, depth, compressionType);
+            channels[i].Read(reader);
             }
 
         if (channels.Length == 4)

@@ -11,7 +11,7 @@ internal partial class Channel
         Type = type;
         Width = width;
         Height = height;
-        Size = size;
+        StreamLength = size;
         }
     }
 

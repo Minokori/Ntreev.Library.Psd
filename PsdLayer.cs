@@ -21,33 +21,28 @@ namespace Ntreev.Library.Psd;
 
 internal partial class PsdLayer : IPsdLayer
     {
-    private ChannelsReader _channelsReader;
+    private ChannelImageDataReader _channelsReader;
 
     private static readonly PsdLayer[] _emptyChilds = [];
 
-    public PsdLayer(PsdBinaryReader reader, PsdDocument document)
-        {
-        Document = document;
+    public PsdLayer(PsdBinaryReader reader, PsdDocument document) => Document = document;
 
-        // 读取 LayerRecords
-        Records = new LayerRecordsReader(reader).Value;
-        Left = Records.Left;
-        Top = Records.Top;
-        Right = Records.Right;
-        Bottom = Records.Bottom;
+    public override string ToString() => Name;
+
+    public void InitChannelReader(PsdBinaryReader reader)
+        {
+        _channelsReader = new ChannelImageDataReader(reader, Records.ToValue<long[]>("ChannelDataLength")!.Sum(), this);
+        _ = _channelsReader.Value;
         }
 
-    public override string ToString() => this.Name;
-
-    public void ReadChannels(PsdBinaryReader reader) =>
-        this._channelsReader = new ChannelsReader(reader, this.Records.ChannelSize, this);
-
     /// <summary>
-    /// 计算边距
+    /// 计算边距(TOP, Bottom, Left, right)
     /// </summary>
     public void ComputeBounds()
         {
-        var sectionType = this.Records.SectionType;
+        var type = Records.ToValue<string>("Resources.lsct.SectionType", "Resources.lsdk.SectionType");
+        var sectionType = string.IsNullOrEmpty(type) ? SectionType.Normal : Enum.Parse<SectionType>(type);
+
         if (sectionType is not SectionType.Opend and not SectionType.Closed)
             return;
 
@@ -63,10 +58,9 @@ internal partial class PsdLayer : IPsdLayer
             if (item == this || item.HasImage == false)
                 continue;
 
-            // 일반 레이어인데 비어 있을때
             if (item.Resources.Contains("PlLd.Transformation"))
                 {
-                var transforms = item.Resources.ToValue<double[]>("PlLd", "Transformation");
+                var transforms = item.Resources.SelectToken("PlLd.Transformation").ToObject<double[]>()!;// ToValue<double[]>("PlLd", "Transformation");
                 double[] xx = [transforms[0], transforms[2], transforms[4], transforms[6]];
                 double[] yy = [transforms[1], transforms[3], transforms[5], transforms[7]];
 
@@ -93,9 +87,9 @@ internal partial class PsdLayer : IPsdLayer
         if (isSet == false)
             return;
 
-        this.Left = left;
-        this.Top = top;
-        this.Right = right;
-        this.Bottom = bottom;
+        Left = left;
+        Top = top;
+        Right = right;
+        Bottom = bottom;
         }
     }

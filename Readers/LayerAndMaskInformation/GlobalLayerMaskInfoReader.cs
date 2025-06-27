@@ -15,11 +15,37 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class GlobalLayerMaskInfoReader(PsdBinaryReader reader) : ValueReader<object>(reader, true, null)
+internal class GlobalLayerMaskInfoReader(PsdBinaryReader reader) : ValueReader<JObject>(reader, true, null)
     {
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 
-    protected override object ReadValue() => new();
+    protected override JObject ReadValue()
+        {
+        var filler_length = StreamLength - (4 + 2 + 8 + 2 + 1);
+        var globalLayerMaskInfo = new JObject()
+            {
+            ["OverlayColorSpace"] = GlobalReader.ReadInt16(),
+            }
+        ;
+
+        JArray colorComponents = [];
+
+        for (var i = 0; i < 4; i++)
+            {
+            colorComponents.Add(GlobalReader.ReadInt16());
+            }
+
+        globalLayerMaskInfo["ColorComponents"] = colorComponents;
+
+        globalLayerMaskInfo["Opacity"] = GlobalReader.ReadInt16();
+
+        globalLayerMaskInfo["Kind"] = GlobalReader.ReadByte();
+
+        globalLayerMaskInfo["Filler"] = GlobalReader.ReadBytes((int)filler_length);
+        return globalLayerMaskInfo;
+        }
     }

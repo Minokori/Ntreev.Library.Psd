@@ -2,36 +2,51 @@ namespace Ntreev.Library.Psd;
 
 internal partial class Channel
     {
+    /// <summary>
+    /// 初始化完整的通道数据 到 Data 里
+    /// </summary>
+    /// <param name="reader">私有Reader</param>
+    /// <param name="depth"></param>
+    /// <param name="compressionType"></param>
+    /// <param name="rlePackLengths"></param>
     private void PrivateReadData(
         PsdBinaryReader reader,
-        int bps,
+        int depth,
         CompressionType compressionType,
         int[] rlePackLengths
     )
         {
-        var length = PsdUtility.DepthToPitch(bps, this.Width);
-        this.Data = new byte[length * Height];
+        // 初始化 Data 的大小 (实际宽度 * 高度)
+        var rowLength = PsdUtility.DepthToPitch(depth, Width);
+        Data = new byte[rowLength * Height];
+
+
+        // 如果是 RLE 压缩, 则需要读取每行的长度
         switch (compressionType)
             {
             case CompressionType.Raw:
-                reader.Read(this.Data, 0, this.Data.Length);
+                //直接将数据读入 Data
+                _ = reader.Read(Data, 0, Data.Length);
                 break;
+
 
             case CompressionType.RLE:
                 //逐行读取
-                for (var i = 0; i < Height; i++)
+                for (var rowIndex = 0; rowIndex < Height; rowIndex++)
                     {
-                    var buffer = new byte[rlePackLengths[i]];
-                    var dst = new byte[length];
-                    reader.Read(buffer, 0, rlePackLengths[i]);
-                    DecodeRLE(buffer, dst, rlePackLengths[i], length);
+                    //读取该行压缩后的数据
+                    var packedRowData = reader.ReadBytes(rlePackLengths[rowIndex]);
 
-                    //解压至_data
-                    // TODO this is the deep source
-                    for (var j = 0; j < length; j++)
+                    //解压
+                    var rowData = DecodeRLE(packedRowData, rowLength);
+
+                    //移动到 data 对应的位置
+                    for (var j = 0; j < rowLength; j++)
                         {
-                        this.Data[(i * length) + j] = (byte)(dst[j] * this.Opacity);
+                        Data[(rowIndex * rowLength) + j] = (byte)(rowData[j] * Opacity);
                         }
+
+
                     }
 
                 break;
@@ -46,14 +61,16 @@ internal partial class Channel
     /// <param name="packedLength">源长度</param>
     /// <param name="unpackedLength">目标长度</param>
     /// <exception cref="Exception"></exception>
-    private static void DecodeRLE(byte[] src, byte[] dst, int packedLength, int unpackedLength)
+    private static byte[] DecodeRLE(byte[] src, int unpackedLength)
+    //private static byte[] DecodeRLE(byte[] src, byte[] rowData, int packedLength, int unpackedLength)
         {
+        var dst = new byte[unpackedLength];
         var index = 0;
         var num2 = 0;
         var num3 = 0;
         byte num4 = 0;
         var num5 = unpackedLength;
-        var num6 = packedLength;
+        var num6 = src.Length;
         while ((num5 > 0) && (num6 > 0))
             {
             num3 = src[index++];
@@ -130,5 +147,8 @@ internal partial class Channel
                 dst[num2++] = 0;
                 }
             }
+
+        return dst;
         }
+
     }

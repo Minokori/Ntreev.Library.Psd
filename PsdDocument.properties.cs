@@ -50,7 +50,7 @@ public partial class PsdDocument
 
     BlendMode IPsdLayer.BlendMode => BlendMode.Normal;
 
-    IChannel[] IImageSource.Channels => this.imageDataSection.Value;
+    IChannel[] IImageSource.Channels => imageDataSection.Value;
 
     // TODO This makes MergeChannels on PsdDocument class no opacity
     float IImageSource.Opacity => 1.0f;

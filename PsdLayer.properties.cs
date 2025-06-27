@@ -1,17 +1,40 @@
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd;
 
 internal partial class PsdLayer
     {
+    // TODO 把 PSDLayer 变成组合, 让属性从组合中获取
 
-    public Channel[] Channels => _channelsReader.Value;
+    #region 来自record的属性
+    public SectionType SectionType
+        {
+        get
+            {
+            var type = Records.ToValue<string>("Resources.lsct.SectionType", "Resources.lsdk.SectionType");
+            return string.IsNullOrEmpty(type) ? SectionType.Normal : Enum.Parse<SectionType>(type);
+            }
+        }
+    public string Name => Records.ToValue<string>("Resources.luni.Name");
 
-    public SectionType SectionType => Records.SectionType;
+    public bool IsVisible => (Enum.Parse<LayerFlags>(Records.ToValue<string>("Flags")) & LayerFlags.Visible) != LayerFlags.Visible;
 
-    public string Name => Records.Name;
+    public float Opacity => Records.ToValue<float>("Opacity") / 255f;
+    public bool IsClipping => Records.ToValue<bool>("Clipping");
 
-    public bool IsVisible => (Records.Flags & LayerFlags.Visible) != LayerFlags.Visible;
+    public BlendMode BlendMode => Enum.Parse<BlendMode>(Records.ToValue<string>("BlendMode"));
 
-    public float Opacity => Records.Opacity / 255f;
+    #endregion
+
+
+    #region 来自record的属性
+
+
+    #endregion
+    public Channel[] Channels => [];// _channelsReader.Value;
+
+
+
 
     public int Left { get; private set; }
 
@@ -27,9 +50,6 @@ internal partial class PsdLayer
 
     public int Depth => Document.FileHeaderSection.Depth;
 
-    public bool IsClipping => Records.Clipping;
-
-    public BlendMode BlendMode => Records.BlendMode;
 
     public PsdLayer Parent { get; set; }
 
@@ -39,17 +59,17 @@ internal partial class PsdLayer
         set;
         } = [];
 
-    public Properties Resources => Records.Resources;
+    public Properties Resources => Records.ToValue<Properties>("Resources");
 
     public PsdDocument Document { get; }
 
-    public LayerRecords Records { get; }
+    public JObject Records { get; set; }
 
     public ILinkedLayer LinkedLayer
         {
         get
             {
-            var placeID = Records.PlacedID;
+            var placeID = new Guid(Records.ToValue<string>("PlacedID"));
 
             if (placeID == Guid.Empty)
                 return null;
@@ -59,14 +79,14 @@ internal partial class PsdLayer
             }
         }
 
-    public bool HasImage => Records.SectionType == SectionType.Normal && Width != 0 && Height != 0;
+    public bool HasImage => SectionType == SectionType.Normal && Width != 0 && Height != 0;
 
-    public bool HasMask => Records.Mask != null;
+    public bool HasMask => Records.Contains("Mask");
     #region IPsdLayer
 
     IPsdLayer IPsdLayer.Parent => Parent == null ? Document : Parent;
 
-    IChannel[] IImageSource.Channels => _channelsReader.Value;
+    IChannel[] IImageSource.Channels => Channels;
 
     IPsdLayer[] IPsdLayer.Childs => Childs;
 

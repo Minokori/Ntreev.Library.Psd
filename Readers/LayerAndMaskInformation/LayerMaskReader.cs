@@ -15,24 +15,56 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Library.Psd.Exceptions;
+
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class LayerMaskReader(PsdBinaryReader reader) : ValueReader<LayerMask>(reader, true, null)
     {
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 
-    // TODO
-    // Flags 后面的数据没有读取, 可能存在问题
+
     protected override LayerMask ReadValue()
         {
-        return new()
+        switch (StreamLength)
             {
-            ["Top"] = GlobalReader.ReadInt32(),
-            ["Left"] = GlobalReader.ReadInt32(),
-            ["Bottom"] = GlobalReader.ReadInt32(),
-            ["Right"] = GlobalReader.ReadInt32(),
-            ["Color"] = GlobalReader.ReadByte(),
-            ["Flags"] = GlobalReader.ReadByte(),
-            };
+            case 4:
+                return [];
+            case 20:
+                {
+                return
+                    new LayerMask()
+                        {
+                        ["Top"] = GlobalReader.ReadInt32(),
+                        ["Left"] = GlobalReader.ReadInt32(),
+                        ["Bottom"] = GlobalReader.ReadInt32(),
+                        ["Right"] = GlobalReader.ReadInt32(),
+                        };
+                }
+
+            ;
+            case 40:
+                {
+                return new LayerMask()
+                    {
+                    ["Top"] = GlobalReader.ReadInt32(),
+                    ["Left"] = GlobalReader.ReadInt32(),
+                    ["Bottom"] = GlobalReader.ReadInt32(),
+                    ["Right"] = GlobalReader.ReadInt32(),
+                    ["Color"] = GlobalReader.ReadByte(),
+                    ["Flags"] = GlobalReader.ReadByte(),
+                    ["UserMaskDensity"] = GlobalReader.ReadByte(),
+                    ["UserMaskFeather"] = GlobalReader.ReadDouble(),
+                    ["VectorMaskDensity"] = GlobalReader.ReadByte(),
+                    ["VectorMaskFeather"] = GlobalReader.ReadDouble(),
+                    };
+                }
+            default:
+                throw new InvalidFormatException(
+                $"LayerMaskReader: Invalid stream length {StreamLength} for LayerMask. Expected 4, 20, or 40 bytes.");
+            }
         }
+
+
+
     }

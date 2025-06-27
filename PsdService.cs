@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Ntreev.Library.Psd.Services;
 
@@ -11,6 +12,7 @@ public static class PsdService
 
     private static ServiceProvider GetServices()
         {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         var serviceProvider = new ServiceCollection()
             .AddSingleton<IDocumentManager, PsdDocumentManager>()
             .BuildServiceProvider();
