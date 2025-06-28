@@ -15,25 +15,39 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
+using Newtonsoft.Json.Linq;
 
 namespace Ntreev.Library.Psd;
 
 internal partial class PsdLayer : IPsdLayer
     {
-    private ChannelImageDataReader _channelsReader;
+    private PsdBinaryReader GlobalReader => Document.BinaryReader;
 
     private static readonly PsdLayer[] _emptyChilds = [];
 
-    public PsdLayer(PsdBinaryReader reader, PsdDocument document) => Document = document;
+    public PsdLayer(JObject layRecord, JArray channelsImageData, PsdDocument document)
+        {
+        Records = layRecord;
+        ChannelImageData = channelsImageData;
+        // 根据 layer record 初始化 PSD Layer
 
+        Document = document;
+        Channels = InitChannels();
+        }
     public override string ToString() => Name;
 
-    public void InitChannelReader(PsdBinaryReader reader)
+    private Channel[] InitChannels()
         {
-        _channelsReader = new ChannelImageDataReader(reader, Records.ToValue<long[]>("ChannelDataLength")!.Sum(), this);
-        _ = _channelsReader.Value;
+        var channels = Records.InitChannels(GlobalReader.Depth);
+
+        foreach (var item in channels.Zip(ChannelImageData.Children(), (channel, metainfo) => new { Channel = channel, MetaInfo = (JObject)metainfo }))
+            {
+            item.Channel.MetaInfo = item.MetaInfo;
+            }
+
+        return channels;
         }
+
 
     /// <summary>
     /// 计算边距(TOP, Bottom, Left, right)

@@ -15,7 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
@@ -28,76 +27,50 @@ namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 /// <param name="reader"></param>
 /// <param name="length">该 layer 所有 channel 的总长度</param>
 /// <param name="layer">Channels</param>
-internal class ChannelImageDataReader(PsdBinaryReader reader, long length, PsdLayer layer)
-    : ValueReader<JObject>(reader, length, layer)
+internal class ChannelImageDataReader(PsdBinaryReader reader, long length, JObject layerRecord)
+    : ValueReader<JArray>(reader, length, layerRecord)
 //internal class ChannelImageDataReader(PsdBinaryReader reader, long length, PsdLayer layer) : ValueReader<Channel[]>(reader, length, layer)
 
     {
-    protected override JObject ReadValue()
+    protected override JArray ReadValue()
         {
-        // TODO 需要 document 的 Depth
-        // TODO 1. 变成一个 Channel的 info, 不要初始化Channel 包括 channel 的
+        var records = UserData as JObject;
+        var channels = records.InitChannels(GlobalReader.Depth);
 
-        var layer = UserData as PsdLayer;
-        var records = layer.Records;
-        var postion = GlobalReader.Position;
-        var channels = records.InitChannels(layer.Depth);
-        (channels, var channelInfo) = PrivateReadValue(channels);
-        Debug.WriteLine(channelInfo);
-        return channelInfo;
-        }
-
-    /// <summary>
-    /// TODO 删掉 reader 入参
-    /// </summary>
-    /// <param name="depth"></param>
-    /// <param name="channels"></param>
-    private Tuple<Channel[], JObject> PrivateReadValue(Channel[] channels)
-        {
-        JObject channelInfo = [];
-        JArray compressionTypes = [];
-        JArray rles = [];
-        JArray dataStartPosition = [];
-        JArray dataStreamLength = [];
+        JArray ImageMetaData = [];
         foreach (var channel in channels)
             {
+            JObject data = [];
             // 1. 读压缩类型
             var compressionType = GlobalReader.ReadAsCompressionType();
-            channel.CompressionType = compressionType;
-            compressionTypes.Add(Enum.GetName(compressionType));
+            //channel.CompressionType = compressionType;
+            data["CompressionType"] = Enum.GetName(compressionType);
 
             // 2. 读压缩长度
+            // TODO ReadHeader 方法需要重构, 脱离channel 类
             var rlePackLength = channel.ReadHeader(GlobalReader, compressionType);
-            channel.RlePackLengths = rlePackLength;
-            rles.Add(rlePackLength);
+            //channel.RlePackLengths = rlePackLength;
+            data["RlePackLengths"] = new JArray(rlePackLength);
 
             // 3. 解压数据
             // 读取的长度:
             // RAW: depth * Width * Height
             // RLE: 每行的长度 Rle 相加
 
-            dataStartPosition.Add(GlobalReader.Position);
+            data["StartPosition"] = GlobalReader.Position;
             var channelTotalLength =
                 compressionType == CompressionType.Raw
                     ? PsdUtility.DepthToPitch(channel.Depth, channel.Width) * channel.Height
                     : rlePackLength.Sum();
+            data["StreamLength"] = channelTotalLength;
 
+            //channel.Read(GlobalReader);
+            GlobalReader.Position += channelTotalLength;
 
-            channel.Read(GlobalReader);
-
-            //if (channelTotalLength % 2 != 0)
-            //    {
-            //    _ = GlobalReader.ReadByte();
-            //    dataStreamLength.Add(channelTotalLength + 1);
-            //    }
-
+            //49698+860
+            ImageMetaData.Add(data);
             }
 
-        channelInfo["CompressionType"] = compressionTypes;
-        channelInfo["RLEPackLength"] = rles;
-        channelInfo["DataStartPosition"] = dataStartPosition;
-        channelInfo["DataStreamLength"] = dataStreamLength;
-
-        return new(channels, channelInfo);
+        return ImageMetaData;
         }
     }

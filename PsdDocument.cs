@@ -25,6 +25,8 @@ public partial class PsdDocument : IPsdLayer, IDisposable
         {
         FileHeaderSection = new FileHeaderSectionReader(BinaryReader).Value;
 
+        BinaryReader.Depth = FileHeaderSection.Depth;
+
         ColorModeDataSection = new()
             {
             ["ColorModeData"] = new ColorModeDataSectionReader(BinaryReader).Value

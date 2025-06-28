@@ -1,3 +1,5 @@
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd;
 
 internal partial class Channel
@@ -18,5 +20,6 @@ internal partial class Channel
     public int Depth { get; init; } = 1;
 
     public CompressionType CompressionType { get; set; }
+    public JToken MetaInfo { get; internal set; }
     }
 

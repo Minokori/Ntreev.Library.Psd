@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text;
 using Ntreev.Library.Psd.Exceptions;
 
@@ -11,6 +10,13 @@ namespace Ntreev.Library.Psd;
 /// <param name="uri">PSD 文件的绝对 Uri. 若 <paramref name="stream"/> 没有对应的文件, 默认 Uri 为当前工作路径</param>
 internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryReader(stream)
     {
+    #region 为了方便 PSD 读取, 定义的 property
+
+    public int Depth { get; set; }
+
+    #endregion
+
+
     #region 以 "ReadAs" 开头的方法, 功能类似于 BinaryReader 的 "Read" 开头方法, 但会返回特定格式的字符串或数据
     /// <summary>
     /// 从流中读取一个 Pascal 字符串，字符串长度由第一个字节指定，后续字节为字符串内容。<para/>

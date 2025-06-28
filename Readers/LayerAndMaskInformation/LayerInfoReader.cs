@@ -43,6 +43,16 @@ internal class LayerInfoReader(PsdBinaryReader reader) : ValueReader<JObject>(re
         layerInfo["LayerRecord"] = layerRecords;
 
 
+        var channelsImageDatas = new JArray();
+        foreach (var item in layerRecords.Cast<JObject>())
+            {
+            var channelsTotalLength = item.ToValue<long[]>("ChannelDataLength")!.Sum();
+            ChannelImageDataReader? channelReader = new(GlobalReader, channelsTotalLength, item);
+            channelsImageDatas.Add(channelReader.Value);
+            }
+
+
+        layerInfo["ChannelsImageData"] = channelsImageDatas;
         //channel image data
         return layerInfo;
         }

@@ -31,7 +31,7 @@ internal partial class PsdLayer
 
 
     #endregion
-    public Channel[] Channels => [];// _channelsReader.Value;
+    public Channel[] Channels { get; init; }// _channelsReader.Value;
 
 
 
@@ -48,7 +48,7 @@ internal partial class PsdLayer
 
     public int Height => Bottom - Top;
 
-    public int Depth => Document.FileHeaderSection.Depth;
+    public int Depth => GlobalReader.Depth;
 
 
     public PsdLayer Parent { get; set; }
@@ -61,9 +61,10 @@ internal partial class PsdLayer
 
     public Properties Resources => Records.ToValue<Properties>("Resources");
 
-    public PsdDocument Document { get; }
+    public PsdDocument Document { get; init; }
 
     public JObject Records { get; set; }
+    public JArray ChannelImageData { get; private set; }
 
     public ILinkedLayer LinkedLayer
         {

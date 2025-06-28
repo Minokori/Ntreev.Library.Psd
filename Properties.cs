@@ -40,7 +40,8 @@ public static class JObjectExtensions
             }
 
         /// <summary>
-        /// 从 JObject 初始化通道(静态方法)
+        /// 从 一个Layer 的 Records 初始化通道(静态方法)
+        /// 没有 MetaInfo
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
@@ -54,7 +55,10 @@ public static class JObjectExtensions
                 throw new NotSupportedException($"Invalidated size ({Width}, {Height})");
                 }
 
+
             var channels = new Channel[count];
+
+
             for (var i = 0; i < count; i++)
                 {
 
