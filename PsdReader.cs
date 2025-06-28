@@ -37,7 +37,7 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
             _ = ReadBytes(padding); // 读取填充字节
             }
 
-        Debug.WriteLine(Encoding.Default.GetString(bytes));
+        //Debug.WriteLine(Encoding.Default.GetString(bytes));
         return text;
         }
 

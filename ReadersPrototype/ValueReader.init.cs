@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Exceptions;
 
 namespace Ntreev.Library.Psd;
@@ -34,6 +36,9 @@ internal abstract partial class ValueReader<T>
 
         // 将 GlobalReader 的位置指针移动到数据块的结束位置, 以便下一个ValueReader 可以继续读取
         reader.Position = EndPosition;
+
+        if (typeof(T) != typeof(JObject) && (typeof(T) != typeof(Properties)))
+            Debug.WriteLine($"ValueReader<{typeof(T).Name}>: StartPosition={StartPosition}, StreamLength={StreamLength}");
         }
 
 
@@ -62,5 +67,9 @@ internal abstract partial class ValueReader<T>
             }
 
         reader.Position = EndPosition;
+        if (typeof(T) != typeof(JObject) && (typeof(T) != typeof(Properties)))
+
+            Debug.WriteLine($"ValueReader<{typeof(T).Name}>: StartPosition={StartPosition}, StreamLength={StreamLength}");
+
         }
     }

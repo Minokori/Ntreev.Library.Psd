@@ -26,8 +26,11 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
     protected override LayerAndMaskInformationSection ReadValue()
         {
         // TODO LayerInfo 的 ImageChannelData 还没有读取
-        var layerInfo = new LayerInfoReader(GlobalReader).Value;
-
+        // BUG 错误移动了Global.Position
+        var position = GlobalReader.Position;
+        var layerInforeader = new LayerInfoReader(GlobalReader);
+        var layerInfo = layerInforeader.Value;
+        GlobalReader.Position = position + layerInforeader.StreamLength;
 
         //globalLayerMaskInfo
         // addtionalInfo

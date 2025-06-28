@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Ntreev.Library.Psd.Readers;
 
 namespace Ntreev.Library.Psd;
@@ -35,6 +34,6 @@ public partial class PsdDocument : IPsdLayer, IDisposable
         layerAndMaskSection = new LayerAndMaskInformationSectionReader(BinaryReader, this);
         imageDataSection = new ImageDataSectionReader(BinaryReader, this);
 
-        Debug.WriteLine(ImageResources);
+        //Debug.WriteLine(ImageResources);
         }
     }
