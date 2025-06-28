@@ -53,7 +53,6 @@ internal class LayerInfoReader(PsdBinaryReader reader) : ValueReader<JObject>(re
 
 
         layerInfo["ChannelsImageData"] = channelsImageDatas;
-        //channel image data
         return layerInfo;
         }
     }

@@ -15,6 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 namespace Ntreev.Library.Psd.Readers;
@@ -24,12 +25,26 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
     {
     protected override LayerAndMaskInformationSection ReadValue()
         {
-        var layerInfo = new LayerInfoReader(GlobalReader).Value;
+        var layerInfoReader = new LayerInfoReader(GlobalReader);
+        var layerInfo = layerInfoReader.Value;
 
 
-        var globalLayerMaskInfo = GlobalReader.Position + 4 >= EndPosition ? [] :
-            new GlobalLayerMaskInfoReader(GlobalReader).Value;
-        //globalLayerMaskInfo
+        JObject globalLayerMaskInfo = [];
+        if (GlobalReader.Position + 4 < EndPosition)
+            {
+            var globalLayerMaskInfoReader = new GlobalLayerMaskInfoReader(GlobalReader);
+            globalLayerMaskInfo = globalLayerMaskInfoReader.Value;
+            }
+
+        Properties additionalInfo = [];
+        if (GlobalReader.Position + 4 < EndPosition)
+            {
+            var additionalInfoReader = new DocumentResourceReader(GlobalReader, EndPosition - GlobalReader.Position);
+            additionalInfo = additionalInfoReader.Value;
+            }
+
+        return new(layerInfo, globalLayerMaskInfo, additionalInfo);
+
         // addtionalInfo
         // 在这里初始化 PSD Layers
         //下面是读取 GlobalLayerMaskInfo
@@ -37,7 +52,7 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
 
         if (GlobalReader.Position + 4 >= EndPosition)
             {
-            return new LayerAndMaskInformationSection(layerInfo, null, [])
+            return new LayerAndMaskInformationSection(layerInfo, globalLayerMaskInfo, [])
                 { Document = UserData as PsdDocument };
             }
         else
@@ -48,7 +63,7 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
             );
             return new LayerAndMaskInformationSection(
                 layerInfo,
-                globalLayerMask,
+                globalLayerMaskInfo,
                 documentResource.Value
             )
                 { Document = UserData as PsdDocument };

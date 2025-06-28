@@ -12,6 +12,9 @@ internal static class ReaderUtilExtensions
             value += value % 2;
             return value;
             }
+
+
+
         }
     extension(long value)
         {
@@ -24,5 +27,7 @@ internal static class ReaderUtilExtensions
             value += value % 2;
             return value;
             }
+
+        internal long PadToFour() => (value + 3) & (~3);
         }
     }

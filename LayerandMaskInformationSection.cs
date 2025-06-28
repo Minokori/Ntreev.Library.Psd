@@ -16,14 +16,13 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Newtonsoft.Json.Linq;
-using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 namespace Ntreev.Library.Psd;
 
-internal class LayerAndMaskInformationSection(JObject layerInfo, GlobalLayerMaskInfoReader globalLayerMask, Properties documentResources)
+internal class LayerAndMaskInformationSection(JObject layerInfo, JObject globalLayerMask, Properties documentResources)
     {
     public JObject LayerInfo { get; init; } = layerInfo;
-    public GlobalLayerMaskInfoReader GlobalLayerMask { get; init; } = globalLayerMask;
+    public JObject GlobalLayerMask { get; init; } = globalLayerMask;
 
     public PsdDocument Document { get; init; }
 
