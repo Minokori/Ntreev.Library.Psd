@@ -18,7 +18,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.ReadersPrototype;
+using Ntreev.Library.Psd.Readers.ResourceReader;
 
 namespace Ntreev.Library.Psd.Readers;
 
@@ -32,18 +32,19 @@ internal static class ReaderCollector
     /// </summary>
     private static Dictionary<string, Type> Readers { get; }
 
+    // TODO ResourceReaderBase => ValueReader<Properties>
 
     /// <summary>
     /// 静态构造函数, 在类加载时自动查找当前程序集中的所有 <see cref="ResourceReaderBase"/> 的子类。
     /// </summary>
     static ReaderCollector()
         {
-        var assembly = typeof(ResourceReaderBase).Assembly;
+        var assembly = typeof(ValueReader<Properties>).Assembly;
 
         var query = assembly
             .GetTypes()
             .Where(item =>
-                typeof(ResourceReaderBase).IsAssignableFrom(item)
+                typeof(ValueReader<Properties>).IsAssignableFrom(item)
                 && (item.Attributes & TypeAttributes.Abstract) != TypeAttributes.Abstract
             );
 
@@ -55,12 +56,18 @@ internal static class ReaderCollector
             if (attributes.Length == 0)
                 continue;
             var resourceID = (ResourceIDAttribute)attributes.First();
-            Readers.Add(resourceID.ID, readerType);
+
+            foreach (var id in resourceID.ID)
+                {
+                Readers.Add(id, readerType);
+                }
+
+            //Readers.Add(resourceID.ID, readerType);
             }
         }
 
 
-    public static ResourceReaderBase CreateReader(string resourceID, PsdBinaryReader reader, long length)
+    public static ValueReader<Properties> CreateReader(string resourceID, PsdBinaryReader reader, long length)
         {
         var readerType = Readers.TryGetValue(resourceID, out var type) ? type : typeof(EmptyResourceReader);
 
@@ -70,16 +77,17 @@ internal static class ReaderCollector
                 [typeof(PsdBinaryReader), typeof(long)],
                 [reader, length]
             );
-        return (ResourceReaderBase)readerInstance!;
+        return (ValueReader<Properties>)readerInstance!;
         }
 
-    public static string GetDisplayName(Type type)
+    private static string GetDisplayName(Type type)
         {
         var resourceIds = type.GetCustomAttributes(typeof(ResourceIDAttribute), true);
         var resourceId = resourceIds.First() as ResourceIDAttribute;
         return resourceId?.DisplayName ?? "";
         }
 
+    // TODO 获取的资源名称会影响到jQuery
     public static string GetDisplayName(string resourceID) =>
         Readers.ContainsKey(resourceID) == true ? GetDisplayName(Readers[resourceID]) : resourceID;
     }

@@ -15,21 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.ReadersPrototype;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources;
+namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
-[ResourceID("lsct")]
-internal class Reader_lsct : ResourceReaderBase
+[ResourceID("fxrp", DisplayName = "ReferencePoint")]
+internal class ReferencePointReader(PsdBinaryReader reader, long length)
+    : ValueReader<Properties>(reader, length, null)
     {
-    public Reader_lsct(PsdBinaryReader reader, long length)
-        : base(reader, length) { }
-
     protected override Properties ReadValue()
         {
-        //var props = new Properties { ["SectionType"] = (SectionType)GlobalReader.ReadInt32() };
-        var props = new Properties { ["SectionType"] = Enum.GetName((SectionType)GlobalReader.ReadInt32()) };
+        var props = new Properties { ["ReferencePoint"] = new JArray(GlobalReader.ReadDoubles(2)) };
         return props;
         }
     }

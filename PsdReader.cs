@@ -116,6 +116,27 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
     /// </summary>
     /// <returns><see cref="CompressionType"/></returns>
     public CompressionType ReadAsCompressionType() => (CompressionType)ReadInt16();
+
+    /// <summary>
+    /// 读取一个长度为 <paramref name="height"/> 的整数数组, 该数组表示一个 channel 的 RLE 压缩长度。<para/>
+    /// <paramref name="height"/> 参数是 channel 的高度。
+    /// </summary>
+    /// <param name="height">channel 的高度</param>
+    /// <returns></returns>
+    /// <remarks>
+    /// 读取的字节数和 <see cref="Version"/> 有关:
+    /// </remarks>
+    public int[] ReadAsChannelRlePackLengths(int height)
+        {
+        var l = new int[height];
+
+        for (var i = 0; i < height; i++)
+            {
+            l[i] = Version == 1 ? ReadInt16() : ReadInt32();
+            }
+
+        return l;
+        }
     #endregion
 
     #region Skip 方法. 功能类似于 Read 方法, 但不关心读取的内容, 只关心跳过多少字节

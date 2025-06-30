@@ -6,13 +6,13 @@ namespace Ntreev.Library.Psd.Attributes;
 /// </summary>
 /// <param name="resourceID"></param>
 [AttributeUsage(AttributeTargets.Class)]
-internal class ResourceIDAttribute(string resourceID) : Attribute
+internal class ResourceIDAttribute(params string[] resourceID) : Attribute
     {
-    public string ID { get; } = resourceID;
+    public string[] ID { get; } = resourceID;
 
     public string DisplayName
         {
-        get => string.IsNullOrEmpty(field) == true ? ID : field; set;
+        get => string.IsNullOrEmpty(field) == true ? string.Concat(ID) : field; set;
         }
     }
 

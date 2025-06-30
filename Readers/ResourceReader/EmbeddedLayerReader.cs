@@ -15,42 +15,27 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.ReadersPrototype;
+using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources;
+namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
-[ResourceID("shmd")]
-internal class Reader_shmd : ResourceReaderBase
+[ResourceID("lnkE", DisplayName = "EmbeddedLayer")]
+internal class EmbeddedReader(PsdBinaryReader reader, long length)
+    : ValueReader<Properties>(reader, length, null)
     {
-    public Reader_shmd(PsdBinaryReader reader, long length)
-        : base(reader, length) { }
-
     protected override Properties ReadValue()
         {
         Properties props = [];
-
-        var count = GlobalReader.ReadInt32();
-
-        List<DescriptorStructure> dss = [];
-
-        for (var i = 0; i < count; i++)
+        List<ILinkedLayer> linkedLayers = [];
+        while (GlobalReader.Position < EndPosition)
             {
-            var s = GlobalReader.ReadAsAscii(4);
-            var k = GlobalReader.ReadAsAscii(4);
-            var c = GlobalReader.ReadByte();
-            var p = GlobalReader.ReadBytes(3);
-            var l = GlobalReader.ReadInt32();
-            var p2 = GlobalReader.Position;
-            var ds = new DescriptorStructure(GlobalReader);
-            dss.Add(ds);
-            GlobalReader.Position = p2 + l;
+            var r = new EmbeddedLayerReader(GlobalReader);
+            linkedLayers.Add(r.Value);
             }
 
-        props["Items"] = new JArray(dss);
-        //props["Items"] = dss;
-
+        // props["Items"] = linkedLayers.ToArray();
+        props.AddLayers(linkedLayers);
         return props;
         }
     }

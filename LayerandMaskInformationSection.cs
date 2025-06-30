@@ -21,10 +21,13 @@ namespace Ntreev.Library.Psd;
 
 internal class LayerAndMaskInformationSection(JObject layerInfo, JObject globalLayerMask, Properties documentResources)
     {
+
     public JObject LayerInfo { get; init; } = layerInfo;
     public JObject GlobalLayerMask { get; init; } = globalLayerMask;
-
+    public Properties Resources { get; init; } = documentResources;
     public PsdDocument Document { get; init; }
+
+
 
     public PsdLayer[] Layers
         {
@@ -61,7 +64,7 @@ internal class LayerAndMaskInformationSection(JObject layerInfo, JObject globalL
             }
         }
 
-    public Properties Resources { get; } = documentResources;
+
 
     private PsdLayer[] InitPsdLayers()
         {
@@ -96,7 +99,7 @@ internal class LayerAndMaskInformationSection(JObject layerInfo, JObject globalL
     /// <param name="parent"></param>
     /// <param name="layers"></param>
     /// <returns></returns>
-    private static PsdLayer[] Initialize(PsdLayer parent, PsdLayer[] layers)
+    private static PsdLayer[] Initialize(PsdLayer? parent, PsdLayer[] layers)
         {
         Stack<PsdLayer> stack = new();
         List<PsdLayer> rootLayers = [];

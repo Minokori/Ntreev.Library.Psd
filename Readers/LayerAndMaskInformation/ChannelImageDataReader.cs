@@ -36,27 +36,25 @@ internal class ChannelImageDataReader(PsdBinaryReader reader, long length, JObje
         {
         var records = UserData as JObject;
         var channels = records.InitChannels(GlobalReader.Depth);
+        var count = records.SelectToken("ChannelCount")!.ToObject<int>();
 
         JArray ImageMetaData = [];
         foreach (var channel in channels)
+        //for (var i = 0; i < count; i++)
             {
             JObject data = [];
             // 1. 读压缩类型
             var compressionType = GlobalReader.ReadAsCompressionType();
-            //channel.CompressionType = compressionType;
             data["CompressionType"] = Enum.GetName(compressionType);
 
             // 2. 读压缩长度
-            // TODO ReadHeader 方法需要重构, 脱离channel 类
-            var rlePackLength = channel.ReadHeader(GlobalReader, compressionType);
-            //channel.RlePackLengths = rlePackLength;
+            var rlePackLength = compressionType == CompressionType.RLE ? GlobalReader.ReadAsChannelRlePackLengths(channel.Height) : [];
             data["RlePackLengths"] = new JArray(rlePackLength);
 
             // 3. 解压数据
             // 读取的长度:
             // RAW: depth * Width * Height
             // RLE: 每行的长度 Rle 相加
-
             data["StartPosition"] = GlobalReader.Position;
             var channelTotalLength =
                 compressionType == CompressionType.Raw
@@ -64,10 +62,9 @@ internal class ChannelImageDataReader(PsdBinaryReader reader, long length, JObje
                     : rlePackLength.Sum();
             data["StreamLength"] = channelTotalLength;
 
-            //channel.Read(GlobalReader);
+
             GlobalReader.Position += channelTotalLength;
 
-            //49698+860
             ImageMetaData.Add(data);
             }
 

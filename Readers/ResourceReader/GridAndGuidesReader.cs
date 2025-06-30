@@ -14,30 +14,45 @@
 //WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.ReadersPrototype;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources;
+namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
-[ResourceID("TySh")]
-internal class Reader_TySh : ResourceReaderBase
+/// <summary>
+/// 图像的网格和参考线信息读取器
+/// </summary>
+/// <param name="reader"></param>
+/// <param name="length"></param>
+[ResourceID("1032", DisplayName = "GridAndGuides")]
+internal class GridAndGuidesReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
     {
-    public Reader_TySh(PsdBinaryReader reader, long length)
-        : base(reader, length) { }
-
     protected override Properties ReadValue()
         {
-        var props = new Properties();
+        Properties props = [];
 
-        GlobalReader.VerifyIntIs<short>(1);
-        props["Transforms"] = new JArray(GlobalReader.ReadDoubles(6));
-        props["TextVersion"] = GlobalReader.ReadInt16();
-        props["Text"] = new DescriptorStructure(GlobalReader);
-        props["WarpVersion"] = GlobalReader.ReadInt16();
-        props["Warp"] = new DescriptorStructure(GlobalReader);
-        props["Bounds"] = new JArray(GlobalReader.ReadDoubles(2));
+        _ = GlobalReader.VerifyIntIs(1); // version
+        props["HorizontalGrid"] = GlobalReader.ReadInt32();
+        props["VerticalGrid"] = GlobalReader.ReadInt32();
+
+        var guideCount = GlobalReader.ReadInt32();
+
+        List<int> horizontalGrids = [];
+        List<int> verticalGrids = [];
+
+        for (var i = 0; i < guideCount; i++)
+            {
+            var n = GlobalReader.ReadInt32();
+            var t = GlobalReader.ReadByte();
+
+            if (t == 0)
+                verticalGrids.Add(n);
+            else
+                horizontalGrids.Add(n);
+            }
+
+        props["HorizontalGuides"] = new JArray(horizontalGrids);
+        props["VerticalGuides"] = new JArray(verticalGrids);
 
         return props;
         }

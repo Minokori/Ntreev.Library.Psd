@@ -17,7 +17,7 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LayerResourceReader(PsdBinaryReader reader, long length) : PropertiesReader(reader, length, null)
+internal class LayerResourceReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
     {
     protected override Properties ReadValue()
         {

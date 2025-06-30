@@ -18,7 +18,7 @@
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class DocumentResourceReader(PsdBinaryReader reader, long length)
-    : PropertiesReader(reader, length, null)
+    : ValueReader<Properties>(reader, length, null)
     {
     private static readonly string[] doubleTypeKeys =
     [
@@ -45,7 +45,7 @@ internal class DocumentResourceReader(PsdBinaryReader reader, long length)
 
         while (GlobalReader.Position < EndPosition)
             {
-            GlobalReader.VerifySignatureIs("8BIM", "8B64");
+            _ = GlobalReader.VerifySignatureIs("8BIM", "8B64");
             var resourceID = GlobalReader.ReadAsType();
             var length = ReadLength(GlobalReader, resourceID);
 

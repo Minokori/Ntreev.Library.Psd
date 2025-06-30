@@ -1,10 +1,21 @@
+using Ntreev.Library.Psd.Readers;
+
 namespace Ntreev.Library.Psd;
 
 public partial class PsdDocument
     {
+    // Stream Reader
+    internal PsdBinaryReader BinaryReader { get; init; }
+    // sections
     public FileHeaderSection FileHeaderSection { get; private set; }
 
     public Properties ColorModeDataSection { get; private set; }
+
+    internal LayerAndMaskInformationSection LayerAndMaskSection { get; private set; }
+    internal ImageDataSectionReader ImageDataSection { get; private set; }
+
+
+
 
     public byte[] ColorModeData => ColorModeDataSection["ColorMode"]!.ToObject<byte[]>()!;
 
@@ -14,11 +25,11 @@ public partial class PsdDocument
 
     public int Depth => FileHeaderSection.Depth;
 
-    public IPsdLayer[] Childs => layerAndMaskSection.Value.Layers;
+    public IPsdLayer[] Childs => LayerAndMaskSection.Layers;//LayerAndMaskSection.Value.Layers;
 
-    public IEnumerable<ILinkedLayer> LinkedLayers => layerAndMaskSection.Value.LinkedLayers;
+    public IEnumerable<ILinkedLayer> LinkedLayers => LayerAndMaskSection.LinkedLayers;//LayerAndMaskSection.Value.LinkedLayers;
 
-    public Properties Resources => layerAndMaskSection.Value.Resources;
+    public Properties Resources => LayerAndMaskSection.Resources;//LayerAndMaskSection.Value.Resources;
 
     // TODO
     public Properties ImageResources { get; private set; }
@@ -44,13 +55,13 @@ public partial class PsdDocument
 
     int IPsdLayer.Top => 0;
 
-    int IPsdLayer.Right => this.Width;
+    int IPsdLayer.Right => Width;
 
-    int IPsdLayer.Bottom => this.Height;
+    int IPsdLayer.Bottom => Height;
 
     BlendMode IPsdLayer.BlendMode => BlendMode.Normal;
 
-    IChannel[] IImageSource.Channels => imageDataSection.Value;
+    IChannel[] IImageSource.Channels => ImageDataSection.Value;
 
     // TODO This makes MergeChannels on PsdDocument class no opacity
     float IImageSource.Opacity => 1.0f;

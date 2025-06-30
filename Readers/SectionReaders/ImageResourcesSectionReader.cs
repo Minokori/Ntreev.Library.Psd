@@ -1,6 +1,6 @@
 namespace Ntreev.Library.Psd.Readers;
 
-internal class ImageResourcesSectionReader(PsdBinaryReader reader) : PropertiesReader(reader, null)
+internal class ImageResourcesSectionReader(PsdBinaryReader reader) : ValueReader<Properties>(reader, true, null)
     {
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 

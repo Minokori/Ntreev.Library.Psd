@@ -15,18 +15,39 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.ReadersPrototype;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources;
+namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
-[ResourceID("SoLd", DisplayName = "Placed Layer")]
-internal class Reader_SoLd(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
+[ResourceID("shmd", DisplayName = "MetadataSetting")]
+internal class MetadataSettingReader(PsdBinaryReader reader, long length)
+    : ValueReader<Properties>(reader, length, null)
     {
     protected override Properties ReadValue()
         {
-        GlobalReader.VerifySignatureIs("soLD");
-        GlobalReader.VerifyIntIs<int>(4);
-        return new DescriptorStructure(GlobalReader, true);
+        Properties props = [];
+
+        var count = GlobalReader.ReadInt32();
+
+        List<DescriptorStructure> dss = [];
+
+        for (var i = 0; i < count; i++)
+            {
+            var s = GlobalReader.ReadAsAscii(4);
+            var k = GlobalReader.ReadAsAscii(4);
+            var c = GlobalReader.ReadByte();
+            var p = GlobalReader.ReadBytes(3);
+            var l = GlobalReader.ReadInt32();
+            var p2 = GlobalReader.Position;
+            var ds = new DescriptorStructure(GlobalReader);
+            dss.Add(ds);
+            GlobalReader.Position = p2 + l;
+            }
+
+        props["Items"] = new JArray(dss);
+        //props["Items"] = dss;
+
+        return props;
         }
     }

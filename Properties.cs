@@ -47,6 +47,7 @@ public static class JObjectExtensions
         /// <exception cref="NotSupportedException"></exception>
         internal Channel[] InitChannels(int depth)
             {
+            //jObject == LayerRecords
             var count = jObject.SelectToken("ChannelCount")!.ToObject<int>();
             var Width = jObject.SelectToken("Right")!.ToObject<int>() - jObject.SelectToken("Left")!.ToObject<int>();
             var Height = jObject.SelectToken("Bottom")!.ToObject<int>() - jObject.SelectToken("Top")!.ToObject<int>();
@@ -61,8 +62,10 @@ public static class JObjectExtensions
 
             for (var i = 0; i < count; i++)
                 {
-
+                // 通道类型, RGBA
                 var type = jObject.SelectToken($"ChannelID[{i}]")!.ToObject<ChannelType>()!;
+
+                // 通道宽高
                 var width = type switch
                     {
                         ChannelType.Mask => jObject.SelectToken("Mask.Width") ?? Width,
@@ -74,14 +77,15 @@ public static class JObjectExtensions
                         ChannelType.Mask => jObject.SelectToken("Mask.Height") ?? Height,
                         _ => Height,
                         };
-                var c = new Channel()
-                    {
-                    Type = type,
-                    StreamLength = jObject.SelectToken($"ChannelDataLength[{i}]")!.ToObject<long>()!,
-                    Height = height.ToObject<int>(),
-                    Width = width.ToObject<int>(),
-                    Depth = depth,
-                    };
+
+
+                var c = new Channel(type,
+                    width.ToObject<int>(),
+                    height.ToObject<int>(),
+                    jObject.SelectToken($"ChannelDataLength[{i}]")!.ToObject<long>()!,
+                    depth);
+
+                // 透明度
                 var prop = jObject.SelectToken("Resources")!;
                 if (type == ChannelType.Alpha && prop.Contains("iOpa.Opacity"))
                     {

@@ -1,5 +1,4 @@
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.ReadersPrototype;
 namespace Ntreev.Library.Psd.Readers.ImageResources;
 /// <summary>
 /// DescriptorVersion Info
@@ -7,7 +6,7 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 /// <param name="reader"></param>
 /// <param name="length"></param>
 [ResourceID("1057", DisplayName = "Version")]
-internal class VersionInfoReader(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
+internal class VersionInfoReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
     {
     protected override Properties ReadValue()
         {

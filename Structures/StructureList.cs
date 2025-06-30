@@ -15,7 +15,6 @@ internal class StructureList : Properties
             var value = StructureReader.Read(type, reader);
             items.Add(value);
             }
-        //        Add("Items", items.ToArray());
 
         Add("Items", new JArray(items));
         }

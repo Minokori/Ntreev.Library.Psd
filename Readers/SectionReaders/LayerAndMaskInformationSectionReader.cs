@@ -15,29 +15,36 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Psd.Attributes;
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
-using Ntreev.Library.Psd.ReadersPrototype;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources;
+namespace Ntreev.Library.Psd.Readers;
 
-[ResourceID("lnkE")]
-internal class Reader_lnkE(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
+internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdDocument document)
+    : ValueReader<LayerAndMaskInformationSection>(reader, true, document)
     {
-    protected override Properties ReadValue()
+    protected override LayerAndMaskInformationSection ReadValue()
         {
-        Properties props = [];
-        List<ILinkedLayer> linkedLayers = [];
+        var layerInfoReader = new LayerInfoReader(GlobalReader);
+        var layerInfo = layerInfoReader.Value;
 
-        //List<EmbeddedLayer> linkedLayers = [];
-        while (GlobalReader.Position < EndPosition)
+        JObject globalLayerMaskInfo = [];
+        if (GlobalReader.Position + 4 < EndPosition)
             {
-            var r = new EmbeddedLayerReader(GlobalReader);
-            linkedLayers.Add(r.Value);
+            var globalLayerMaskInfoReader = new GlobalLayerMaskInfoReader(GlobalReader);
+            globalLayerMaskInfo = globalLayerMaskInfoReader.Value;
             }
 
-        // props["Items"] = linkedLayers.ToArray();
-        props.AddLayers(linkedLayers);
-        return props;
+        Properties additionalInfo = [];
+        if (GlobalReader.Position + 4 < EndPosition)
+            {
+            var additionalInfoReader = new DocumentResourceReader(
+                GlobalReader,
+                EndPosition - GlobalReader.Position
+            );
+            additionalInfo = additionalInfoReader.Value;
+            }
+
+        return new(layerInfo, globalLayerMaskInfo, additionalInfo) { Document = (PsdDocument)UserData };
         }
     }

@@ -15,7 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Structures;
 
 namespace Ntreev.Library.Psd;
@@ -51,14 +50,7 @@ internal class DescriptorStructure : Properties
             else
                 {
                 var obj = StructureReader.Read(osType, reader);
-                if (obj is Properties)
-                    {
-                    Add(key.Trim(), (JToken)obj);
-                    }
-                else
-                    {
-                    Add(key.Trim(), new JValue(obj));
-                    }
+                Add(key.Trim(), obj);
                 }
             }
         }

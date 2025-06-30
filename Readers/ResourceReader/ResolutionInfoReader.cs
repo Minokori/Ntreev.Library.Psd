@@ -1,5 +1,4 @@
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.ReadersPrototype;
 
 namespace Ntreev.Library.Psd.Readers.ImageResources;
 
@@ -10,7 +9,7 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 /// <param name="length"></param>
 [ResourceID("1005", DisplayName = "Resolution")]
 internal class ResolutionInfoReader(PsdBinaryReader reader, long length)
-    : ResourceReaderBase(reader, length)
+    : ValueReader<Properties>(reader, length, null)
     {
     protected override Properties ReadValue()
         {

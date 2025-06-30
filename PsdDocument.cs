@@ -4,16 +4,15 @@ namespace Ntreev.Library.Psd;
 
 public partial class PsdDocument : IPsdLayer, IDisposable
     {
-    private LayerAndMaskInformationSectionReader? layerAndMaskSection;
-    private ImageDataSectionReader? imageDataSection;
-    internal PsdBinaryReader BinaryReader { get; init; }
+    //private LayerAndMaskInformationSectionReader? LayerAndMaskSection;
+
+
 
     public void Dispose()
         {
         BinaryReader?.Dispose();
         OnDisposed(EventArgs.Empty);
 
-        // Suppress finalization to comply with CA1816
         GC.SuppressFinalize(this);
         }
 
@@ -33,9 +32,9 @@ public partial class PsdDocument : IPsdLayer, IDisposable
             };
         ImageResources = new ImageResourcesSectionReader(BinaryReader).Value;
 
-        layerAndMaskSection = new LayerAndMaskInformationSectionReader(BinaryReader, this);
-        imageDataSection = new ImageDataSectionReader(BinaryReader, this);
+        LayerAndMaskSection = new LayerAndMaskInformationSectionReader(BinaryReader, this).Value;
 
-        //Debug.WriteLine(ImageResources);
+        ImageDataSection = new ImageDataSectionReader(BinaryReader, FileHeaderSection);
+
         }
     }

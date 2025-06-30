@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Text;
 
 namespace Ntreev.Library.Psd.Structures;
 
@@ -26,7 +25,6 @@ internal class StructureEngineData : Properties
             }
 
         reader.Skip('\n');
-        //Properties properties = new Properties();
         while (true)
             {
             reader.Skip('\t', level);
@@ -38,9 +36,7 @@ internal class StructureEngineData : Properties
                 }
             else
                 {
-                //assert c == 9;
                 c = reader.ReadChar();
-                //assert c == '/' : "unknown char: " + c + " on level: " + level;
                 var name = string.Empty;
                 while (true)
                     {
@@ -56,7 +52,7 @@ internal class StructureEngineData : Properties
                 if (c == 10)
                     {
                     Properties p = [];
-                    this.ReadProperties(reader, level + 1, p);
+                    ReadProperties(reader, level + 1, p);
                     if (p.Count > 0)
                         props.Add(name, p);
                     reader.Skip('\n');
@@ -64,7 +60,6 @@ internal class StructureEngineData : Properties
                 else if (c == ' ')
                     {
                     var value = ReadValue(reader, level + 1);
-                    //props.Add(name, value);
                     if (value is float f)
                         {
                         props[name] = f;
@@ -79,7 +74,6 @@ internal class StructureEngineData : Properties
                         }
                     else
                         {
-                        //assert false;
                         }
                     }
                 }
@@ -89,11 +83,11 @@ internal class StructureEngineData : Properties
     private object ReadValue(PsdBinaryReader reader, int level)
         {
         var c = reader.ReadChar();
-        if (c == ']')//93
+        if (c == ']') //93
             {
             return null;
             }
-        else if (c == '(')//99
+        else if (c == '(') //99
             {
             // unicode string
             var text = string.Empty;
@@ -106,12 +100,12 @@ internal class StructureEngineData : Properties
                 var b1 = reader.ReadChar();
                 if (b1 == ')') // 41
                     {
-                    reader.Skip('\n');//10
+                    reader.Skip('\n'); //10
                     return text;
                     }
 
                 var b2 = reader.ReadChar();
-                if (b2 == '\\')//92
+                if (b2 == '\\') //92
                     {
                     b2 = reader.ReadChar();
                     }
@@ -135,7 +129,7 @@ internal class StructureEngineData : Properties
                 {
                 if (c == ' ')
                     {
-                    var val = this.ReadValue(reader, level);
+                    var val = ReadValue(reader, level);
                     if (val == null)
                         {
                         reader.Skip('\n');
@@ -173,8 +167,7 @@ internal class StructureEngineData : Properties
                 {
                 value += c;
                 c = reader.ReadChar();
-                }
-            while (c is not (char)10 and not ' ');
+                } while (c is not (char)10 and not ' ');
 
                 {
                 if (int.TryParse(value, out var f))
@@ -194,58 +187,4 @@ internal class StructureEngineData : Properties
             return value;
             }
         }
-
-
-    private object ReadValue2(PsdBinaryReader reader, int level)
-        {
-        var c = reader.ReadChar();
-        if (c == ']')
-            {
-            return null;
-            }
-        else if (c == '(')
-            {
-            // 读取 BOM
-            var bom = reader.ReadInt16();
-            if ((bom & 0xFFFF) != 0xFEFF)
-                throw new InvalidDataException("字符串缺少 UTF-16 BE BOM");
-
-            // 用内存流收集字节
-            using var ms = new MemoryStream();
-            while (true)
-                {
-                var b1 = reader.ReadChar();
-                if (b1 == ')')
-                    {
-                    reader.Skip('\n');
-                    break;
-                    }
-
-                var b2 = reader.ReadChar();
-                if (b2 == '\\')
-                    {
-                    b2 = reader.ReadChar();
-                    }
-
-                if (b2 == 13)
-                    {
-                    ms.WriteByte(0x00);
-                    ms.WriteByte((byte)'\n');
-                    }
-                else
-                    {
-                    ms.WriteByte((byte)b1);
-                    ms.WriteByte((byte)b2);
-                    }
-                }
-            // 解码为字符串
-            ms.Position = 0;
-            return Encoding.BigEndianUnicode.GetString(ms.ToArray());
-            }
-        // 其它分支同原方法...
-        // 可根据需要补充
-        return null;
-        }
-
     }
-

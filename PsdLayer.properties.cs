@@ -15,7 +15,7 @@ internal partial class PsdLayer
             return string.IsNullOrEmpty(type) ? SectionType.Normal : Enum.Parse<SectionType>(type);
             }
         }
-    public string Name => Records.ToValue<string>("Resources.luni.Name");
+    public string Name => Records.ToValue<string>("Resources.UnicodeLayerName.Name");
 
     public bool IsVisible => (Enum.Parse<LayerFlags>(Records.ToValue<string>("Flags")) & LayerFlags.Visible) != LayerFlags.Visible;
 

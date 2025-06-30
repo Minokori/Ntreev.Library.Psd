@@ -1,6 +1,5 @@
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.ReadersPrototype;
 
 namespace Ntreev.Library.Psd.Readers.ImageResources;
 
@@ -11,7 +10,7 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 /// <param name="length"></param>
 [ResourceID("1050", DisplayName = "Slices")]
 internal class SlicesInfoReader(PsdBinaryReader reader, long length)
-    : ResourceReaderBase(reader, length)
+    : ValueReader<Properties>(reader, length, null)
     {
     protected override Properties ReadValue()
         {

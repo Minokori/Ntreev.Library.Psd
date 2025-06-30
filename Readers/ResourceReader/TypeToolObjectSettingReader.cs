@@ -14,17 +14,28 @@
 //WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.ReadersPrototype;
 
-namespace Ntreev.Library.Psd.Readers.LayerResources;
+namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
-[ResourceID("iOpa")]
-internal class Reader_iOpa(PsdBinaryReader reader, long length) : ResourceReaderBase(reader, length)
+[ResourceID("TySh", DisplayName = "TypeToolObjectSetting")]
+internal class TypeToolObjectSettingReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
     {
+
     protected override Properties ReadValue()
         {
-        var props = new Properties { ["Opacity"] = GlobalReader.ReadByte() };
+        var props = new Properties();
+
+        GlobalReader.VerifyIntIs<short>(1);
+        props["Transforms"] = new JArray(GlobalReader.ReadDoubles(6));
+        props["TextVersion"] = GlobalReader.ReadInt16();
+        props["Text"] = new DescriptorStructure(GlobalReader);
+        props["WarpVersion"] = GlobalReader.ReadInt16();
+        props["Warp"] = new DescriptorStructure(GlobalReader);
+        props["Bounds"] = new JArray(GlobalReader.ReadDoubles(2));
+
         return props;
         }
     }
