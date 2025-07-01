@@ -15,13 +15,24 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 namespace Ntreev.Library.Psd;
 
-internal class LinkedLayer(string name, Guid id, LinkedDocumentReader documentReader, LinkedDocumnetFileHeaderReader fileHeaderReader) : ILinkedLayer
+/// <summary>
+/// 除了 EmbeddedLayer, 其他的链接图层实现
+/// </summary>
+/// <param name="name"></param>
+/// <param name="id"></param>
+/// <param name="documentReader"></param>
+/// <param name="fileHeaderReader"></param>
+internal class LinkedLayer(JObject info, LinkedDocumentReader? documentReader, LinkedDocumentFileHeaderReader? fileHeaderReader) : ILinkedLayer
     {
+
+    // TODO 让 LinkedLayer 只有一个构造函数, from JObj
     private readonly LinkedDocumentReader? documentReader = documentReader;
-    private readonly LinkedDocumnetFileHeaderReader fileHeaderReader = fileHeaderReader;
+    private readonly LinkedDocumentFileHeaderReader? fileHeaderReader = fileHeaderReader;
+    private JObject info = info;
 
     public PsdDocument Document => documentReader?.Value;
 
@@ -30,9 +41,9 @@ internal class LinkedLayer(string name, Guid id, LinkedDocumentReader documentRe
 
     public bool HasDocument => documentReader != null;
 
-    public Guid ID { get; } = id;
+    public Guid ID => info.ToValue<Guid>("UniqueId");
 
-    public string Name { get; } = name;
+    public string Name => info.ToValue<string>("OriginalFileName") ?? "";
 
     public int Width => fileHeaderReader is null ? -1 : fileHeaderReader.Value.Width;
 

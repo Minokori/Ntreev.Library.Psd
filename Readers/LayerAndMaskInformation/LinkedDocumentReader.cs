@@ -31,8 +31,6 @@ internal class LinkedDocumentReader(PsdBinaryReader reader, long length)
             );
 
             var document = new PsdDocument(stream, GlobalReader.Uri);
-            //using PsdBinaryReader streamReader = new(stream, GlobalReader.Uri);
-            //PsdDocument document = new InternalDocument() { BinaryReader = streamReader };
             document.InitSections();
             return document;
             }

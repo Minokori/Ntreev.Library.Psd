@@ -72,9 +72,9 @@ internal partial class PsdLayer : IPsdLayer
             if (item == this || item.HasImage == false)
                 continue;
 
-            if (item.Resources.Contains("PlLd.Transformation"))
+            if (item.Records.Contains("Resources.PlLd.Transformation"))
                 {
-                var transforms = item.Resources.SelectToken("PlLd.Transformation").ToObject<double[]>()!;// ToValue<double[]>("PlLd", "Transformation");
+                var transforms = item.Records.SelectToken("Resources.PlLd.Transformation").ToObject<double[]>()!;// ToValue<double[]>("PlLd", "Transformation");
                 double[] xx = [transforms[0], transforms[2], transforms[4], transforms[6]];
                 double[] yy = [transforms[1], transforms[3], transforms[5], transforms[7]];
 

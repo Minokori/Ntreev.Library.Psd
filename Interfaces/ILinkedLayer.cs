@@ -1,4 +1,4 @@
-﻿//Released under the MIT License.
+//Released under the MIT License.
 //
 //Copyright (c) 2015 Ntreev Soft co., Ltd.
 //
@@ -25,16 +25,24 @@ public interface ILinkedLayer
     /// <summary>
     /// 链接到的图层
     /// </summary>
-    PsdDocument Document
+    PsdDocument? Document
         {
         get;
         }
 
+
+    /// <summary>
+    /// 若链接图层是嵌入的其他 PSD, 其他图层的绝对路径, 通过 resolver 实现懒加载
+    /// </summary>
     Uri AbsoluteUri
         {
         get;
         }
 
+
+    /// <summary>
+    /// 是否是实际的 Psd 文档, 或只是Psd 文档内的链接图层
+    /// </summary>
     bool HasDocument
         {
         get;

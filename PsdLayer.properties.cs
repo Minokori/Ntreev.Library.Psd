@@ -59,7 +59,7 @@ internal partial class PsdLayer
         set;
         } = [];
 
-    public Properties Resources => Records.ToValue<Properties>("Resources");
+    public Properties Resources => Properties.FromJObject(Records.ToValue<JObject>("Resources")); //TODO UnalbleTOCast
 
     public PsdDocument Document { get; init; }
 
@@ -70,10 +70,11 @@ internal partial class PsdLayer
         {
         get
             {
-            var placeID = new Guid(Records.ToValue<string>("PlacedID"));
+            var guidString = Records.ToValue<string>("Resources.PlacedLayer.UniqueId");
 
-            if (placeID == Guid.Empty)
-                return null;
+            if (guidString is null) return null;
+            var placeID = new Guid(guidString);
+
 
             field ??= Document.LinkedLayers.Where(i => i.ID == placeID && i.HasDocument).FirstOrDefault();
             return field;

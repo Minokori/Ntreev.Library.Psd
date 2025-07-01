@@ -15,10 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
+
 
 [ResourceID("lnkE", DisplayName = "EmbeddedLayer")]
 internal class EmbeddedReader(PsdBinaryReader reader, long length)
@@ -28,14 +30,67 @@ internal class EmbeddedReader(PsdBinaryReader reader, long length)
         {
         Properties props = [];
         List<ILinkedLayer> linkedLayers = [];
+        JArray embeddedLayerInfoList = [];
+
         while (GlobalReader.Position < EndPosition)
             {
-            var r = new EmbeddedLayerReader(GlobalReader);
-            linkedLayers.Add(r.Value);
+            var endPosition = GlobalReader.ReadInt64().PadToFour() + GlobalReader.Position;
+            JObject embeddedLayerInfo = new()
+                {
+                //'liFD' linked file data, 'liFE' linked file external or 'liFA' linked file alias
+                ["Type"] = GlobalReader.VerifySignatureIs("liFD", "liFA", "liFE"),
+                // Version ( = 1 to 7 )
+                ["Version"] = GlobalReader.ReadInt32(),
+                ["UniqueId"] = GlobalReader.ReadAsPascalString(),
+                ["OriginalFileName"] = GlobalReader.ReadString(),
+                ["FileType"] = GlobalReader.ReadAsType(),
+                ["FileCreator"] = GlobalReader.ReadAsType(),
+                };
+
+            var lengthOfDataBelow = GlobalReader.ReadInt64();
+            var fileOpenDescriptor = GlobalReader.ReadBoolean();
+
+            DescriptorStructure? properties = null;
+            if (fileOpenDescriptor)
+                {
+                properties = new DescriptorStructure(GlobalReader);
+                }
+            // in document :If the type is 'liFE' then a linked file Descriptor is next.
+            embeddedLayerInfo["DescriptorOfLinkedFile"] = new DescriptorStructure(GlobalReader).ToJobject();
+
+
+            if (embeddedLayerInfo.ToValue<int>("Version") > 3)
+                {
+                embeddedLayerInfo["Year"] = GlobalReader.ReadInt32();
+                embeddedLayerInfo["Month"] = GlobalReader.ReadByte();
+                embeddedLayerInfo["Day"] = GlobalReader.ReadByte();
+                embeddedLayerInfo["Hour"] = GlobalReader.ReadByte();
+                embeddedLayerInfo["Minute"] = GlobalReader.ReadByte();
+                embeddedLayerInfo["Seconds"] = GlobalReader.ReadDouble();
+                }
+
+            embeddedLayerInfo["FileSize"] = GlobalReader.ReadInt64();
+            if (embeddedLayerInfo.ToValue<int>("Version") >= 5)
+                {
+                embeddedLayerInfo["ChildDocumentId"] = GlobalReader.ReadString();
+                }
+
+            if (embeddedLayerInfo.ToValue<int>("Version") >= 6)
+                {
+                embeddedLayerInfo["AssetModTime"] = GlobalReader.ReadDouble();
+                }
+
+            if (embeddedLayerInfo.ToValue<int>("Version") >= 7)
+                {
+                embeddedLayerInfo["AssetLockedState"] = GlobalReader.ReadBoolean();
+                }
+
+            embeddedLayerInfoList.Add(embeddedLayerInfo);
+            GlobalReader.Position = endPosition;
             }
 
-        // props["Items"] = linkedLayers.ToArray();
-        props.AddLayers(linkedLayers);
+        Debug.WriteLine("Embedded Layer Info List:\n" + embeddedLayerInfoList.ToString());
+        props.AddLayers(embeddedLayerInfoList.Select(i => new EmbeddedLayer((JObject)i)).Cast<ILinkedLayer>().ToList());
         return props;
         }
     }

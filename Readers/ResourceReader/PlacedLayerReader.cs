@@ -21,7 +21,7 @@ using Ntreev.Library.Psd.Attributes;
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 // (replaced by SoLd in Photoshop CS3)
-[ResourceID("PlLd", DisplayName = "Placed Layer")]
+[ResourceID("PlLd", DisplayName = "PlacedLayer")]
 internal class PlacedLayerReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
     {
     protected override Properties ReadValue()
@@ -30,7 +30,7 @@ internal class PlacedLayerReader(PsdBinaryReader reader, long length) : ValueRea
 
         GlobalReader.VerifySignatureIs("plcL");
         props["Version"] = GlobalReader.ReadInt32();
-        props["UniqueID"] = GlobalReader.ReadAsPascalString(1);
+        props["UniqueId"] = GlobalReader.ReadAsPascalString(1);
         props["PageNumbers"] = GlobalReader.ReadInt32();
         props["Pages"] = GlobalReader.ReadInt32();
         props["AntiAlias"] = GlobalReader.ReadInt32();

@@ -18,7 +18,12 @@ internal partial class Channel
     /// <summary>
     /// Data[行索引x * 行长度(宽度Width) + y] = 图片 (x,y) 处 的通道像素值
     /// </summary>
+    /// <remarks>
+    /// TODO 只有这个需要懒加载
+    /// </remarks>
     public byte[] Data { get; private set; } = [];
+
+
     public ChannelType Type { get; set; }
     public int Width { get; set; }
     public int Height { get; init; }

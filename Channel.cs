@@ -2,12 +2,6 @@ namespace Ntreev.Library.Psd;
 
 internal partial class Channel : IChannel
     {
-
-
-
-
-
-
     /// <summary>
     /// 直接读取图像数据流到 Data 中, 不进行懒加载
     /// </summary>

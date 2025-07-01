@@ -17,24 +17,24 @@
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LinkedDocumnetFileHeaderReader(PsdBinaryReader reader, long length)
+internal class LinkedDocumentFileHeaderReader(PsdBinaryReader reader, long length)
     : ValueReader<FileHeaderSection>(reader, length, null)
     {
     protected override FileHeaderSection ReadValue()
         {
-        if (this.IsDocument(GlobalReader) == true)
+        if (IsDocument(GlobalReader) == true)
             {
             using Stream stream = new RangeStream(
                 GlobalReader.Stream,
                 GlobalReader.Position,
-                this.StreamLength
+                StreamLength
             );
             using var r = new PsdBinaryReader(stream) { Uri = GlobalReader.Uri };
-            return FileHeaderSectionReader.Read(r);
+            return new FileHeaderSectionReader(r).Value;
             }
         else
             {
-            return new FileHeaderSection();
+            return [];
             }
         }
 

@@ -20,7 +20,7 @@ public class FileHeaderSection : Properties
     public static FileHeaderSection FromFile(string filename)
         {
         using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using var reader = new PsdBinaryReader(stream) { Uri = new(System.IO.Path.GetDirectoryName(filename)!) };
-        return FileHeaderSectionReader.Read(reader);
+        using var reader = new PsdBinaryReader(stream) { Uri = new(System.IO.Path.GetFullPath(filename)) };
+        return new FileHeaderSectionReader(reader).Value;
         }
     }

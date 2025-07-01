@@ -3,6 +3,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Ntreev.Library.Psd;
 
+
+// TODO AddLayers 抽出来
 public class Properties : JObject
     {
     private readonly List<ILinkedLayer> linkedLayers = [];
@@ -10,6 +12,20 @@ public class Properties : JObject
 
     [JsonIgnore]
     public ILinkedLayer[] LinkedLayers => [.. linkedLayers];
+
+
+
+    // TODO For兼容性
+    public static Properties FromJObject(JObject jObject)
+        {
+        var properties = new Properties();
+        foreach (var item in jObject)
+            {
+            properties.Add(item.Key, item.Value);
+            }
+
+        return properties;
+        }
     }
 
 /// <summary>

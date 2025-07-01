@@ -37,7 +37,7 @@ internal abstract partial class ValueReader<T>
         // 将 GlobalReader 的位置指针移动到数据块的结束位置, 以便下一个ValueReader 可以继续读取
         reader.Position = EndPosition;
 
-        if (typeof(T) != typeof(JObject) && (typeof(T) != typeof(Properties)))
+        if (typeof(T) != typeof(JObject) && (typeof(T) != typeof(Properties)) && (typeof(T) != typeof(JArray)))
             Debug.WriteLine($"ValueReader<{typeof(T).Name}>: StartPosition={StartPosition}, StreamLength={StreamLength}");
         }
 
@@ -67,7 +67,7 @@ internal abstract partial class ValueReader<T>
             }
 
         reader.Position = EndPosition;
-        if (typeof(T) != typeof(JObject) && (typeof(T) != typeof(Properties)))
+        if (typeof(T) != typeof(JObject) && (typeof(T) != typeof(Properties)) && (typeof(T) != typeof(JArray)))
 
             Debug.WriteLine($"ValueReader<{typeof(T).Name}>: StartPosition={StartPosition}, StreamLength={StreamLength}");
 

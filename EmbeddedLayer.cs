@@ -1,47 +1,52 @@
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Services;
 
 namespace Ntreev.Library.Psd;
 
-
 /// <summary>
 /// 嵌入的其他 PSD document.
 /// </summary>
-internal class EmbeddedLayer : ILinkedLayer
+internal class EmbeddedLayer(JObject info) : ILinkedLayer
     {
-
     private readonly IDocumentManager resolver = PsdService.Resolver;
-
-    public EmbeddedLayer(Guid id, Uri absoluteUri)
-        {
-        ID = id;
-        AbsoluteUri = absoluteUri;
-
-        if (File.Exists(AbsoluteUri.LocalPath))
-            {
-            var header = FileHeaderSection.FromFile(AbsoluteUri.LocalPath);
-            Width = header.Width;
-            Height = header.Height;
-            }
-        }
-
-    public PsdDocument Document
+    public FileHeaderSection FileHeader
         {
         get
             {
-            field ??= resolver.GetDocument(AbsoluteUri);
+            field ??= FileHeaderSection.FromFile(AbsoluteUri.LocalPath);
             return field;
             }
         }
+    public JObject Properties { get; } = info;
 
-    public Uri AbsoluteUri { get; }
 
-    public bool HasDocument => File.Exists(this.AbsoluteUri.LocalPath);
+    public PsdDocument Document => resolver.GetDocument(AbsoluteUri);
 
-    public Guid ID { get; }
+    //from Properties
+    public Uri AbsoluteUri
+        {
+        get
+            {
+                {
+                var paths = Properties
+                    .SelectTokens("$..TEXT")
+                    .OfType<JValue>()
+                    .Select(x => x.Value<string>())
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Select(x => Path.GetFullPath(x!))
+                    .Where(File.Exists);
+                return new(paths.First());
+                }
+            }
+        }
+
+    public bool HasDocument => true;
+
+    public Guid ID => Properties.ToValue<Guid>("UniqueId");
 
     public string Name => AbsoluteUri.LocalPath;
 
-    public int Width { get; }
+    public int Width => FileHeader.Width;
 
-    public int Height { get; }
+    public int Height => FileHeader.Height;
     }

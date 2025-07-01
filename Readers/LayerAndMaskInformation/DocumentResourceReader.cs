@@ -15,6 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Diagnostics;
+
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class DocumentResourceReader(PsdBinaryReader reader, long length)
@@ -49,10 +51,15 @@ internal class DocumentResourceReader(PsdBinaryReader reader, long length)
             var resourceID = GlobalReader.ReadAsType();
             var length = ReadLength(GlobalReader, resourceID);
 
-            var resourceReader = ReaderCollector.CreateReader(resourceID, GlobalReader, length);
+            var resource = ReaderCollector.CreateReader(resourceID, GlobalReader, length).Value;
             var resourceName = ReaderCollector.GetDisplayName(resourceID);
 
-            props[resourceName] = resourceReader.Value;
+            if (resourceName is "EmbeddedLayer" or "LinkedLayer")
+                {
+                Debug.WriteLine("This is an ILinkedLayer Object");
+                }
+
+            props[resourceName] = resource;
             }
 
         return props;
