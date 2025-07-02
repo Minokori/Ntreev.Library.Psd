@@ -23,11 +23,11 @@ namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 // (replaced by SoLd in Photoshop CS3)
 [ResourceID("PlLd", DisplayName = "PlacedLayer")]
-internal class PlacedLayerReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
+internal class PlacedLayerReader(PsdBinaryReader reader, long length) : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        Properties props = [];
+        JObject props = [];
 
         GlobalReader.VerifySignatureIs("plcL");
         props["Version"] = GlobalReader.ReadInt32();
@@ -47,12 +47,12 @@ internal class PlacedLayerReader(PsdBinaryReader reader, long length) : ValueRea
     }
 
 [ResourceID("SoLd", DisplayName = "PlacedLayerData")]
-internal class Reader_SoLd(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
+internal class Reader_SoLd(PsdBinaryReader reader, long length) : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
         GlobalReader.VerifySignatureIs("soLD");
         GlobalReader.VerifyIntIs(4);
-        return Properties.FromJObject(StructureReader.ReadDescriptor(GlobalReader));
+        return StructureReader.ReadDescriptor(GlobalReader);
         }
     }

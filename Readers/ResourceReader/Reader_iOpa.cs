@@ -1,14 +1,15 @@
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 [ResourceID("iOpa")]
 internal class Reader_iOpa(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        var props = new Properties { ["Opacity"] = GlobalReader.ReadByte() };
+        var props = new JObject { ["Opacity"] = GlobalReader.ReadByte() };
         return props;
         }
     }

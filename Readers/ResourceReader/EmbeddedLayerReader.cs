@@ -23,9 +23,9 @@ namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 [ResourceID("lnkE", DisplayName = "EmbeddedLayer")]
 internal class EmbeddedReader(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JArray ReadValue()
         {
         JArray embeddedLayerInfoList = [];
 
@@ -84,6 +84,6 @@ internal class EmbeddedReader(PsdBinaryReader reader, long length)
             GlobalReader.Position = endPosition;
             }
 
-        return new() { ["Info"] = embeddedLayerInfoList };
+        return embeddedLayerInfoList;
         }
     }

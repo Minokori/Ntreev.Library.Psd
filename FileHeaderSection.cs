@@ -1,8 +1,9 @@
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Readers;
 
 namespace Ntreev.Library.Psd;
 
-public class FileHeaderSection : Properties
+public class FileHeaderSection : JObject
     {
     public string Signature => this[nameof(Signature)]!.ToObject<string>()!;
     public int Version => this[nameof(Version)]!.ToObject<int>();
@@ -15,12 +16,16 @@ public class FileHeaderSection : Properties
     public int Width => this[nameof(Width)]!.ToObject<int>();
 
     public int Depth => this[nameof(Depth)]!.ToObject<int>();
-    public ColorMode ColorMode => Enum.Parse<ColorMode>(this[nameof(ColorMode)]!.ToObject<string>()!);
+    public ColorMode ColorMode =>
+        Enum.Parse<ColorMode>(this[nameof(ColorMode)]!.ToObject<string>()!);
 
     public static FileHeaderSection FromFile(string filename)
         {
         using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using var reader = new PsdBinaryReader(stream) { Uri = new(System.IO.Path.GetFullPath(filename)) };
+        using var reader = new PsdBinaryReader(stream)
+            {
+            Uri = new(System.IO.Path.GetFullPath(filename)),
+            };
         return new FileHeaderSectionReader(reader).Value;
         }
     }

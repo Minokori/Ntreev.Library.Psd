@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Readers;
 
 namespace Ntreev.Library.Psd;
@@ -9,7 +10,7 @@ public partial class PsdDocument
     // sections
     public FileHeaderSection FileHeaderSection { get; private set; }
 
-    public Properties ColorModeDataSection { get; private set; }
+    public JObject ColorModeDataSection { get; private set; }
 
     internal LayerAndMaskInformationSection LayerAndMaskSection { get; private set; }
     internal ImageDataSectionReader ImageDataSection { get; private set; }
@@ -29,10 +30,10 @@ public partial class PsdDocument
 
     public IEnumerable<ILinkedLayer> LinkedLayers => LayerAndMaskSection.LinkedLayers;//LayerAndMaskSection.Value.LinkedLayers;
 
-    public Properties Resources => LayerAndMaskSection.Resources;//LayerAndMaskSection.Value.Resources;
+    public JObject Resources => LayerAndMaskSection.Resources;//LayerAndMaskSection.Value.Resources;
 
     // TODO
-    public Properties ImageResources { get; private set; }
+    public JObject ImageResources { get; private set; }
 
     //TODO
     public bool HasImage =>

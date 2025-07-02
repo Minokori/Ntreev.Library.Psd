@@ -22,11 +22,11 @@ namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 [ResourceID("fxrp", DisplayName = "ReferencePoint")]
 internal class ReferencePointReader(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        var props = new Properties { ["ReferencePoint"] = new JArray(GlobalReader.ReadDoubles(2)) };
+        var props = new JObject { ["ReferencePoint"] = new JArray(GlobalReader.ReadDoubles(2)) };
         return props;
         }
     }

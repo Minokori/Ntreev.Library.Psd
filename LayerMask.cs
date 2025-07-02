@@ -15,6 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd;
 
 
@@ -22,7 +24,7 @@ namespace Ntreev.Library.Psd;
 /// 图层蒙版数据 <para/>
 /// 可以是 40 字节、24 字节或   4 字节（如果没有图层掩码）。
 /// </summary>
-internal class LayerMask : Properties
+internal class LayerMask : JObject
     {
     public int Top => this["Top"]!.ToObject<int>()!;
     public int Left => this["Left"]!.ToObject<int>()!;

@@ -23,11 +23,11 @@ namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 [ResourceID("shmd", DisplayName = "MetadataSetting")]
 internal class MetadataSettingReader(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        Properties props = [];
+        JObject props = [];
 
         var count = GlobalReader.ReadInt32();
 

@@ -20,7 +20,7 @@ using Newtonsoft.Json.Linq;
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class DocumentResourceReader(PsdBinaryReader reader, long length)
-    : ValueReader<Tuple<Properties, LinkedLayer[], EmbeddedLayer[]>>(reader, length, null)
+    : ValueReader<Tuple<JObject, LinkedLayer[], EmbeddedLayer[]>>(reader, length, null)
     {
     private static readonly string[] doubleTypeKeys =
     [
@@ -41,9 +41,9 @@ internal class DocumentResourceReader(PsdBinaryReader reader, long length)
         "extd",
     ];
 
-    protected override Tuple<Properties, LinkedLayer[], EmbeddedLayer[]> ReadValue()
+    protected override Tuple<JObject, LinkedLayer[], EmbeddedLayer[]> ReadValue()
         {
-        Properties props = [];
+        JObject props = [];
         List<LinkedLayer> linkedLayers = [];
         List<EmbeddedLayer> embeddedLayers = [];
         while (GlobalReader.Position < EndPosition)
@@ -59,7 +59,7 @@ internal class DocumentResourceReader(PsdBinaryReader reader, long length)
                 {
                 case "LinkedLayer":
                     {
-                    var items = (JArray)resource["Info"];
+                    var items = (JArray)resource;
                     foreach (var item in items)
                         {
                         var linkedLayer = new LinkedLayer((JObject)item);
@@ -71,7 +71,7 @@ internal class DocumentResourceReader(PsdBinaryReader reader, long length)
                     }
                 case "EmbeddedLayer":
                     {
-                    var items = (JArray)resource["Info"];
+                    var items = (JArray)resource;
                     foreach (var item in items)
                         {
                         var embeddedLayer = new EmbeddedLayer((JObject)item);

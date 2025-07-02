@@ -6,9 +6,9 @@ namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 [ResourceID("lnkD", "lnk2", "lnk3", DisplayName = "LinkedLayer")]
 internal class LinkedLayerReader(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JArray ReadValue()
         {
         JArray info = [];
         while (GlobalReader.Position < EndPosition)
@@ -52,7 +52,7 @@ internal class LinkedLayerReader(PsdBinaryReader reader, long length)
             GlobalReader.Position = endPosition;
             }
 
-        return new() { ["Info"] = info };
+        return info;
         }
 
     private static bool IsDocument(PsdBinaryReader reader)

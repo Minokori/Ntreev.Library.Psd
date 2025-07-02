@@ -19,12 +19,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Ntreev.Library.Psd;
 
-internal class LayerAndMaskInformationSection(JObject layerInfo, JObject globalLayerMask, Properties documentResources)
+internal class LayerAndMaskInformationSection(JObject layerInfo, JObject globalLayerMask, JObject documentResources)
     {
 
     public JObject LayerInfo { get; init; } = layerInfo;
     public JObject GlobalLayerMask { get; init; } = globalLayerMask;
-    public Properties Resources { get; init; } = documentResources;
+    public JObject Resources { get; init; } = documentResources;
     public PsdDocument Document { get; init; }
 
 

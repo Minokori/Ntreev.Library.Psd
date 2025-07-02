@@ -73,7 +73,7 @@ internal partial class PsdLayer
         set;
         } = [];
 
-    public Properties Resources => Properties.FromJObject(Records.ToValue<JObject>("Resources")); //TODO UnalbleTOCast
+    public JObject Resources => Records.ToValue<JObject>("Resources"); //TODO UnalbleTOCast
 
     public PsdDocument Document { get; init; }
 

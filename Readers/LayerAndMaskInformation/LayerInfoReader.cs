@@ -31,7 +31,7 @@ internal class LayerInfoReader(PsdBinaryReader reader) : ValueReader<JObject>(re
 
         var layerCount = Math.Abs((int)GlobalReader.ReadInt16());
 
-        Properties layerInfo = new() { ["LayerCount"] = layerCount };
+        JObject layerInfo = new() { ["LayerCount"] = layerCount };
 
         var layerRecords = new JArray();
         for (var i = 0; i < layerInfo["LayerCount"]!.ToObject<int>(); i++)

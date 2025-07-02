@@ -11,18 +11,19 @@
 //Software.
 //
 //THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 [ResourceID("lsct", DisplayName = "SectionDividerSetting")]
 internal class SectionDividerSettingReader(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
         //var props = new Properties { ["SectionType"] = (SectionType)GlobalReader.ReadInt32() };
-        var props = new Properties
+        var props = new JObject
             {
             ["SectionType"] = Enum.GetName((SectionType)GlobalReader.ReadInt32()),
             };

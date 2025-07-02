@@ -15,7 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 //Released under the MIT License.
 //
 //Copyright (c) 2015 Ntreev Soft co., Ltd.
@@ -33,18 +32,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 [ResourceID("lyid", DisplayName = "LayerID")]
-internal class LayerIdReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
+internal class LayerIdReader(PsdBinaryReader reader, long length)
+    : ValueReader<JToken>(reader, length, null)
     {
-
-
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        var props = new Properties { ["ID"] = GlobalReader.ReadInt32() };
+        var props = new JObject { ["ID"] = GlobalReader.ReadInt32() };
         return props;
         }
     }

@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 namespace Ntreev.Library.Psd.Readers.ImageResources;
 /// <summary>
@@ -6,11 +7,11 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 /// <param name="reader"></param>
 /// <param name="length"></param>
 [ResourceID("1057", DisplayName = "Version")]
-internal class VersionInfoReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
+internal class VersionInfoReader(PsdBinaryReader reader, long length) : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        var props = new Properties()
+        var props = new JObject()
             {
             ["Version"] = GlobalReader.ReadInt32(),
             ["HasRealMergedData"] = GlobalReader.ReadBoolean(),

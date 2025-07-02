@@ -15,13 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LayerResourceReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
+internal class LayerResourceReader(PsdBinaryReader reader, long length)
+    : ValueReader<JObject>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        Properties props = [];
+        JObject props = [];
 
         while (GlobalReader.Position < EndPosition)
             {

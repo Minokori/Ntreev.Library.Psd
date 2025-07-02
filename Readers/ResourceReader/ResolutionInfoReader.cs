@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 
 namespace Ntreev.Library.Psd.Readers.ImageResources;
@@ -9,11 +10,11 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 /// <param name="length"></param>
 [ResourceID("1005", DisplayName = "Resolution")]
 internal class ResolutionInfoReader(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        var props = new Properties()
+        var props = new JObject()
             {
             ["HorizontalRes"] = GlobalReader.ReadInt16(),
             ["HorizontalResUnit"] = GlobalReader.ReadInt32(),

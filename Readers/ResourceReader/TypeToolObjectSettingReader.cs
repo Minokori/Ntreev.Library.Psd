@@ -22,12 +22,12 @@ using Ntreev.Library.Psd.Structures;
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
 [ResourceID("TySh", DisplayName = "TypeToolObjectSetting")]
-internal class TypeToolObjectSettingReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
+internal class TypeToolObjectSettingReader(PsdBinaryReader reader, long length) : ValueReader<JToken>(reader, length, null)
     {
 
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        var props = new Properties();
+        JObject props = [];
 
         GlobalReader.VerifyIntIs<short>(1);
         props["Transforms"] = new JArray(GlobalReader.ReadDoubles(6));

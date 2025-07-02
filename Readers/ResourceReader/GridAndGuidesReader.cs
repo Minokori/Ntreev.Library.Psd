@@ -25,11 +25,11 @@ namespace Ntreev.Library.Psd.Readers.ResourceReader;
 /// <param name="reader"></param>
 /// <param name="length"></param>
 [ResourceID("1032", DisplayName = "GridAndGuides")]
-internal class GridAndGuidesReader(PsdBinaryReader reader, long length) : ValueReader<Properties>(reader, length, null)
+internal class GridAndGuidesReader(PsdBinaryReader reader, long length) : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        Properties props = [];
+        JObject props = [];
 
         _ = GlobalReader.VerifyIntIs(1); // version
         props["HorizontalGrid"] = GlobalReader.ReadInt32();

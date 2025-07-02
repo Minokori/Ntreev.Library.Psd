@@ -1,14 +1,15 @@
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
-
+// TODO lrFX, EffectsLayer 现在不读取任何有用信息
 [ResourceID("lrFX", DisplayName = "EffectsLayer")]
 internal class EffectsLayerReader(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        var value = new Properties();
+        JObject value = [];
 
         var version = GlobalReader.ReadInt16();
         int count = GlobalReader.ReadInt16();

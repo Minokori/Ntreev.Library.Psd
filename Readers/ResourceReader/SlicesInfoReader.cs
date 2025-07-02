@@ -11,11 +11,11 @@ namespace Ntreev.Library.Psd.Readers.ImageResources;
 /// <param name="length"></param>
 [ResourceID("1050", DisplayName = "Slices")]
 internal class SlicesInfoReader(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<JToken>(reader, length, null)
     {
-    protected override Properties ReadValue()
+    protected override JObject ReadValue()
         {
-        Properties props = [];
+        JObject props = [];
 
         var version = GlobalReader.ReadInt32();
         if (version == 6)  // Photoshop<=7.0
@@ -34,7 +34,7 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
 
 
             // slice resource blocks
-            var slices = new List<Properties>(count);
+            JArray slices = [];
             for (var i = 0; i < count; i++)
                 {
                 slices.Add(ReadSliceResourceBlock(GlobalReader));
@@ -47,21 +47,21 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
 
             var items = (JArray)descriptor.SelectToken("slices");
 
-            var slices = new List<Properties>(items.Count);//items.Length
+            JArray slices = [];//items.Length
             foreach (var item in items)
                 {
                 slices.Add(ReadSliceInfo(item));
                 }
 
-            props["Items"] = new JArray(slices);
+            props["Items"] = slices;
             }
 
         return props;
         }
 
-    private static Properties ReadSliceResourceBlock(PsdBinaryReader reader)
+    private static JObject ReadSliceResourceBlock(PsdBinaryReader reader)
         {
-        var props = new Properties
+        var props = new JObject
             {
             ["ID"] = reader.ReadInt32(),
             ["GroupID"] = reader.ReadInt32(),
@@ -102,9 +102,9 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
         return props;
         }
 
-    private static Properties ReadSliceInfo(JToken properties)
+    private static JObject ReadSliceInfo(JToken properties)
         {
-        var props = new Properties
+        var props = new JObject
             {
             ["ID"] = properties["sliceID"],
             ["GroupID"] = properties["groupID"],

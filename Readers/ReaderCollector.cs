@@ -17,6 +17,7 @@
 
 using System.ComponentModel;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
 using Ntreev.Library.Psd.Readers.ResourceReader;
 
@@ -37,12 +38,12 @@ internal static class ReaderCollector
     /// </summary>
     static ReaderCollector()
         {
-        var assembly = typeof(ValueReader<Properties>).Assembly;
+        var assembly = typeof(ValueReader<JToken>).Assembly;
 
         var query = assembly
             .GetTypes()
             .Where(item =>
-                typeof(ValueReader<Properties>).IsAssignableFrom(item)
+                typeof(ValueReader<JToken>).IsAssignableFrom(item)
                 && (item.Attributes & TypeAttributes.Abstract) != TypeAttributes.Abstract
             );
 
@@ -64,7 +65,7 @@ internal static class ReaderCollector
             }
         }
 
-    public static ValueReader<Properties> CreateReader(
+    public static ValueReader<JToken> CreateReader(
         string resourceID,
         PsdBinaryReader reader,
         long length
@@ -80,7 +81,7 @@ internal static class ReaderCollector
             [typeof(PsdBinaryReader), typeof(long)],
             [reader, length]
         );
-        return (ValueReader<Properties>)readerInstance!;
+        return (ValueReader<JToken>)readerInstance!;
         }
 
     private static string GetDisplayName(Type type)

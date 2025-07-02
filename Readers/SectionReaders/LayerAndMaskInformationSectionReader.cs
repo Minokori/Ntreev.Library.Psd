@@ -35,7 +35,7 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
             globalLayerMaskInfo = globalLayerMaskInfoReader.Value;
             }
 
-        Properties additionalInfo = [];
+        JObject additionalInfo = [];
         LinkedLayer[] linkedLayers = [];
         EmbeddedLayer[] embeddedLayers = [];
         if (GlobalReader.Position + 4 < EndPosition)

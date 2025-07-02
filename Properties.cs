@@ -3,21 +3,6 @@ using Newtonsoft.Json.Linq;
 namespace Ntreev.Library.Psd;
 
 
-public class Properties : JObject
-    {
-    // TODO For兼容性
-    public static Properties FromJObject(JObject jObject)
-        {
-        var properties = new Properties();
-        foreach (var item in jObject)
-            {
-            properties.Add(item.Key, item.Value);
-            }
-
-        return properties;
-        }
-    }
-
 /// <summary>
 /// backup for some time use
 /// </summary>
