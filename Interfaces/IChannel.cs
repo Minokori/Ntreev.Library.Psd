@@ -1,4 +1,4 @@
-namespace Ntreev.Library.Psd;
+namespace Ntreev.Library.Psd.Interfaces;
 
 /// <summary>
 /// 通道接口

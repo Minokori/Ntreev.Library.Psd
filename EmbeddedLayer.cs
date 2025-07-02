@@ -1,4 +1,6 @@
 using Newtonsoft.Json.Linq;
+using Ntreev.Library.Psd.Interfaces;
+using Ntreev.Library.Psd.Sections;
 using Ntreev.Library.Psd.Services;
 
 namespace Ntreev.Library.Psd;

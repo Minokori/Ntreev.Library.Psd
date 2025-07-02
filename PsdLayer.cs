@@ -16,44 +16,23 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Newtonsoft.Json.Linq;
+using Ntreev.Library.Psd.Interfaces;
 
 namespace Ntreev.Library.Psd;
 
 internal partial class PsdLayer : IPsdLayer
     {
     private PsdBinaryReader GlobalReader => Document.BinaryReader;
-
-    private static readonly PsdLayer[] _emptyChilds = [];
-
-    public PsdLayer(JObject layRecord, JArray channelsImageData, PsdDocument document)
+    public PsdLayer(JObject layerRecord, JArray channelsImageData, PsdDocument document)
         {
-        Records = layRecord;
-
-        Top = Records.ToValue<int>("Top");
-        Left = Records.ToValue<int>("Left");
-        Right = Records.ToValue<int>("Right");
-        Bottom = Records.ToValue<int>("Bottom");
-
+        Records = layerRecord;
         ChannelImageData = channelsImageData;
-        // 根据 layer record 初始化 PSD Layer
-
         Document = document;
         Channels = InitChannels();
-
         }
     public override string ToString() => Name;
 
-    private Channel[] InitChannels()
-        {
-        var channels = Records.InitChannels(GlobalReader.Depth);
-
-        foreach (var item in channels.Zip(ChannelImageData.Children(), (channel, metainfo) => new { Channel = channel, MetaInfo = (JObject)metainfo }))
-            {
-            item.Channel.MetaInfo = item.MetaInfo;
-            }
-
-        return channels;
-        }
+    private Channel[] InitChannels() => Records.InitChannels(GlobalReader.Depth);
 
 
     /// <summary>
@@ -63,9 +42,6 @@ internal partial class PsdLayer : IPsdLayer
         {
         var type = Records.ToValue<string>("Resources.SectionDividerSetting.SectionType", "Resources.lsdk.SectionType");
         var sectionType = string.IsNullOrEmpty(type) ? SectionType.Normal : Enum.Parse<SectionType>(type);
-
-
-
         if (sectionType is not SectionType.Opend and not SectionType.Closed)
             {
             return;

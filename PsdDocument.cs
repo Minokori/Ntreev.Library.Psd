@@ -1,3 +1,4 @@
+using Ntreev.Library.Psd.Interfaces;
 using Ntreev.Library.Psd.Readers;
 
 namespace Ntreev.Library.Psd;
@@ -28,9 +29,9 @@ public partial class PsdDocument : IPsdLayer, IDisposable
 
         ColorModeDataSection = new()
             {
-            ["ColorModeData"] = new ColorModeDataSectionReader(BinaryReader).Value
+            [nameof(ColorModeData)] = new ColorModeDataSectionReader(BinaryReader).Value
             };
-        ImageResources = new ImageResourcesSectionReader(BinaryReader).Value;
+        ImageResourcesSection = new ImageResourcesSectionReader(BinaryReader).Value;
 
         LayerAndMaskSection = new LayerAndMaskInformationSectionReader(BinaryReader, this).Value;
 

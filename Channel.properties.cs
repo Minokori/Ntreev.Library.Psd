@@ -1,9 +1,14 @@
-using Newtonsoft.Json.Linq;
-
 namespace Ntreev.Library.Psd;
 
-internal partial class Channel
+internal partial class Channel(ChannelType type, int width, int height, int depth)
     {
+    public ChannelType Type { get; init; } = type;
+    public int Width { get; init; } = width;
+    public int Height { get; init; } = height;
+    public int Depth { get; init; } = depth;
+
+    // meta data, for lazy loading data from stream
+
     /// <summary>
     /// size = Height
     /// </summary>
@@ -19,18 +24,14 @@ internal partial class Channel
     /// Data[行索引x * 行长度(宽度Width) + y] = 图片 (x,y) 处 的通道像素值
     /// </summary>
     /// <remarks>
-    /// TODO 只有这个需要懒加载
-    /// TODO 还没有实现懒加载, 现在是直接读取图像数据流到 Data 中, 不进行懒加载
+    /// 懒加载在 <see cref="PsdLayer"/> 中实现. 访问 <see cref="PsdLayer.Channels"/> 时会从流中读取数据.<para/>
+    /// 懒加载的方法在 <see cref="ReadImageStreamLazily(PsdBinaryReader, Newtonsoft.Json.Linq.JObject)"/>
     /// </remarks>
     public byte[] Data { get; private set; } = [];
 
-
-    public ChannelType Type { get; set; }
-    public int Width { get; set; }
-    public int Height { get; init; }
+    /// <summary>
+    /// 透明度, 0-1 (完全不透明)
+    /// </summary>
     public float Opacity { get; set; } = 1.0f;
-    public long StreamLength { get; set; }
-    public int Depth { get; init; } = 1;
     public CompressionType CompressionType { get; set; }
-    public JToken MetaInfo { get; internal set; }
     }

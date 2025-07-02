@@ -1,5 +1,7 @@
 using Newtonsoft.Json.Linq;
+using Ntreev.Library.Psd.Interfaces;
 using Ntreev.Library.Psd.Readers;
+using Ntreev.Library.Psd.Sections;
 
 namespace Ntreev.Library.Psd;
 
@@ -30,15 +32,15 @@ public partial class PsdDocument
 
     public IEnumerable<ILinkedLayer> LinkedLayers => LayerAndMaskSection.LinkedLayers;//LayerAndMaskSection.Value.LinkedLayers;
 
-    public JObject Resources => LayerAndMaskSection.Resources;//LayerAndMaskSection.Value.Resources;
+    public JObject Resources => LayerAndMaskSection.AdditionalLayerInformation;//LayerAndMaskSection.Value.AdditionalLayerInfomation;
 
     // TODO
-    public JObject ImageResources { get; private set; }
+    public JObject ImageResourcesSection { get; private set; }
 
     //TODO
     public bool HasImage =>
-        ImageResources.Contains("Version") != false
-        && ImageResources.SelectToken("Version.HasRealMergedData").ToObject<bool>();
+        ImageResourcesSection.Contains("Version") != false
+        && ImageResourcesSection.SelectToken("Version.HasRealMergedData").ToObject<bool>();
 
     #region IPsdLayer
 

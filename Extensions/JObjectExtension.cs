@@ -1,6 +1,8 @@
 using Newtonsoft.Json.Linq;
 
+#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
 namespace Ntreev.Library.Psd;
+#pragma warning restore IDE0130 // 命名空间与文件夹结构不匹配
 
 
 /// <summary>
@@ -42,10 +44,8 @@ public static class JObjectExtensions
             var count = jObject.SelectToken("ChannelCount")!.ToObject<int>();
             var Width = jObject.SelectToken("Right")!.ToObject<int>() - jObject.SelectToken("Left")!.ToObject<int>();
             var Height = jObject.SelectToken("Bottom")!.ToObject<int>() - jObject.SelectToken("Top")!.ToObject<int>();
-            if ((Width > 0x3000) || (Height > 0x3000))
-                {
+            if (Width > 0x3000 || Height > 0x3000)
                 throw new NotSupportedException($"Invalidated size ({Width}, {Height})");
-                }
 
 
             var channels = new Channel[count];
@@ -73,7 +73,6 @@ public static class JObjectExtensions
                 var c = new Channel(type,
                     width.ToObject<int>(),
                     height.ToObject<int>(),
-                    jObject.SelectToken($"ChannelDataLength[{i}]")!.ToObject<long>()!,
                     depth);
 
                 // 透明度

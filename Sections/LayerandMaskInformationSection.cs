@@ -15,39 +15,43 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Ntreev.Library.Psd.Interfaces;
+namespace Ntreev.Library.Psd.Sections;
 
-internal class LinkedDocumentFileHeaderReader(PsdBinaryReader reader, long length)
-    : ValueReader<FileHeaderSection>(reader, length, null)
+internal partial class LayerAndMaskInformationSection : JObject
     {
-    protected override FileHeaderSection ReadValue()
+    public LayerAndMaskInformationSection(
+        JObject layerInfo,
+        JObject globalLayerMask,
+        JObject additionalLayerInfo
+    )
         {
-        if (IsDocument(GlobalReader) == true)
+        this[nameof(LayerInformation)] = layerInfo;
+        this[nameof(GlobalLayerMask)] = globalLayerMask;
+        this[nameof(AdditionalLayerInformation)] = additionalLayerInfo;
+        }
+
+
+    public JObject LayerInformation => this.ToValue<JObject>("LayerInformation")!;
+    public JObject GlobalLayerMask => this.ToValue<JObject>("GlobalLayerMask")!;
+    public JObject AdditionalLayerInformation => this.ToValue<JObject>("AdditionalLayerInformation")!;
+
+
+    [JsonIgnore]
+    public PsdDocument? Document { get; init; }
+
+    [JsonIgnore]
+    public PsdLayer[] Layers
+        {
+        get
             {
-            using Stream stream = new RangeStream(
-                GlobalReader.Stream,
-                GlobalReader.Position,
-                StreamLength
-            );
-            using var r = new PsdBinaryReader(stream) { Uri = GlobalReader.Uri };
-            return new FileHeaderSectionReader(r).Value;
-            }
-        else
-            {
-            return [];
+            field ??= InitPsdLayers();
+            return field;
             }
         }
 
-    private bool IsDocument(PsdBinaryReader reader)
-        {
-        var position = reader.Position;
-        try
-            {
-            return reader.ReadAsType() == "8BPS";
-            }
-        finally
-            {
-            reader.Position = position;
-            }
-        }
+    [JsonIgnore]
+    public ILinkedLayer[] LinkedLayers { get; init; } = [];
     }

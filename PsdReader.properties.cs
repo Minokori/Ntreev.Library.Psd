@@ -1,4 +1,5 @@
 using Ntreev.Library.Psd.Exceptions;
+using Ntreev.Library.Psd.Sections;
 using Ntreev.Library.Psd.Services;
 namespace Ntreev.Library.Psd;
 

@@ -15,7 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace Ntreev.Library.Psd;
+namespace Ntreev.Library.Psd.Interfaces;
 
 /// <summary>
 /// 链接图层接口
@@ -34,7 +34,7 @@ public interface ILinkedLayer
     /// <summary>
     /// 若链接图层是嵌入的其他 PSD, 其他图层的绝对路径, 通过 resolver 实现懒加载
     /// </summary>
-    Uri AbsoluteUri
+    Uri? AbsoluteUri
         {
         get;
         }

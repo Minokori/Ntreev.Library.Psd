@@ -20,13 +20,13 @@ using Newtonsoft.Json.Linq;
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class LayerBlendingRangesReader(PsdBinaryReader reader)
-    : ValueReader<LayerBlendingRanges>(reader, true, null)
+    : ValueReader<JObject>(reader, true, null)
     {
 
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
-    protected override LayerBlendingRanges ReadValue()
+    protected override JObject ReadValue()
         {
-        var blendingRanges = new LayerBlendingRanges()
+        var blendingRanges = new JObject()
             {
             ["CompositeGrayBlendSource"] = GlobalReader.ReadInt32(),
             ["CompositeGrayDestinationRange"] = GlobalReader.ReadInt32(),

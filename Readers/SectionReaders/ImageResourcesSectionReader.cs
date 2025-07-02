@@ -18,7 +18,6 @@ internal class ImageResourcesSectionReader(PsdBinaryReader reader)
             long length = GlobalReader.ReadInt32().PadToEven(); // Actual size of resource data that follows (even)
 
             var resourceReader = ReaderCollector.CreateReader(resourceID, GlobalReader, length);
-            // TODO jobj or jarr?
             if (((JObject)resourceReader.Value).Count > 0)
                 {
                 props[ReaderCollector.GetDisplayName(resourceID)] = resourceReader.Value;

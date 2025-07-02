@@ -203,4 +203,33 @@ internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryR
         throw new InvalidFormatException($"expect {typeof(T)} value {value}");
         }
     #endregion
+    public PsdBinaryReader View(long position, long streamLength)
+        {
+        if (position < 0 || streamLength < 0 || position + streamLength > Stream.Length)
+            throw new ArgumentOutOfRangeException("position or streamLength out of range.");
+
+        // 保存当前流位置
+        var originalPosition = Stream.Position;
+        try
+            {
+            Stream.Position = position;
+            var buffer = new byte[streamLength];
+            var read = 0;
+            while (read < streamLength)
+                {
+                var n = Stream.Read(buffer, read, (int)(streamLength - read));
+                if (n == 0)
+                    throw new EndOfStreamException("无法读取指定长度的数据。");
+                read += n;
+                }
+            // 创建内存流副本
+            var memStream = new MemoryStream(buffer, writable: false);
+            // 保持 Uri 一致
+            return new PsdBinaryReader(memStream, this.Uri) { Version = this.Version };
+            }
+        finally
+            {
+            Stream.Position = originalPosition;
+            }
+        }
     }

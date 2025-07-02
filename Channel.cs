@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using Ntreev.Library.Psd.Interfaces;
 
 namespace Ntreev.Library.Psd;
 
@@ -27,7 +28,7 @@ internal partial class Channel : IChannel
 
         }
 
-    public void ReadImageStreamLazy(PsdBinaryReader reader, JObject channelImageData)
+    public void ReadImageStreamLazily(PsdBinaryReader reader, JObject channelImageData)
         {
         var position = reader.Position;
 
@@ -51,4 +52,6 @@ internal partial class Channel : IChannel
 
         reader.Position = position;
         }
+
+
     }

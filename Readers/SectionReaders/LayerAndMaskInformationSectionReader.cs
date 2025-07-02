@@ -16,7 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Newtonsoft.Json.Linq;
+using Ntreev.Library.Psd.Interfaces;
 using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
+using Ntreev.Library.Psd.Sections;
 
 namespace Ntreev.Library.Psd.Readers;
 
@@ -25,16 +27,23 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
     {
     protected override LayerAndMaskInformationSection ReadValue()
         {
+        #region Layer Info
         var layerInfoReader = new LayerInfoReader(GlobalReader);
         var layerInfo = layerInfoReader.Value;
+        #endregion
 
+
+        #region Global Layer Mask Info
         JObject globalLayerMaskInfo = [];
         if (GlobalReader.Position + 4 < EndPosition)
             {
             var globalLayerMaskInfoReader = new GlobalLayerMaskInfoReader(GlobalReader);
             globalLayerMaskInfo = globalLayerMaskInfoReader.Value;
             }
+        #endregion
 
+
+        #region Additional Info (JObeject) & Linked/Embedded Layers (ILinkedLayer)
         JObject additionalInfo = [];
         LinkedLayer[] linkedLayers = [];
         EmbeddedLayer[] embeddedLayers = [];
@@ -46,6 +55,7 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
             );
             (additionalInfo, linkedLayers, embeddedLayers) = additionalInfoReader.Value;
             }
+        #endregion
 
         return new(layerInfo, globalLayerMaskInfo, additionalInfo)
             {

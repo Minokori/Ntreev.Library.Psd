@@ -15,16 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Exceptions;
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
-internal class LayerMaskReader(PsdBinaryReader reader) : ValueReader<LayerMask>(reader, true, null)
+internal class LayerMaskReader(PsdBinaryReader reader) : ValueReader<JObject>(reader, true, null)
     {
     protected override long InitStreamLength() => GlobalReader.ReadInt32();
 
 
-    protected override LayerMask ReadValue()
+    protected override JObject ReadValue()
         {
         switch (StreamLength)
             {
@@ -33,7 +34,7 @@ internal class LayerMaskReader(PsdBinaryReader reader) : ValueReader<LayerMask>(
             case 20:
                 {
                 return
-                    new LayerMask()
+                    new JObject()
                         {
                         ["Top"] = GlobalReader.ReadInt32(),
                         ["Left"] = GlobalReader.ReadInt32(),
@@ -45,7 +46,7 @@ internal class LayerMaskReader(PsdBinaryReader reader) : ValueReader<LayerMask>(
             ;
             case 40:
                 {
-                return new LayerMask()
+                return new JObject()
                     {
                     ["Top"] = GlobalReader.ReadInt32(),
                     ["Left"] = GlobalReader.ReadInt32(),

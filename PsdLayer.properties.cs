@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using Ntreev.Library.Psd.Interfaces;
 
 namespace Ntreev.Library.Psd;
 
@@ -11,13 +12,18 @@ internal partial class PsdLayer
         {
         get
             {
-            var type = Records.ToValue<string>("Resources.SectionDividerSetting.SectionType", "Resources.lsdk.SectionType");
+            var type = Records.ToValue<string>(
+                "Resources.SectionDividerSetting.SectionType",
+                "Resources.lsdk.SectionType"
+            );
             return string.IsNullOrEmpty(type) ? SectionType.Normal : Enum.Parse<SectionType>(type);
             }
         }
     public string Name => Records.ToValue<string>("Resources.UnicodeLayerName.Name");
 
-    public bool IsVisible => (Enum.Parse<LayerFlags>(Records.ToValue<string>("Flags")) & LayerFlags.Visible) != LayerFlags.Visible;
+    public bool IsVisible =>
+        (Enum.Parse<LayerFlags>(Records.ToValue<string>("Flags")) & LayerFlags.Visible)
+        != LayerFlags.Visible;
 
     public float Opacity => Records.ToValue<float>("Opacity") / 255f;
     public bool IsClipping => Records.ToValue<bool>("Clipping");
@@ -27,36 +33,65 @@ internal partial class PsdLayer
     #endregion
 
 
-    #region 来自record的属性
-
-
-    #endregion
     public Channel[] Channels
         {
         get
             {
-            foreach (var (First, Second) in field.Zip(ChannelImageData))
+            foreach (var (channel, channelImageData) in field.Zip(ChannelImageData.Cast<JObject>()))
                 {
-                if (First.Data.Length != 0) continue;
-                var jobj = (JObject)Second;
-                First.ReadImageStreamLazy(GlobalReader, jobj);
+                if (channel.Data.Length != 0)
+                    continue;
+                channel.ReadImageStreamLazily(GlobalReader, channelImageData);
                 }
 
             return field;
             }
         init;
-        }// _channelsReader.Value;
+        }
 
+    public int Left
+        {
+        get
+            {
+            if (field < 0)
+                field = Records.ToValue<int>("Left");
+            return field;
+            }
+        private set;
+        } = -1;
 
+    public int Top
+        {
+        get
+            {
+            if (field < 0)
+                field = Records.ToValue<int>("Top");
+            return field;
+            }
+        private set;
+        } = -1;
 
+    public int Right
+        {
+        get
+            {
+            if (field < 0)
+                field = Records.ToValue<int>("Right");
+            return field;
+            }
+        private set;
+        } = -1;
 
-    public int Left { get; private set; }
-
-    public int Top { get; private set; }
-
-    public int Right { get; private set; }
-
-    public int Bottom { get; private set; }
+    public int Bottom
+        {
+        get
+            {
+            if (field < 0)
+                field = Records.ToValue<int>("Bottom");
+            return field;
+            }
+        private set;
+        } = -1;
 
     public int Width => Right - Left;
 
@@ -64,14 +99,9 @@ internal partial class PsdLayer
 
     public int Depth => GlobalReader.Depth;
 
+    public PsdLayer? Parent { get; set; }
 
-    public PsdLayer Parent { get; set; }
-
-    public PsdLayer[] Childs
-        {
-        get => (field) ?? _emptyChilds;
-        set;
-        } = [];
+    public PsdLayer[] Childs { get; set; } = [];
 
     public JObject Resources => Records.ToValue<JObject>("Resources"); //TODO UnalbleTOCast
 
@@ -84,13 +114,16 @@ internal partial class PsdLayer
         {
         get
             {
+            //Resources.SmartObjectLayerData.Idnt
             var guidString = Records.ToValue<string>("Resources.PlacedLayer.UniqueId");
 
-            if (guidString is null) return null;
+            if (guidString is null)
+                return null;
             var placeID = new Guid(guidString);
 
-
-            field ??= Document.LinkedLayers.Where(i => i.ID == placeID && i.HasDocument).FirstOrDefault();
+            field ??= Document
+                .LinkedLayers.Where(i => i.ID == placeID && i.HasDocument)
+                .FirstOrDefault();
             return field;
             }
         }
@@ -98,6 +131,7 @@ internal partial class PsdLayer
     public bool HasImage => SectionType == SectionType.Normal && Width != 0 && Height != 0;
 
     public bool HasMask => Records.Contains("Mask");
+
     #region IPsdLayer
 
     IPsdLayer IPsdLayer.Parent => Parent == null ? Document : Parent;
@@ -108,4 +142,3 @@ internal partial class PsdLayer
 
     #endregion
     }
-

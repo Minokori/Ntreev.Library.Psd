@@ -14,22 +14,22 @@ internal class RangeStream(Stream stream, long position, long length) : Stream
 
     public override void Flush() { }
 
-    public override long Length => this.length;
+    public override long Length => length;
 
     public override long Position
         {
-        get => this.stream.Position - this.position;
-        set => this.stream.Position = this.position + value;
+        get => stream.Position - position;
+        set => stream.Position = position + value;
         }
 
     public override int Read(byte[] buffer, int offset, int count) =>
-        this.stream.Read(buffer, offset, count);
+        stream.Read(buffer, offset, count);
 
     public override long Seek(long offset, SeekOrigin origin)
         {
         return origin == SeekOrigin.Current
-            ? this.stream.Seek(offset, origin) - this.position
-            : this.stream.Seek(this.position + offset, origin) - this.position;
+            ? stream.Seek(offset, origin) - position
+            : stream.Seek(position + offset, origin) - position;
         }
 
     public override void SetLength(long value) => throw new NotImplementedException();

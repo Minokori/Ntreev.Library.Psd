@@ -18,7 +18,7 @@
 
 using Newtonsoft.Json.Linq;
 
-namespace Ntreev.Library.Psd;
+namespace Ntreev.Library.Psd.Interfaces;
 
 /// <summary>
 /// Photoshop 图层接口，继承自 <see cref="IImageSource"/>

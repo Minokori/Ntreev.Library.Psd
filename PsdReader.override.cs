@@ -87,6 +87,7 @@ internal partial class PsdBinaryReader
             {
             values[i] = ReadDouble();
             }
+
         return values;
         }
     #endregion

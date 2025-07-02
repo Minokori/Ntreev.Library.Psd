@@ -15,6 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Library.Psd.Sections;
+
 namespace Ntreev.Library.Psd.Readers;
 
 internal class ImageDataSectionReader(PsdBinaryReader reader, FileHeaderSection fileHeaderSection)
@@ -44,7 +46,7 @@ internal class ImageDataSectionReader(PsdBinaryReader reader, FileHeaderSection 
         for (var i = 0; i < channels.Length; i++)
             {
             var type = i < types.Length ? types[i] : ChannelType.Mask;
-            channels[i] = new Channel(type, width, height, 0, depth)
+            channels[i] = new Channel(type, width, height, depth)
                 {
                 CompressionType = compressionType,
                 RlePackLengths =
