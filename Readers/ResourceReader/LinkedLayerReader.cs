@@ -1,7 +1,6 @@
-using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
-using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
+using Ntreev.Library.Psd.Structures;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
@@ -11,8 +10,7 @@ internal class LinkedLayerReader(PsdBinaryReader reader, long length)
     {
     protected override Properties ReadValue()
         {
-        Properties props = [];
-        List<ILinkedLayer> linkedLayers = [];
+        JArray info = [];
         while (GlobalReader.Position < EndPosition)
             {
             // 注意: 先读取 **长度**, 使 GlobalReader.Position 移动后再计算 endPosition
@@ -28,40 +26,33 @@ internal class LinkedLayerReader(PsdBinaryReader reader, long length)
                 ["FileType"] = GlobalReader.ReadAsType(),
                 ["FileCreator"] = GlobalReader.ReadAsType(),
                 };
-
-            var lengthOfDataBelow = GlobalReader.ReadInt64();
+            // length of data below
+            _ = GlobalReader.ReadInt64();
 
             var fileOpenDescriptor = GlobalReader.ReadBoolean();
-
-            DescriptorStructure? properties = null;
             if (fileOpenDescriptor)
                 {
-                properties = new DescriptorStructure(GlobalReader);
+                _ = StructureReader.ReadDescriptor(GlobalReader);
                 }
 
-            var isDocument = IsDocument(GlobalReader);
-            LinkedDocumentReader documentReader = null;
-            LinkedDocumentFileHeaderReader fileHeaderReader = null;
-            if (lengthOfDataBelow > 0 && isDocument == true)
-                {
-                var position = GlobalReader.Position;
-                documentReader = new LinkedDocumentReader(GlobalReader, lengthOfDataBelow);
-                GlobalReader.Position = position;
-                fileHeaderReader = new LinkedDocumentFileHeaderReader(GlobalReader, lengthOfDataBelow);
-                }
+            #region TODO maybe raw bytes for linked img, ,linked psd turns to lnkE
+            //var isDocument = IsDocument(GlobalReader);
+            //LinkedDocumentReader documentReader = null;
+            //LinkedDocumentFileHeaderReader fileHeaderReader = null;
+            //if (lengthOfDataBelow > 0 && isDocument == true)
+            //    {
+            //    var position = GlobalReader.Position;
+            //    documentReader = new LinkedDocumentReader(GlobalReader, lengthOfDataBelow);
+            //    GlobalReader.Position = position;
+            //    fileHeaderReader = new LinkedDocumentFileHeaderReader(GlobalReader, lengthOfDataBelow);
+            //    }
+            #endregion
 
-            Debug.WriteLine("Linked Layer Info:\n" + linkedLayerInfo.ToString());
-            var linkedLayer = new LinkedLayer(
-                linkedLayerInfo,
-                documentReader,
-                fileHeaderReader
-            );
-            linkedLayers.Add(linkedLayer);
+            info.Add(linkedLayerInfo);
             GlobalReader.Position = endPosition;
             }
 
-        props.AddLayers(linkedLayers);
-        return props;
+        return new() { ["Info"] = info };
         }
 
     private static bool IsDocument(PsdBinaryReader reader)

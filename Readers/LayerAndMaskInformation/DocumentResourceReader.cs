@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 
 namespace Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 
 internal class DocumentResourceReader(PsdBinaryReader reader, long length)
-    : ValueReader<Properties>(reader, length, null)
+    : ValueReader<Tuple<Properties, LinkedLayer[], EmbeddedLayer[]>>(reader, length, null)
     {
     private static readonly string[] doubleTypeKeys =
     [
@@ -41,10 +41,11 @@ internal class DocumentResourceReader(PsdBinaryReader reader, long length)
         "extd",
     ];
 
-    protected override Properties ReadValue()
+    protected override Tuple<Properties, LinkedLayer[], EmbeddedLayer[]> ReadValue()
         {
         Properties props = [];
-
+        List<LinkedLayer> linkedLayers = [];
+        List<EmbeddedLayer> embeddedLayers = [];
         while (GlobalReader.Position < EndPosition)
             {
             _ = GlobalReader.VerifySignatureIs("8BIM", "8B64");
@@ -54,15 +55,41 @@ internal class DocumentResourceReader(PsdBinaryReader reader, long length)
             var resource = ReaderCollector.CreateReader(resourceID, GlobalReader, length).Value;
             var resourceName = ReaderCollector.GetDisplayName(resourceID);
 
-            if (resourceName is "EmbeddedLayer" or "LinkedLayer")
+            switch (resourceName)
                 {
-                Debug.WriteLine("This is an ILinkedLayer Object");
-                }
+                case "LinkedLayer":
+                    {
+                    var items = (JArray)resource["Info"];
+                    foreach (var item in items)
+                        {
+                        var linkedLayer = new LinkedLayer((JObject)item);
+                        linkedLayers.Add(linkedLayer);
+                        }
 
-            props[resourceName] = resource;
+                    props[resourceName] = items;
+                    continue;
+                    }
+                case "EmbeddedLayer":
+                    {
+                    var items = (JArray)resource["Info"];
+                    foreach (var item in items)
+                        {
+                        var embeddedLayer = new EmbeddedLayer((JObject)item);
+                        embeddedLayers.Add(embeddedLayer);
+                        }
+
+                    props[resourceName] = items;
+                    continue;
+                    }
+                default:
+                    {
+                    props[resourceName] = resource;
+                    continue;
+                    }
+                }
             }
 
-        return props;
+        return new(props, linkedLayers.ToArray(), embeddedLayers.ToArray());
         }
 
     private static long ReadLength(PsdBinaryReader reader, string resourceID)

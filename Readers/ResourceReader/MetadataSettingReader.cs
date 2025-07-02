@@ -17,6 +17,7 @@
 
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.Structures;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
@@ -30,7 +31,7 @@ internal class MetadataSettingReader(PsdBinaryReader reader, long length)
 
         var count = GlobalReader.ReadInt32();
 
-        List<DescriptorStructure> dss = [];
+        JArray dss = [];
 
         for (var i = 0; i < count; i++)
             {
@@ -40,12 +41,12 @@ internal class MetadataSettingReader(PsdBinaryReader reader, long length)
             var p = GlobalReader.ReadBytes(3);
             var l = GlobalReader.ReadInt32();
             var p2 = GlobalReader.Position;
-            var ds = new DescriptorStructure(GlobalReader);
+            var ds = StructureReader.ReadDescriptor(GlobalReader);
             dss.Add(ds);
             GlobalReader.Position = p2 + l;
             }
 
-        props["Items"] = new JArray(dss);
+        props["Items"] = dss;
         //props["Items"] = dss;
 
         return props;

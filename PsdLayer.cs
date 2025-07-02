@@ -28,11 +28,18 @@ internal partial class PsdLayer : IPsdLayer
     public PsdLayer(JObject layRecord, JArray channelsImageData, PsdDocument document)
         {
         Records = layRecord;
+
+        Top = Records.ToValue<int>("Top");
+        Left = Records.ToValue<int>("Left");
+        Right = Records.ToValue<int>("Right");
+        Bottom = Records.ToValue<int>("Bottom");
+
         ChannelImageData = channelsImageData;
         // 根据 layer record 初始化 PSD Layer
 
         Document = document;
         Channels = InitChannels();
+
         }
     public override string ToString() => Name;
 
@@ -54,11 +61,16 @@ internal partial class PsdLayer : IPsdLayer
     /// </summary>
     public void ComputeBounds()
         {
-        var type = Records.ToValue<string>("Resources.lsct.SectionType", "Resources.lsdk.SectionType");
+        var type = Records.ToValue<string>("Resources.SectionDividerSetting.SectionType", "Resources.lsdk.SectionType");
         var sectionType = string.IsNullOrEmpty(type) ? SectionType.Normal : Enum.Parse<SectionType>(type);
 
+
+
         if (sectionType is not SectionType.Opend and not SectionType.Closed)
+            {
             return;
+            }
+
 
         var left = int.MaxValue;
         var top = int.MaxValue;
@@ -72,9 +84,9 @@ internal partial class PsdLayer : IPsdLayer
             if (item == this || item.HasImage == false)
                 continue;
 
-            if (item.Records.Contains("Resources.PlLd.Transformation"))
+            if (item.Records.Contains("Resources.PlacedLayer.Transformation"))
                 {
-                var transforms = item.Records.SelectToken("Resources.PlLd.Transformation").ToObject<double[]>()!;// ToValue<double[]>("PlLd", "Transformation");
+                var transforms = item.Records.SelectToken("Resources.PlacedLayer.Transformation").ToObject<double[]>()!;// ToValue<double[]>("PlLd", "Transformation");
                 double[] xx = [transforms[0], transforms[2], transforms[4], transforms[6]];
                 double[] yy = [transforms[1], transforms[3], transforms[5], transforms[7]];
 

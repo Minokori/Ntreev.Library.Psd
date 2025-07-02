@@ -17,6 +17,7 @@
 
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.Structures;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
@@ -31,9 +32,9 @@ internal class TypeToolObjectSettingReader(PsdBinaryReader reader, long length) 
         GlobalReader.VerifyIntIs<short>(1);
         props["Transforms"] = new JArray(GlobalReader.ReadDoubles(6));
         props["TextVersion"] = GlobalReader.ReadInt16();
-        props["Text"] = new DescriptorStructure(GlobalReader);
+        props["Text"] = StructureReader.ReadDescriptor(GlobalReader);
         props["WarpVersion"] = GlobalReader.ReadInt16();
-        props["Warp"] = new DescriptorStructure(GlobalReader);
+        props["Warp"] = StructureReader.ReadDescriptor(GlobalReader);
         props["Bounds"] = new JArray(GlobalReader.ReadDoubles(2));
 
         return props;

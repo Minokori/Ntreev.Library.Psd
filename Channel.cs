@@ -1,3 +1,5 @@
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd;
 
 internal partial class Channel : IChannel
@@ -7,7 +9,7 @@ internal partial class Channel : IChannel
     /// </summary>
     /// <param name="reader">私有 reader</param>
     /// <param name="compressionType"></param>
-    public void ReadImageStream(PsdBinaryReader reader)
+    public void ReadImageStreamDirectly(PsdBinaryReader reader)
         {
         switch (CompressionType)
             {
@@ -23,5 +25,30 @@ internal partial class Channel : IChannel
                 break;
             }
 
+        }
+
+    public void ReadImageStreamLazy(PsdBinaryReader reader, JObject channelImageData)
+        {
+        var position = reader.Position;
+
+        var compressionType = Enum.Parse<CompressionType>(channelImageData.ToValue<string>("CompressionType"));
+        reader.Position = channelImageData.ToValue<long>("StartPosition");
+        switch (compressionType)
+            {
+
+            case CompressionType.Raw:
+                {
+                PrivateReadData(reader, Depth, compressionType, []);
+                break;
+                }
+            case CompressionType.RLE:
+                {
+                PrivateReadData(reader, Depth, compressionType, channelImageData.ToValue<int[]>("RlePackLengths"));
+                break;
+
+                }
+            }
+
+        reader.Position = position;
         }
     }

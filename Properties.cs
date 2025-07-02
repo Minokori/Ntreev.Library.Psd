@@ -1,20 +1,10 @@
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Ntreev.Library.Psd;
 
 
-// TODO AddLayers 抽出来
 public class Properties : JObject
     {
-    private readonly List<ILinkedLayer> linkedLayers = [];
-    public void AddLayers(List<ILinkedLayer> layers) => linkedLayers.AddRange(layers);
-
-    [JsonIgnore]
-    public ILinkedLayer[] LinkedLayers => [.. linkedLayers];
-
-
-
     // TODO For兼容性
     public static Properties FromJObject(JObject jObject)
         {

@@ -23,7 +23,7 @@ using Ntreev.Library.Psd.Readers.ResourceReader;
 namespace Ntreev.Library.Psd.Readers;
 
 /// <summary>
-/// 静态类型, 用于通过反射自动创建继承自 <see cref="ResourceReaderBase"/> 的实例。
+/// 静态类型, 用于通过反射自动创建实例。
 /// </summary>
 internal static class ReaderCollector
     {
@@ -32,10 +32,8 @@ internal static class ReaderCollector
     /// </summary>
     private static Dictionary<string, Type> Readers { get; }
 
-    // TODO ResourceReaderBase => ValueReader<Properties>
-
     /// <summary>
-    /// 静态构造函数, 在类加载时自动查找当前程序集中的所有 <see cref="ResourceReaderBase"/> 的子类。
+    /// 静态构造函数
     /// </summary>
     static ReaderCollector()
         {
@@ -66,17 +64,22 @@ internal static class ReaderCollector
             }
         }
 
-
-    public static ValueReader<Properties> CreateReader(string resourceID, PsdBinaryReader reader, long length)
+    public static ValueReader<Properties> CreateReader(
+        string resourceID,
+        PsdBinaryReader reader,
+        long length
+    )
         {
-        var readerType = Readers.TryGetValue(resourceID, out var type) ? type : typeof(EmptyResourceReader);
+        var readerType = Readers.TryGetValue(resourceID, out var type)
+            ? type
+            : typeof(EmptyResourceReader);
 
         var readerInstance = TypeDescriptor.CreateInstance(
-                null,
-                readerType,
-                [typeof(PsdBinaryReader), typeof(long)],
-                [reader, length]
-            );
+            null,
+            readerType,
+            [typeof(PsdBinaryReader), typeof(long)],
+            [reader, length]
+        );
         return (ValueReader<Properties>)readerInstance!;
         }
 

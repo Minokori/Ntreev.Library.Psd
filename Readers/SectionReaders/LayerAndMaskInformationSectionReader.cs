@@ -36,15 +36,21 @@ internal class LayerAndMaskInformationSectionReader(PsdBinaryReader reader, PsdD
             }
 
         Properties additionalInfo = [];
+        LinkedLayer[] linkedLayers = [];
+        EmbeddedLayer[] embeddedLayers = [];
         if (GlobalReader.Position + 4 < EndPosition)
             {
             var additionalInfoReader = new DocumentResourceReader(
                 GlobalReader,
                 EndPosition - GlobalReader.Position
             );
-            additionalInfo = additionalInfoReader.Value;
+            (additionalInfo, linkedLayers, embeddedLayers) = additionalInfoReader.Value;
             }
 
-        return new(layerInfo, globalLayerMaskInfo, additionalInfo) { Document = (PsdDocument)UserData };
+        return new(layerInfo, globalLayerMaskInfo, additionalInfo)
+            {
+            Document = (PsdDocument)UserData,
+            LinkedLayers = [.. linkedLayers.Cast<ILinkedLayer>(), .. embeddedLayers.Cast<ILinkedLayer>()],
+            };
         }
     }

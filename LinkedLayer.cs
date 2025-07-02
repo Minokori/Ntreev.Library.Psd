@@ -16,7 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Newtonsoft.Json.Linq;
-using Ntreev.Library.Psd.Readers.LayerAndMaskInformation;
 namespace Ntreev.Library.Psd;
 
 /// <summary>
@@ -26,27 +25,29 @@ namespace Ntreev.Library.Psd;
 /// <param name="id"></param>
 /// <param name="documentReader"></param>
 /// <param name="fileHeaderReader"></param>
-internal class LinkedLayer(JObject info, LinkedDocumentReader? documentReader, LinkedDocumentFileHeaderReader? fileHeaderReader) : ILinkedLayer
+//internal class LinkedLayer(JObject info, LinkedDocumentReader? documentReader, LinkedDocumentFileHeaderReader? fileHeaderReader) : ILinkedLayer
+internal class LinkedLayer(JObject info) : ILinkedLayer
+
     {
 
     // TODO 让 LinkedLayer 只有一个构造函数, from JObj
-    private readonly LinkedDocumentReader? documentReader = documentReader;
-    private readonly LinkedDocumentFileHeaderReader? fileHeaderReader = fileHeaderReader;
-    private JObject info = info;
+    //private readonly LinkedDocumentReader? documentReader = documentReader;
+    //private readonly LinkedDocumentFileHeaderReader? fileHeaderReader = fileHeaderReader;
+    private readonly JObject info = info;
 
-    public PsdDocument Document => documentReader?.Value;
+    public PsdDocument Document => null;//documentReader?.Value;
 
     public Uri? AbsoluteUri => null;
 
 
-    public bool HasDocument => documentReader != null;
+    public bool HasDocument => false;//documentReader != null;
 
     public Guid ID => info.ToValue<Guid>("UniqueId");
 
     public string Name => info.ToValue<string>("OriginalFileName") ?? "";
 
-    public int Width => fileHeaderReader is null ? -1 : fileHeaderReader.Value.Width;
+    public int Width => -1;//fileHeaderReader is null ? -1 : fileHeaderReader.Value.Width;
 
-    public int Height => fileHeaderReader is null ? -1 : fileHeaderReader.Value.Height;
+    public int Height => -1;//fileHeaderReader is null ? -1 : fileHeaderReader.Value.Height;
     }
 

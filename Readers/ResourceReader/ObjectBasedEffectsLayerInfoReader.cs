@@ -1,4 +1,5 @@
 using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.Structures;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
@@ -9,6 +10,6 @@ internal class ObjectBasedEffectsLayerInfoReader(PsdBinaryReader reader, long le
     protected override Properties ReadValue()
         {
         _ = GlobalReader.VerifyIntIs(0);
-        return new DescriptorStructure(GlobalReader, true);
+        return Properties.FromJObject(StructureReader.ReadDescriptor(GlobalReader));
         }
     }

@@ -17,6 +17,7 @@
 
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.Structures;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
 
@@ -39,7 +40,7 @@ internal class PlacedLayerReader(PsdBinaryReader reader, long length) : ValueRea
         //props["Transformation"] = GlobalReader.ReadDoubles(8);
         props["Transformation"] = new JArray(GlobalReader.ReadDoubles(8));
         GlobalReader.VerifyIntIs(0);
-        props["Warp"] = new DescriptorStructure(GlobalReader);
+        props["Warp"] = StructureReader.ReadDescriptor(GlobalReader);
 
         return props;
         }
@@ -52,6 +53,6 @@ internal class Reader_SoLd(PsdBinaryReader reader, long length) : ValueReader<Pr
         {
         GlobalReader.VerifySignatureIs("soLD");
         GlobalReader.VerifyIntIs(4);
-        return new DescriptorStructure(GlobalReader, true);
+        return Properties.FromJObject(StructureReader.ReadDescriptor(GlobalReader));
         }
     }

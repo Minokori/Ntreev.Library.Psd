@@ -40,28 +40,29 @@ internal class LayerAndMaskInformationSection(JObject layerInfo, JObject globalL
 
     public ILinkedLayer[] LinkedLayers
         {
-        get
-            {
-            if (field == null)
-                {
-                List<ILinkedLayer> list = [];
-                string[] ids = ["lnk2", "lnk3", "lnkD", "lnkE",];
+        get; init;
+        //get
+        //    {
+        //    if (field == null)
+        //        {
+        //        List<ILinkedLayer> list = [];
+        //        string[] ids = ["lnk2", "lnk3", "lnkD", "lnkE",];
 
-                foreach (var item in ids)
-                    {
-                    if (this.Resources.Contains(item))
-                        {
-                        //var items = this.Resources.ToValue<ILinkedLayer[]>(item, "Items");
-                        var items = this.Resources.LinkedLayers;
-                        list.AddRange(items);
-                        }
-                    }
+        //        foreach (var item in ids)
+        //            {
+        //            if (this.Resources.Contains(item))
+        //                {
+        //                //var items = this.Resources.ToValue<ILinkedLayer[]>(item, "Items");
+        //                var items = this.Resources.LinkedLayers;
+        //                list.AddRange(items);
+        //                }
+        //            }
 
-                field = [.. list];
-                }
+        //        field = [.. list];
+        //        }
 
-            return field;
-            }
+        //    return field;
+        //    }
         }
 
 

@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.Structures;
 
 namespace Ntreev.Library.Psd.Readers.ImageResources;
 
@@ -42,14 +43,14 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
 
         // Photoshop>=CS
             {
-            DescriptorStructure descriptor = new(GlobalReader);//as IProperties;
+            var descriptor = StructureReader.ReadDescriptor(GlobalReader); //DescriptorStructure.New(GlobalReader);//as IProperties;
 
-            var items = descriptor.SelectTokens("slices.Items[0]");
+            var items = (JArray)descriptor.SelectToken("slices");
 
-            var slices = new List<Properties>(items.Count());//items.Length
+            var slices = new List<Properties>(items.Count);//items.Length
             foreach (var item in items)
                 {
-                slices.Add(ReadSliceInfo(item as Properties));
+                slices.Add(ReadSliceInfo(item));
                 }
 
             props["Items"] = new JArray(slices);
@@ -101,7 +102,7 @@ internal class SlicesInfoReader(PsdBinaryReader reader, long length)
         return props;
         }
 
-    private static Properties ReadSliceInfo(Properties properties)
+    private static Properties ReadSliceInfo(JToken properties)
         {
         var props = new Properties
             {

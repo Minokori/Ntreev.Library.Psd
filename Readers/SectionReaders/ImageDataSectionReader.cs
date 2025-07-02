@@ -56,7 +56,7 @@ internal class ImageDataSectionReader(PsdBinaryReader reader, FileHeaderSection 
 
         for (var i = 0; i < channels.Length; i++)
             {
-            channels[i].ReadImageStream(reader);
+            channels[i].ReadImageStreamDirectly(reader);
             }
 
         // 处理透明度

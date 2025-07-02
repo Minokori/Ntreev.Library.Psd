@@ -15,12 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Attributes;
+using Ntreev.Library.Psd.Structures;
 
 namespace Ntreev.Library.Psd.Readers.ResourceReader;
-
 
 [ResourceID("lnkE", DisplayName = "EmbeddedLayer")]
 internal class EmbeddedReader(PsdBinaryReader reader, long length)
@@ -28,8 +27,6 @@ internal class EmbeddedReader(PsdBinaryReader reader, long length)
     {
     protected override Properties ReadValue()
         {
-        Properties props = [];
-        List<ILinkedLayer> linkedLayers = [];
         JArray embeddedLayerInfoList = [];
 
         while (GlobalReader.Position < EndPosition)
@@ -47,17 +44,15 @@ internal class EmbeddedReader(PsdBinaryReader reader, long length)
                 ["FileCreator"] = GlobalReader.ReadAsType(),
                 };
 
-            var lengthOfDataBelow = GlobalReader.ReadInt64();
+            // length of data below
+            _ = GlobalReader.ReadInt64();
             var fileOpenDescriptor = GlobalReader.ReadBoolean();
-
-            DescriptorStructure? properties = null;
             if (fileOpenDescriptor)
                 {
-                properties = new DescriptorStructure(GlobalReader);
+                _ = StructureReader.ReadDescriptor(GlobalReader);
                 }
             // in document :If the type is 'liFE' then a linked file Descriptor is next.
-            embeddedLayerInfo["DescriptorOfLinkedFile"] = new DescriptorStructure(GlobalReader).ToJobject();
-
+            embeddedLayerInfo["DescriptorOfLinkedFile"] = StructureReader.ReadDescriptor(GlobalReader);
 
             if (embeddedLayerInfo.ToValue<int>("Version") > 3)
                 {
@@ -89,8 +84,6 @@ internal class EmbeddedReader(PsdBinaryReader reader, long length)
             GlobalReader.Position = endPosition;
             }
 
-        Debug.WriteLine("Embedded Layer Info List:\n" + embeddedLayerInfoList.ToString());
-        props.AddLayers(embeddedLayerInfoList.Select(i => new EmbeddedLayer((JObject)i)).Cast<ILinkedLayer>().ToList());
-        return props;
+        return new() { ["Info"] = embeddedLayerInfoList };
         }
     }

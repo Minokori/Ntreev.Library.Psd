@@ -11,7 +11,7 @@ internal partial class PsdLayer
         {
         get
             {
-            var type = Records.ToValue<string>("Resources.lsct.SectionType", "Resources.lsdk.SectionType");
+            var type = Records.ToValue<string>("Resources.SectionDividerSetting.SectionType", "Resources.lsdk.SectionType");
             return string.IsNullOrEmpty(type) ? SectionType.Normal : Enum.Parse<SectionType>(type);
             }
         }
@@ -31,7 +31,21 @@ internal partial class PsdLayer
 
 
     #endregion
-    public Channel[] Channels { get; init; }// _channelsReader.Value;
+    public Channel[] Channels
+        {
+        get
+            {
+            foreach (var (First, Second) in field.Zip(ChannelImageData))
+                {
+                if (First.Data.Length != 0) continue;
+                var jobj = (JObject)Second;
+                First.ReadImageStreamLazy(GlobalReader, jobj);
+                }
+
+            return field;
+            }
+        init;
+        }// _channelsReader.Value;
 
 
 

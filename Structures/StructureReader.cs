@@ -15,43 +15,69 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Newtonsoft.Json.Linq;
+
 namespace Ntreev.Library.Psd.Structures;
 
-internal static class StructureReader
+internal static partial class StructureReader
     {
-    public static Properties Read(string osType, PsdBinaryReader reader)
+
+    public static JObject ReadDescriptor(PsdBinaryReader reader)
+        {
+        JObject obj = [];
+        var _ = reader.ReadInt32();// Version, not used
+
+        obj.Add("Name", reader.ReadString());
+        obj.Add("ClassID", reader.ReadAsKey());
+
+        var count = reader.ReadInt32();
+        for (var i = 0; i < count; i++)
+            {
+            // key, and osType, both 4 bytes
+            var key = reader.ReadAsKey();
+            var osType = reader.ReadAsType();
+            var prop = Read(osType, reader);
+            obj.Add(key.Trim(), prop);
+            }
+
+        return obj;
+
+
+        }
+
+    public static JToken Read(string osType, PsdBinaryReader reader)
         {
         return osType switch
             {
-                // base types
-                "doub" => new Properties() { ["double"] = reader.ReadDouble() },
-                "TEXT" => new Properties() { ["TEXT"] = reader.ReadString() },
-                "long" => new Properties() { ["long"] = reader.ReadInt32() },
-                "bool" => new Properties() { ["bool"] = reader.ReadBoolean() },
-                "comp" => new Properties() { ["comp"] = reader.ReadInt64() },
+                // 基本数据类型, 返回 JValue
+                "doub" => ReadDouble(reader),
+                "TEXT" => ReadString(reader),
+                "long" => ReadInt32(reader),
+                "bool" => ReadBoolean(reader),
+                "comp" => ReadInt64(reader),
 
-                // dictionary (basetype inside) 不依赖其他的结构
-                // 考虑拼接出来
-                "prop" => new StructureProperty(reader),
-                "UntF" => new StructureUnitFloat(reader),
-                "type" => new StructureClass(reader),
-                "GlbC" => new StructureClass(reader),
-                "Clss" => new StructureClass(reader),
-                "enum" => new StructureEnumerate(reader),
-                "Enmr" => new StructureEnumerateReference(reader), //TODO 和文档描述不一致,修改前和上面一行一样
-                "alis" => new StructureAlias(reader),
-                "rele" => new StructureOffset(reader),
+                // 简单数据类型 (没有嵌套包含其他简单类型), 返回 JObject
+                "prop" => ReadProperty(reader),
+                "UntF" => ReadUnitFloat(reader),
+                "type" => ReadClass(reader),
+                "GlbC" => ReadClass(reader),
+                "Clss" => ReadClass(reader),
+                "enum" => ReadEnumerate(reader),
+                "Enmr" => ReadEnumerateReference(reader), //TODO 和文档描述不一致,修改前和上面一行一样
+                "alis" => ReadAlias(reader),
+                "rele" => ReadOffset(reader),
+                "tdta" => ReadEngineData(reader),
 
                 //依赖其他的Structure
-                "obj" => new StructureReference(reader),
+                "obj" => ReadReference(reader),
                 //会导致递归调用
-                "VlLs" => new StructureList(reader),
-                "Objc" => new DescriptorStructure(reader, false),
-                "GlbO" => new DescriptorStructure(reader, false),
+                "VlLs" => ReadStructureList(reader),
+                "Objc" => ReadSubDescriptor(reader),
+                "GlbO" => ReadSubDescriptor(reader),
 
                 // 不受支持的
-                "tdta" => new StructureUnknownOSType("Cannot read RawData"),
-                "ObAr" => new StructureObjectArray(reader),
+
+                "ObAr" => ReadObjectArray(reader),
                 _ => throw new NotSupportedException(osType),
                 };
         }

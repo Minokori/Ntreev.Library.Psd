@@ -20,6 +20,7 @@ internal partial class Channel
     /// </summary>
     /// <remarks>
     /// TODO 只有这个需要懒加载
+    /// TODO 还没有实现懒加载, 现在是直接读取图像数据流到 Data 中, 不进行懒加载
     /// </remarks>
     public byte[] Data { get; private set; } = [];
 
