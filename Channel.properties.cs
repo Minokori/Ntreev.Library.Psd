@@ -2,6 +2,17 @@ namespace Ntreev.Library.Psd;
 
 internal partial class Channel(ChannelType type, int width, int height, int depth)
     {
+
+
+
+    /// <summary>
+    /// Data[行索引x * 行长度(宽度Width) + y] = 图片 (x,y) 处 的通道像素值
+    /// </summary>
+    /// <remarks>
+    /// 懒加载在 <see cref="PsdLayer"/> 中实现. 访问 <see cref="PsdLayer.Channels"/> 时会从流中读取数据.<para/>
+    /// 懒加载的方法在 <see cref="ReadImageStreamLazily(PsdBinaryReader, Newtonsoft.Json.Linq.JObject)"/>
+    /// </remarks>
+    public byte[] Data { get; private set; } = [];
     public ChannelType Type { get; init; } = type;
     public int Width { get; init; } = width;
     public int Height { get; init; } = height;
@@ -20,18 +31,16 @@ internal partial class Channel(ChannelType type, int width, int height, int dept
     public int[] RlePackLengths { get; set; } = [];
 
 
-    /// <summary>
-    /// Data[行索引x * 行长度(宽度Width) + y] = 图片 (x,y) 处 的通道像素值
-    /// </summary>
-    /// <remarks>
-    /// 懒加载在 <see cref="PsdLayer"/> 中实现. 访问 <see cref="PsdLayer.Channels"/> 时会从流中读取数据.<para/>
-    /// 懒加载的方法在 <see cref="ReadImageStreamLazily(PsdBinaryReader, Newtonsoft.Json.Linq.JObject)"/>
-    /// </remarks>
-    public byte[] Data { get; private set; } = [];
+
 
     /// <summary>
     /// 透明度, 0-1 (完全不透明)
     /// </summary>
     public float Opacity { get; set; } = 1.0f;
     public CompressionType CompressionType { get; set; }
+
+    // TODO : try to make Data into a matrix
+    /// <summary>
+    /// shape = (h,w)
+    /// </summary>
     }

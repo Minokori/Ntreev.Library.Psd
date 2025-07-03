@@ -23,6 +23,7 @@ namespace Ntreev.Library.Psd;
 internal partial class PsdLayer : IPsdLayer
     {
     private PsdBinaryReader GlobalReader => Document.BinaryReader;
+
     public PsdLayer(JObject layerRecord, JArray channelsImageData, PsdDocument document)
         {
         Records = layerRecord;
@@ -30,23 +31,27 @@ internal partial class PsdLayer : IPsdLayer
         Document = document;
         Channels = InitChannels();
         }
+
     public override string ToString() => Name;
 
     private Channel[] InitChannels() => Records.InitChannels(GlobalReader.Depth);
-
 
     /// <summary>
     /// 计算边距(TOP, Bottom, Left, right)
     /// </summary>
     public void ComputeBounds()
         {
-        var type = Records.ToValue<string>("Resources.SectionDividerSetting.SectionType", "Resources.lsdk.SectionType");
-        var sectionType = string.IsNullOrEmpty(type) ? SectionType.Normal : Enum.Parse<SectionType>(type);
-        if (sectionType is not SectionType.Opend and not SectionType.Closed)
+        var type = Records.ToValue<string>(
+            "Resources.SectionDividerSetting.SectionType",
+            "Resources.lsdk.SectionType"
+        );
+        var sectionType = string.IsNullOrEmpty(type)
+            ? SectionType.Normal
+            : Enum.Parse<SectionType>(type);
+        if (sectionType is not SectionType.Open and not SectionType.Closed)
             {
             return;
             }
-
 
         var left = int.MaxValue;
         var top = int.MaxValue;
@@ -62,7 +67,9 @@ internal partial class PsdLayer : IPsdLayer
 
             if (item.Records.Contains("Resources.PlacedLayer.Transformation"))
                 {
-                var transforms = item.Records.SelectToken("Resources.PlacedLayer.Transformation").ToObject<double[]>()!;// ToValue<double[]>("PlLd", "Transformation");
+                var transforms = item
+                    .Records.SelectToken("Resources.PlacedLayer.Transformation")
+                    .ToObject<double[]>()!; // ToValue<double[]>("PlLd", "Transformation");
                 double[] xx = [transforms[0], transforms[2], transforms[4], transforms[6]];
                 double[] yy = [transforms[1], transforms[3], transforms[5], transforms[7]];
 
@@ -93,5 +100,22 @@ internal partial class PsdLayer : IPsdLayer
         Top = top;
         Right = right;
         Bottom = bottom;
+        }
+
+    /// <summary>
+    /// 递归遍历指定 <see cref="PsdLayer"/> 及其所有子层，返回包含自身及所有后代层的枚举序列。
+    /// </summary>
+    /// <param name="layer">要遍历的根 <see cref="PsdLayer"/> 实例。</param>
+    /// <returns>包含自身及所有后代 <see cref="PsdLayer"/> 的 <see cref="IEnumerable{PsdLayer}"/> 序列。</returns>
+    internal IEnumerable<PsdLayer> Descendants()
+        {
+        yield return this;
+        foreach (var item in Childs)
+            {
+            foreach (var child in item.Descendants())
+                {
+                yield return child;
+                }
+            }
         }
     }

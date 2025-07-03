@@ -29,6 +29,7 @@
         <IsTrimmable>False</IsTrimmable>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Emgu.CV" Version="4.10.0.5680" />
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

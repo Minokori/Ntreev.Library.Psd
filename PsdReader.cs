@@ -8,7 +8,7 @@ namespace Ntreev.Library.Psd;
 /// </summary>
 /// <param name="stream">PSD 文件的数据流</param>
 /// <param name="uri">PSD 文件的绝对 Uri. 若 <paramref name="stream"/> 没有对应的文件, 默认 Uri 为当前工作路径</param>
-internal partial class PsdBinaryReader(Stream stream, Uri? uri = null) : BinaryReader(stream)
+internal partial class PsdBinaryReader(Stream stream, Uri? uri) : BinaryReader(stream)
     {
     #region 为了方便 PSD 读取, 定义的 property
 

@@ -7,8 +7,6 @@ public partial class PsdDocument : IPsdLayer, IDisposable
     {
     //private LayerAndMaskInformationSectionReader? LayerAndMaskSection;
 
-
-
     public void Dispose()
         {
         BinaryReader?.Dispose();
@@ -29,13 +27,12 @@ public partial class PsdDocument : IPsdLayer, IDisposable
 
         ColorModeDataSection = new()
             {
-            [nameof(ColorModeData)] = new ColorModeDataSectionReader(BinaryReader).Value
+            [nameof(ColorModeData)] = new ColorModeDataSectionReader(BinaryReader).Value,
             };
         ImageResourcesSection = new ImageResourcesSectionReader(BinaryReader).Value;
 
         LayerAndMaskSection = new LayerAndMaskInformationSectionReader(BinaryReader, this).Value;
 
-        ImageDataSection = new ImageDataSectionReader(BinaryReader, FileHeaderSection);
-
+        ImageDataSection = new ImageDataSectionReader(BinaryReader, this).Value;
         }
     }

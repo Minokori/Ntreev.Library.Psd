@@ -44,10 +44,12 @@ internal partial class Channel
                     for (var j = 0; j < rowLength; j++)
                         {
                         Data[(rowIndex * rowLength) + j] = (byte)(rowData[j] * Opacity);
+
                         }
 
 
                     }
+
 
                 break;
             }

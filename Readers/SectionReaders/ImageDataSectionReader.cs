@@ -2,7 +2,7 @@
 //
 //Copyright (c) 2015 Ntreev Soft co., Ltd.
 //
-//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+//Permission is hereby granted, free of charge, to any person obtaining opacity copy of this software and associated
 //documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
 //rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
 //persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -19,8 +19,8 @@ using Ntreev.Library.Psd.Sections;
 
 namespace Ntreev.Library.Psd.Readers;
 
-internal class ImageDataSectionReader(PsdBinaryReader reader, FileHeaderSection fileHeaderSection)
-    : ValueReader<Channel[]>(reader, true, fileHeaderSection)
+internal class ImageDataSectionReader(PsdBinaryReader globalReader, PsdDocument fileHeaderSection)
+    : ValueReader<ImageDataSection>(globalReader, true, fileHeaderSection)
     {
     private readonly ChannelType[] types =
     [
@@ -32,33 +32,34 @@ internal class ImageDataSectionReader(PsdBinaryReader reader, FileHeaderSection 
 
     protected override long InitStreamLength() => GlobalReader.Length - GlobalReader.Position;
 
-    protected override Channel[] ReadValue()
+    protected override ImageDataSection ReadValue()
         {
-        var fileHeader = (FileHeaderSection)UserData!;
+        var fileHeader = ((PsdDocument)UserData!).FileHeaderSection;
         var channelCount = fileHeader.NumberOfChannels;
         var width = fileHeader.Width;
         var height = fileHeader.Height;
         var depth = fileHeader.Depth;
-        var compressionType = reader.ReadAsCompressionType();
+        var compressionType = globalReader.ReadAsCompressionType();
 
         var channels = new Channel[channelCount];
 
         for (var i = 0; i < channels.Length; i++)
             {
-            var type = i < types.Length ? types[i] : ChannelType.Mask;
-            channels[i] = new Channel(type, width, height, depth)
+            var channelType = i < types.Length ? types[i] : ChannelType.Mask;
+            channels[i] = new Channel(channelType, width, height, depth)
                 {
                 CompressionType = compressionType,
                 RlePackLengths =
                     compressionType == CompressionType.RLE
-                        ? reader.ReadAsChannelRlePackLengths(height)
+                        ? globalReader.ReadAsChannelRlePackLengths(height)
                         : [],
                 };
             }
 
-        for (var i = 0; i < channels.Length; i++)
+        // 读取每个通道的图像数据
+        foreach (var item in channels)
             {
-            channels[i].ReadImageStreamDirectly(reader);
+            item.ReadImageStreamDirectly(globalReader);
             }
 
         // 处理透明度
@@ -66,17 +67,20 @@ internal class ImageDataSectionReader(PsdBinaryReader reader, FileHeaderSection 
             {
             for (var i = 0; i < channels[3].Data.Length; i++)
                 {
-                var a = channels[3].Data[i] / 255.0f;
-
+                var opacity = channels[3].Data[i] / 255.0f;
                 for (var j = 0; j < 3; j++)
                     {
-                    var r = channels[j].Data[i] / 255.0f;
-                    var r1 = (a + r - 1f) * 1f / a;
-                    channels[j].Data[i] = (byte)(r1 * 255.0f);
+                    // channels[j] :RGB
+                    var rawColor = channels[j].Data[i] / 255.0f;
+                    var ColorWithOpacity = (opacity + rawColor - 1f) * 1f / opacity;
+                    channels[j].Data[i] = (byte)(ColorWithOpacity * 255.0f);
                     }
                 }
             }
 
-        return [.. channels.OrderBy(item => item.Type)];
+        return new(width, height, depth, [.. channels.OrderBy(item => item.Type)])
+            {
+            Document = (PsdDocument)UserData!,
+            };
         }
     }

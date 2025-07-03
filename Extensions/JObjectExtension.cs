@@ -2,13 +2,11 @@ using Newtonsoft.Json.Linq;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
 namespace Ntreev.Library.Psd;
-#pragma warning restore IDE0130 // 命名空间与文件夹结构不匹配
-
 
 /// <summary>
 /// backup for some time use
 /// </summary>
-public static class JObjectExtensions
+internal static class JObjectExtensions
     {
     extension(JObject jObject)
         {

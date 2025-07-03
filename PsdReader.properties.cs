@@ -55,8 +55,7 @@ internal partial class PsdBinaryReader
     public Uri? Uri
         {
         get;
-        init => field = uri ?? new Uri(Directory.GetCurrentDirectory());
-        }
+        } = uri ?? new Uri(Directory.GetCurrentDirectory());
     }
 
 

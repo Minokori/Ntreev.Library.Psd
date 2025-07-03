@@ -31,10 +31,7 @@ public class FileHeaderSection : JObject
     public static FileHeaderSection FromFile(string filename)
         {
         using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using var reader = new PsdBinaryReader(stream)
-            {
-            Uri = new(System.IO.Path.GetFullPath(filename)),
-            };
+        using var reader = new PsdBinaryReader(stream, new(System.IO.Path.GetFullPath(filename)));
         return new FileHeaderSectionReader(reader).Value;
         }
     }

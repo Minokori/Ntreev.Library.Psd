@@ -1,13 +1,13 @@
-﻿namespace Ntreev.Library.Psd;
+namespace Ntreev.Library.Psd;
 
 /// <summary>
 /// 图层组状态
 /// </summary>
 internal enum SectionType
     {
-    Normal,
+    Normal = 0,
 
-    Opend = 1,
+    Open = 1,
 
     Closed = 2,
 

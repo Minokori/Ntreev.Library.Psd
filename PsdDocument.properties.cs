@@ -1,6 +1,5 @@
 using Newtonsoft.Json.Linq;
 using Ntreev.Library.Psd.Interfaces;
-using Ntreev.Library.Psd.Readers;
 using Ntreev.Library.Psd.Sections;
 
 namespace Ntreev.Library.Psd;
@@ -9,16 +8,14 @@ public partial class PsdDocument
     {
     // Stream Reader
     internal PsdBinaryReader BinaryReader { get; init; }
+
     // sections
     public FileHeaderSection FileHeaderSection { get; private set; }
 
     public JObject ColorModeDataSection { get; private set; }
 
     internal LayerAndMaskInformationSection LayerAndMaskSection { get; private set; }
-    internal ImageDataSectionReader ImageDataSection { get; private set; }
-
-
-
+    internal ImageDataSection ImageDataSection { get; private set; }
 
     public byte[] ColorModeData => ColorModeDataSection["ColorMode"]!.ToObject<byte[]>()!;
 
@@ -28,11 +25,11 @@ public partial class PsdDocument
 
     public int Depth => FileHeaderSection.Depth;
 
-    public IPsdLayer[] Childs => LayerAndMaskSection.Layers;//LayerAndMaskSection.Value.Layers;
+    public IPsdLayer[] Childs => LayerAndMaskSection.Layers; //LayerAndMaskSection.Value.Layers;
 
-    public IEnumerable<ILinkedLayer> LinkedLayers => LayerAndMaskSection.LinkedLayers;//LayerAndMaskSection.Value.LinkedLayers;
+    public IEnumerable<ILinkedLayer> LinkedLayers => LayerAndMaskSection.LinkedLayers; //LayerAndMaskSection.Value.LinkedLayers;
 
-    public JObject Resources => LayerAndMaskSection.AdditionalLayerInformation;//LayerAndMaskSection.Value.AdditionalLayerInfomation;
+    public JObject Resources => LayerAndMaskSection.AdditionalLayerInformation; //LayerAndMaskSection.Value.AdditionalLayerInfomation;
 
     // TODO
     public JObject ImageResourcesSection { get; private set; }
@@ -64,11 +61,13 @@ public partial class PsdDocument
 
     BlendMode IPsdLayer.BlendMode => BlendMode.Normal;
 
-    IChannel[] IImageSource.Channels => ImageDataSection.Value;
+    IChannel[] IPsdLayer.Channels => ImageDataSection.Channels;
 
     // TODO This makes MergeChannels on PsdDocument class no opacity
-    float IImageSource.Opacity => 1.0f;
+    float IPsdLayer.Opacity => 1.0f;
 
-    bool IImageSource.HasMask => this.FileHeaderSection.NumberOfChannels > 4;
+    bool IPsdLayer.HasMask => FileHeaderSection.NumberOfChannels > 4;
+
+    public Uri Uri => BinaryReader.Uri;
     #endregion
     }

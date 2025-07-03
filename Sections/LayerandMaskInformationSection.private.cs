@@ -60,7 +60,7 @@ internal partial class LayerAndMaskInformationSection
                 rootLayers.Insert(0, layer);
                 }
 
-            if (layer.SectionType is SectionType.Opend or SectionType.Closed)
+            if (layer.SectionType is SectionType.Open or SectionType.Closed)
                 {
                 stack.Push(parent);
                 parent = layer;

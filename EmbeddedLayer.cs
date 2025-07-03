@@ -20,8 +20,6 @@ internal class EmbeddedLayer(JObject info) : ILinkedLayer
             }
         }
     public JObject Properties { get; } = info;
-
-
     public PsdDocument Document => resolver.GetDocument(AbsoluteUri);
 
     //from Properties

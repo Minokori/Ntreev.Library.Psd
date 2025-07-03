@@ -5,8 +5,6 @@ namespace Ntreev.Library.Psd;
 
 internal partial class PsdLayer
     {
-    // TODO 把 PSDLayer 变成组合, 让属性从组合中获取
-
     #region 来自record的属性
     public SectionType SectionType
         {
@@ -19,7 +17,7 @@ internal partial class PsdLayer
             return string.IsNullOrEmpty(type) ? SectionType.Normal : Enum.Parse<SectionType>(type);
             }
         }
-    public string Name => Records.ToValue<string>("Resources.UnicodeLayerName.Name");
+    public string Name => Records.ToValue<string>("Resources.UnicodeLayerName.Name") ?? "";
 
     public bool IsVisible =>
         (Enum.Parse<LayerFlags>(Records.ToValue<string>("Flags")) & LayerFlags.Visible)
@@ -103,18 +101,17 @@ internal partial class PsdLayer
 
     public PsdLayer[] Childs { get; set; } = [];
 
-    public JObject Resources => Records.ToValue<JObject>("Resources"); //TODO UnalbleTOCast
+    public JObject Resources => Records.ToValue<JObject>("Resources");
 
     public PsdDocument Document { get; init; }
 
     public JObject Records { get; set; }
     public JArray ChannelImageData { get; private set; }
 
-    public ILinkedLayer LinkedLayer
+    public ILinkedLayer? LinkedLayer
         {
         get
             {
-            //Resources.SmartObjectLayerData.Idnt
             var guidString = Records.ToValue<string>("Resources.PlacedLayer.UniqueId");
 
             if (guidString is null)
@@ -128,6 +125,10 @@ internal partial class PsdLayer
             }
         }
 
+
+    /// <summary>
+    /// 是否有图像数据, 一般情况下为 <see cref="true"/>, 但 特殊的图层类型如 <see cref="SectionType.Divider"/> 可能没有图像数据
+    /// </summary>
     public bool HasImage => SectionType == SectionType.Normal && Width != 0 && Height != 0;
 
     public bool HasMask => Records.Contains("Mask");
@@ -136,7 +137,7 @@ internal partial class PsdLayer
 
     IPsdLayer IPsdLayer.Parent => Parent == null ? Document : Parent;
 
-    IChannel[] IImageSource.Channels => Channels;
+    IChannel[] IPsdLayer.Channels => Channels;
 
     IPsdLayer[] IPsdLayer.Childs => Childs;
 
