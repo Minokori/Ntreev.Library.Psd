@@ -26,7 +26,7 @@ internal class GlobalLayerMaskInfoReader(PsdBinaryReader reader) : ValueReader<J
     protected override JObject ReadValue()
         {
         if (StreamLength == 0) return [];
-        var filler_length = StreamLength - (4 + 2 + 8 + 2 + 1);
+        var filler_length = StreamLength - (2 + 8 + 2 + 1);
         var globalLayerMaskInfo = new JObject()
             {
             ["OverlayColorSpace"] = GlobalReader.ReadInt16(),

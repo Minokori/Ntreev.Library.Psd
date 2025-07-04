@@ -28,14 +28,21 @@ internal class EmbeddedLayer(JObject info) : ILinkedLayer
         get
             {
                 {
-                var paths = Properties
-                    .SelectTokens("$..TEXT")
-                    .OfType<JValue>()
-                    .Select(x => x.Value<string>())
-                    .Where(x => !string.IsNullOrEmpty(x))
-                    .Select(x => Path.GetFullPath(x!))
-                    .Where(File.Exists);
-                return new(paths.First());
+                //查找所有带PAth的属性
+                //DescriptorOfLinkedFile
+                //BUG
+                //var paths = Properties
+                //    .SelectTokens("DescriptorOfLinkedFile['Nm','fullPath','relPath']")
+                //    .Select(x => x.Value<string>())
+                //    .Where(x => !string.IsNullOrEmpty(x));
+
+                //paths = paths
+                //    .Select(x => Path.GetFullPath(x!))
+                //    .Where(File.Exists);
+
+                //return new(paths.First());
+
+                return Properties.ToValue<Uri>("DescriptorOfLinkedFile.fullPath");
                 }
             }
         }

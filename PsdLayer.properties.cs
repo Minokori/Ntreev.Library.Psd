@@ -112,8 +112,8 @@ internal partial class PsdLayer
         {
         get
             {
-            var guidString = Records.ToValue<string>("Resources.PlacedLayer.UniqueId");
-
+            //var guidString = Records.ToValue<string>("Resources.PlacedLayer.UniqueId");
+            var guidString = Records.ToValue<string>("Resources.SmartObjectLayerData.Idnt");
             if (guidString is null)
                 return null;
             var placeID = new Guid(guidString);
